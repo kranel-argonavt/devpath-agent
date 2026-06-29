@@ -1,0 +1,25 @@
+{
+  "target_roles": [
+    "Junior .NET Developer",
+    "Junior Unity Developer",
+    "Junior C# Developer"
+  ],
+  "experience_level": "Junior",
+  "skills": [
+    "C#",
+    ".NET",
+    "WPF",
+    "Unity",
+    "SQLite",
+    "EF Core",
+    "Git",
+    "MVVM"
+  ],
+  "languages": [
+    "English B1-B2",
+    "German A1",
+    "Ukrainian Native"
+  ],
+  "education": "Software Engineering",
+  "location_preference": "Germany / Remote EU"
+}

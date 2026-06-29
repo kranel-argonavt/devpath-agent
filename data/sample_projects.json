@@ -1,0 +1,35 @@
+[
+  {
+    "name": "TaskFlow Desktop",
+    "summary": "A desktop task manager for personal productivity built with C#, WPF, and MVVM.",
+    "technologies": ["C#", ".NET", "WPF", "MVVM", "SQLite"],
+    "highlights": [
+      "Implemented task creation, filtering, and due-date reminders",
+      "Persisted user data locally with SQLite",
+      "Structured the UI around the MVVM pattern"
+    ],
+    "repository_url": "https://github.com/example/taskflow-desktop"
+  },
+  {
+    "name": "Galaxy Courier",
+    "summary": "A 2D Unity prototype game focused on movement, UI feedback, and save state handling.",
+    "technologies": ["C#", "Unity", "Git"],
+    "highlights": [
+      "Built player movement and level progression systems",
+      "Added a lightweight settings and progress save feature",
+      "Used Git for version control across project milestones"
+    ],
+    "repository_url": "https://github.com/example/galaxy-courier"
+  },
+  {
+    "name": "Student API Demo",
+    "summary": "A beginner-friendly backend demo showing CRUD operations with ASP.NET Core and EF Core.",
+    "technologies": ["C#", ".NET", "ASP.NET Core", "EF Core", "REST API", "SQL", "Git"],
+    "highlights": [
+      "Created CRUD endpoints for student records",
+      "Connected application data to a relational database",
+      "Tested endpoints locally with HTTP client tools"
+    ],
+    "repository_url": "https://github.com/example/student-api-demo"
+  }
+]
