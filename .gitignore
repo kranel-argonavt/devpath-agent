@@ -3,6 +3,6 @@
 __pycache__/
 *.pyc
 .pytest_cache/
-.pytest_tmp/
+.pytest_tmp*/
 outputs/*.md
 .DS_Store
