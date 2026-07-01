@@ -1,4 +1,4 @@
-"""Streamlit mock workflow for DevPath Agent Step 1C."""
+"""Streamlit mock workflow for DevPath Agent Step 1D."""
 
 from pathlib import Path
 from typing import Any
@@ -25,7 +25,7 @@ TARGET_ROLES = [
 
 
 def main() -> None:
-    """Render the DevPath Agent mock workflow."""
+    """Render the DevPath Agent polished mock workflow."""
 
     st.set_page_config(page_title="DevPath Agent", page_icon="🧭", layout="wide")
     initialize_session_state()
@@ -33,12 +33,24 @@ def main() -> None:
     render_header()
     render_sidebar()
 
-    job_text, job_source_url = render_job_posting_section()
-    target_role = render_target_role_section()
-    profile = render_candidate_profile_section(target_role)
-    projects = render_portfolio_section()
-    cv_text = render_cv_section()
-    settings = render_analysis_settings_section()
+    with st.container(border=True):
+        job_text, job_source_url = render_job_posting_section()
+
+    with st.container(border=True):
+        profile = render_candidate_profile_section()
+
+    with st.container(border=True):
+        projects = render_portfolio_section()
+
+    with st.container(border=True):
+        target_role = render_target_role_section()
+        profile["target_roles"] = [target_role]
+
+    with st.container(border=True):
+        cv_text = render_cv_section()
+
+    with st.container(border=True):
+        settings = render_analysis_settings_section()
 
     st.divider()
     if st.button("Generate Career Strategy", type="primary", use_container_width=True):
@@ -73,45 +85,61 @@ def initialize_session_state() -> None:
 def render_header() -> None:
     st.title("DevPath Agent")
     st.subheader("AI Career Copilot for Junior Software Developers")
-    st.caption(
-        "Mock mode: this version uses deterministic local logic. Gemini, ADK, MCP, "
-        "and GitHub API integration will be added later."
+    st.markdown(
+        "Analyze a job posting, compare it with your profile and portfolio, "
+        "and generate a focused career preparation plan."
+    )
+    st.info(
+        "Mock MVP: deterministic local logic only. Gemini, ADK, MCP, and GitHub API "
+        "integration are planned for later steps.",
+        icon="🧭",
     )
 
 
 def render_sidebar() -> None:
     with st.sidebar:
-        st.header("Project Status")
-        st.write("Status: Step 1C - Streamlit mock workflow")
-        st.write("Data source: local sample files")
-        st.write("AI mode: mock / deterministic")
-        st.write("External API calls: disabled")
-
-        st.header("Workflow Steps")
+        st.header("DevPath MVP")
         st.markdown(
-            "- Add job posting\n"
-            "- Review candidate profile\n"
-            "- Select portfolio source\n"
-            "- Generate mock career strategy\n"
-            "- Export Markdown report"
+            "**Project status:** Step 1D - polished mock MVP  \n"
+            "**Mode:** local deterministic mock  \n"
+            "**External API calls:** disabled  \n"
+            "**Data source:** sample JSON/TXT files"
         )
 
-        st.header("Security Note")
-        st.info("Use sample data for demos. Do not paste secrets, passwords, API keys, or private personal data.")
-
-        st.header("Planned Features")
+        st.divider()
+        st.subheader("Workflow")
         st.markdown(
-            "- Gemini-assisted analysis\n"
-            "- Google ADK root agent\n"
-            "- MCP server tools\n"
-            "- GitHub repository evidence\n"
-            "- Rich Streamlit workflow"
+            "1. Load or paste a job posting\n"
+            "2. Review candidate profile\n"
+            "3. Review portfolio projects\n"
+            "4. Choose target role\n"
+            "5. Add optional CV context\n"
+            "6. Adjust analysis settings\n"
+            "7. Generate and export report"
         )
+
+        st.divider()
+        st.subheader("Security")
+        st.warning("Do not paste secrets, passwords, private tokens, or sensitive personal data.")
+
+        with st.expander("Planned later"):
+            st.markdown(
+                "- Gemini API integration\n"
+                "- Google ADK root agent\n"
+                "- MCP server tools\n"
+                "- GitHub public repository import"
+            )
 
 
 def render_job_posting_section() -> tuple[str, str]:
     st.header("1. Job Posting")
-    load_sample = st.checkbox("Load sample job posting", value=False)
+    st.caption("Load the sample posting or paste a junior developer role you want to analyze.")
+
+    load_sample = st.checkbox(
+        "Load sample job posting",
+        value=False,
+        help="Loads data/sample_job_posting.txt once, then leaves the text editable.",
+    )
     if load_sample and not st.session_state.sample_job_loaded:
         try:
             st.session_state.job_text = load_text_file(SAMPLE_JOB_PATH)
@@ -124,7 +152,7 @@ def render_job_posting_section() -> tuple[str, str]:
     job_text = st.text_area(
         "Job posting text",
         key="job_text",
-        height=260,
+        height=240,
         placeholder="Paste a job posting or load the sample posting.",
     )
     job_source_url = st.text_input(
@@ -135,14 +163,15 @@ def render_job_posting_section() -> tuple[str, str]:
     return job_text, job_source_url
 
 
-def render_target_role_section() -> str:
-    st.header("2. Target Role")
-    return st.selectbox("Target role", TARGET_ROLES)
+def render_candidate_profile_section() -> dict[str, Any]:
+    st.header("2. Candidate Profile")
+    st.caption("Keep this lightweight for the MVP: simple editable text fields are enough.")
 
-
-def render_candidate_profile_section(target_role: str) -> dict[str, Any]:
-    st.header("3. Candidate Profile")
-    load_sample = st.checkbox("Load sample profile", value=False)
+    load_sample = st.checkbox(
+        "Load sample profile",
+        value=False,
+        help="Loads data/sample_profile.json once, then leaves the fields editable.",
+    )
     if load_sample and not st.session_state.sample_profile_loaded:
         try:
             sample_profile = load_json_file(SAMPLE_PROFILE_PATH)
@@ -165,18 +194,20 @@ def render_candidate_profile_section(target_role: str) -> dict[str, Any]:
         skills_text = st.text_area(
             "Skills",
             key="skills_text",
-            height=130,
+            height=120,
             placeholder="C#, .NET, WPF, Unity, SQLite, EF Core, Git, MVVM",
+            help="Separate skills with commas or new lines.",
         )
         languages_text = st.text_area(
             "Languages",
             key="languages_text",
-            height=130,
+            height=120,
             placeholder="English B1-B2, German A1, Ukrainian Native",
+            help="Separate languages with commas or new lines.",
         )
 
     return {
-        "target_roles": [target_role],
+        "target_roles": [],
         "experience_level": experience_level.strip(),
         "skills": split_editable_list(skills_text),
         "languages": split_editable_list(languages_text),
@@ -186,13 +217,14 @@ def render_candidate_profile_section(target_role: str) -> dict[str, Any]:
 
 
 def render_portfolio_section() -> list[dict[str, Any]]:
-    st.header("4. Portfolio Source")
+    st.header("3. Portfolio Source")
+    st.caption("The current MVP always analyzes local sample projects. GitHub import is a planned future step.")
     source = st.radio("Portfolio source", ["Local sample projects", "GitHub public repositories"], horizontal=True)
 
     if source == "GitHub public repositories":
         username = st.text_input("GitHub username", placeholder="octocat")
         if is_github_username_provided(username):
-            st.success(f"GitHub username provided: {username.strip()}")
+            st.success(f"GitHub username accepted for the placeholder flow: {username.strip()}")
         else:
             st.warning("Enter a GitHub username to validate the placeholder input.")
         st.info(
@@ -206,21 +238,31 @@ def render_portfolio_section() -> list[dict[str, Any]]:
     return projects
 
 
+def render_target_role_section() -> str:
+    st.header("4. Target Role")
+    return st.selectbox(
+        "Target role",
+        TARGET_ROLES,
+        help="Used as the profile target role when the mock report is generated.",
+    )
+
+
 def render_cv_section() -> str:
-    st.header("5. Optional CV Text")
+    st.header("5. Optional CV Context")
     st.warning("Do not paste sensitive personal data, API keys, passwords, or private information.")
-    return st.text_area("Paste optional CV text", height=180, placeholder="Optional CV text for mock context.")
+    return st.text_area(
+        "Paste optional CV text",
+        height=150,
+        placeholder="Optional CV text for mock context.",
+        help="This text stays local in the mock MVP and is only passed to the deterministic report builder.",
+    )
 
 
 def render_analysis_settings_section() -> dict[str, Any]:
     st.header("6. Analysis Settings")
-    col_a, col_b, col_c = st.columns(3)
-    with col_a:
-        output_style = st.selectbox("Output style", ["Concise", "Detailed"])
-    with col_b:
-        include_cover_letter = st.checkbox("Include cover letter draft", value=True)
-    with col_c:
-        include_interview_prep = st.checkbox("Include interview prep", value=True)
+    output_style = st.selectbox("Output style", ["Concise", "Detailed"])
+    include_cover_letter = st.checkbox("Include cover letter draft", value=True)
+    include_interview_prep = st.checkbox("Include interview prep", value=True)
     return {
         "output_style": output_style,
         "include_cover_letter": include_cover_letter,
@@ -264,7 +306,9 @@ def handle_generate_report(
 
 def render_results_tabs(report: dict[str, Any], projects: list[dict[str, Any]], settings: dict[str, Any]) -> None:
     st.divider()
-    st.header("Career Strategy Results")
+    st.header("7. Results")
+    st.caption("Review the mock analysis, then export a Markdown report when the result looks useful.")
+
     tabs = st.tabs(
         [
             "Job Analysis",
@@ -298,12 +342,15 @@ def render_results_tabs(report: dict[str, Any], projects: list[dict[str, Any]], 
 
 def render_job_analysis_tab(job_analysis: dict[str, Any]) -> None:
     st.subheader("Job Analysis")
-    st.write(job_analysis.get("detected_focus", "No job analysis available."))
-    st.write(f"Target role: {job_analysis.get('target_role', 'Unknown')}")
-    st.write(f"Output style: {job_analysis.get('output_style', 'Concise')}")
+    st.markdown(job_analysis.get("detected_focus", "No job analysis available."))
+
+    col_a, col_b, col_c = st.columns(3)
+    col_a.metric("Detected role", job_analysis.get("target_role", "Unknown"))
+    col_b.metric("Output style", job_analysis.get("output_style", "Concise"))
+    col_c.metric("CV context", "Yes" if job_analysis.get("cv_context_provided") else "No")
+
     if job_analysis.get("job_source_url"):
-        st.markdown(f"Source URL: {job_analysis['job_source_url']}")
-    st.write(f"CV context provided: {'Yes' if job_analysis.get('cv_context_provided') else 'No'}")
+        st.markdown(f"**Source URL:** {job_analysis['job_source_url']}")
 
 
 def render_profile_match_tab(profile_match: dict[str, Any], skill_gaps: dict[str, Any]) -> None:
@@ -317,43 +364,53 @@ def render_profile_match_tab(profile_match: dict[str, Any], skill_gaps: dict[str
     columns = st.columns(3)
     for index, (name, value) in enumerate(category_scores.items()):
         with columns[index % 3]:
-            st.metric(name.replace("_", " ").title(), value)
+            st.metric(name.replace("_", " ").title(), f"{value}")
 
-    st.markdown("### Strong Matches")
-    st.write(profile_match.get("strong_matches", []) or "No strong matches detected yet.")
+    match_col, partial_col, gap_col = st.columns(3)
+    with match_col:
+        st.markdown("### Strong Matches")
+        render_bullets(profile_match.get("strong_matches", []), "No strong matches detected yet.")
+    with partial_col:
+        st.markdown("### Partial Matches")
+        render_bullets(profile_match.get("partial_matches", []), "No partial matches detected yet.")
+    with gap_col:
+        st.markdown("### Missing Skills")
+        render_bullets(skill_gaps.get("missing_skills", []), "No major required skill gaps detected.")
 
-    st.markdown("### Partial Matches")
-    st.write(profile_match.get("partial_matches", []) or "No partial matches detected yet.")
-
-    st.markdown("### Missing Skills")
-    st.write(skill_gaps.get("missing_skills", []) or "No major required skill gaps detected.")
-
-    st.markdown("### Explanation")
-    st.write(profile_match.get("explanation", "No explanation available."))
+    with st.expander("Why this score?"):
+        st.write(profile_match.get("explanation", "No explanation available."))
 
 
 def render_portfolio_evidence_tab(portfolio_evidence: dict[str, Any], projects: list[dict[str, Any]]) -> None:
     st.subheader("Portfolio Evidence")
     st.write(portfolio_evidence.get("summary", "No portfolio summary available."))
-    st.markdown("### Suggested Evidence Points")
-    st.write(portfolio_evidence.get("suggested_evidence_points", []))
+    with st.expander("Suggested evidence points", expanded=True):
+        render_bullets(portfolio_evidence.get("suggested_evidence_points", []), "No evidence points available.")
     render_project_cards(projects)
 
 
 def render_skill_gaps_tab(skill_gaps: dict[str, Any]) -> None:
     st.subheader("Skill Gaps")
     st.write(skill_gaps.get("message", "No skill gap analysis available."))
-    st.markdown("### Missing Skills")
-    st.write(skill_gaps.get("missing_skills", []) or "No required missing skills detected.")
-    st.markdown("### Priority")
-    st.write(skill_gaps.get("priority", []) or "Keep strengthening portfolio evidence.")
+
+    gap_col, priority_col = st.columns(2)
+    with gap_col:
+        st.markdown("### Missing Skills")
+        render_bullets(skill_gaps.get("missing_skills", []), "No required missing skills detected.")
+    with priority_col:
+        st.markdown("### Priority")
+        render_bullets(skill_gaps.get("priority", []), "Keep strengthening portfolio evidence.")
 
 
 def render_preparation_plan_tab(preparation_plan: dict[str, Any]) -> None:
     st.subheader("Preparation Plan")
-    render_plan_block("7-Day Plan", preparation_plan.get("7_day_plan", []))
-    render_plan_block("14-Day Plan", preparation_plan.get("14_day_plan", []))
-    render_plan_block("30-Day Roadmap", preparation_plan.get("30_day_roadmap", []))
+    col_a, col_b, col_c = st.columns(3)
+    with col_a:
+        render_plan_block("7-Day Plan", preparation_plan.get("7_day_plan", []))
+    with col_b:
+        render_plan_block("14-Day Plan", preparation_plan.get("14_day_plan", []))
+    with col_c:
+        render_plan_block("30-Day Roadmap", preparation_plan.get("30_day_roadmap", []))
 
 
 def render_application_drafts_tab(application_drafts: dict[str, Any], include_cover_letter: bool) -> None:
@@ -385,16 +442,18 @@ def render_interview_prep_tab(interview_prep: dict[str, Any], include_interview_
         return
 
     st.markdown("### Interview Questions")
-    for question in interview_prep.get("questions", []):
-        st.markdown(f"- {question}")
+    for index, question in enumerate(interview_prep.get("questions", []), start=1):
+        st.markdown(f"{index}. {question}")
 
     st.markdown("### Practice Focus")
-    st.write(interview_prep.get("practice_focus", []))
+    render_bullets(interview_prep.get("practice_focus", []), "No practice focus available.")
 
 
 def render_export_tab(report: dict[str, Any]) -> None:
     st.subheader("Export")
     st.info(report.get("privacy_notice", "Review personal details before exporting."))
+    st.caption("Generated Markdown files in outputs/*.md are ignored by Git.")
+
     if st.button("Export Markdown Report"):
         try:
             exported_path = export_markdown_report(report)
@@ -410,25 +469,41 @@ def render_project_cards(projects: list[dict[str, Any]]) -> None:
     st.markdown("### Projects")
     for project in projects:
         name = project.get("name", "Portfolio project")
-        technologies = ", ".join(project.get("technologies", [])) or "No stack listed"
+        technologies = project.get("technologies", [])
+        stack = ", ".join(technologies) or "No stack listed"
         summary = project.get("summary", "No description available.")
+        evidence_line = build_project_evidence_line(technologies, summary)
+
         with st.expander(name, expanded=False):
-            st.markdown(f"**Stack:** {technologies}")
+            st.markdown(f"**Stack:** {stack}")
             st.write(summary)
+            st.caption(evidence_line)
             highlights = project.get("highlights", [])
             if highlights:
                 st.markdown("**Highlights:**")
-                for highlight in highlights:
-                    st.markdown(f"- {highlight}")
+                render_bullets(highlights, "No highlights listed.")
 
 
 def render_plan_block(title: str, items: list[str]) -> None:
     st.markdown(f"### {title}")
+    render_bullets(items, "No plan items available.")
+
+
+def render_bullets(items: list[str], empty_message: str) -> None:
     if not items:
-        st.write("No plan items available.")
+        st.write(empty_message)
         return
     for item in items:
         st.markdown(f"- {item}")
+
+
+def build_project_evidence_line(technologies: list[str], summary: str) -> str:
+    evidence_keywords = ["C#", ".NET", "WPF", "SQLite", "Unity", "Git", "ASP.NET Core", "REST API"]
+    combined = " ".join([*technologies, summary]).lower()
+    matches = [keyword for keyword in evidence_keywords if keyword.lower() in combined]
+    if not matches:
+        return "Portfolio evidence: add clearer technology, outcome, and role evidence."
+    return f"Portfolio evidence: demonstrates {', '.join(matches)} experience."
 
 
 def load_sample_projects() -> list[dict[str, Any]]:

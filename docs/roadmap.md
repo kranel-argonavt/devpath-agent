@@ -1,13 +1,23 @@
 # Roadmap
 
-## Step 1
+- [x] Step 1A - Project skeleton
+- [x] Step 1B - Core helper functions and tests
+- [x] Step 1C - Streamlit mock workflow
+- [x] Step 1D - UI polish and README update
+- [ ] Step 2 - Improve scoring logic
+- [ ] Step 3 - Gemini integration
+- [ ] Step 4 - ADK root agent and sub-agents
+- [ ] Step 5 - MCP tools
+- [ ] Step 6 - GitHub public repo import
+- [ ] Step 7 - Demo video and Kaggle writeup
 
-Create the repository skeleton, placeholder modules, sample data, documentation, and minimal Streamlit app.
+## Current Focus
 
-## Next Planned Steps
+The project is still in mock MVP mode. The priority is a clear demo flow, explainable local behavior, reliable tests, and documentation that sets correct expectations.
 
-1. Add the first interactive Streamlit workflow.
-2. Load and display sample profile, project, and job posting data.
-3. Implement deterministic analysis and scoring helpers.
-4. Add draft report generation.
-5. Introduce controlled integrations for Gemini, ADK, MCP, and GitHub in later phases.
+## Later Quality Improvements
+
+- Improve requirement extraction from job postings.
+- Add richer portfolio evidence mapping.
+- Expand report exports and demo assets.
+- Add agent and API integrations only after the local workflow is stable.
