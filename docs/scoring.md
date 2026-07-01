@@ -1,21 +1,53 @@
 # Scoring
 
-The current Step 1B/1C/1D scoring system is deterministic and keyword-based. It is useful for demos and early workflow validation, but it is not the final career-matching model.
+Step 2A improves DevPath Agent scoring while keeping it fully deterministic. The current scorer does not use Gemini, Google ADK, MCP tools, GitHub APIs, or any real LLM calls.
 
-## Current Mock Scoring
+## Current Deterministic Approach
 
-`devpath/core/scoring.py` looks for important keywords in the job posting, candidate profile, and portfolio projects. It returns:
+The scoring flow is:
 
-- overall score;
-- category scores;
-- strong matches;
-- partial matches;
-- missing skills;
-- short explanation.
+```text
+job posting requirements
+-> normalized skills
+-> profile evidence
+-> portfolio evidence
+-> match categories
+-> score breakdown
+-> prioritized gaps
+-> explanation
+```
 
-The logic is intentionally simple and explainable. It should be improved later with better evidence extraction, structured requirement parsing, and agent-assisted reasoning.
+`devpath/core/scoring.py` extracts heuristic requirements from the job text, normalizes skills through aliases, collects evidence from the candidate profile and portfolio projects, and returns an explainable score object.
 
-## Planned Weighted Matrix
+## Skill Normalization
+
+The scorer maps common aliases to canonical skill names. Examples:
+
+- `c#`, `c sharp`, and `csharp` map to `C#`.
+- `.net`, `dotnet`, `.net 8`, and `.net core` map to `.NET`.
+- `asp.net core`, `asp net core`, and `aspnetcore` map to `ASP.NET Core`.
+- `sqlite`, `mysql`, and `postgresql` are treated as SQL-related evidence.
+- `ef core` maps to `Entity Framework`.
+
+Important boundary: general `.NET` or `Entity Framework` evidence does not count as `ASP.NET Core` evidence. If a job requires ASP.NET Core, the scorer expects ASP.NET Core-specific evidence.
+
+## Evidence-Based Scoring
+
+The result includes:
+
+- `overall_score`;
+- `category_scores`;
+- `category_details`;
+- `strong_matches`;
+- `partial_matches`;
+- `missing_skills`;
+- `evidence_by_skill`;
+- `prioritized_gaps`;
+- `explanation`.
+
+Profile evidence comes from candidate fields such as skills, languages, education, and location preference. Portfolio evidence comes from flexible project fields such as name, technologies, summary, description, stack, features, and highlights.
+
+## Weighted Matrix
 
 - Required technical skills: 35%
 - Portfolio evidence: 25%
@@ -24,9 +56,23 @@ The logic is intentionally simple and explainable. It should be improved later w
 - Language/location fit: 10%
 - Education/domain relevance: 5%
 
-## Known Limitations
+Category scores are deterministic and sum to the overall score, capped between 0 and 100.
 
-- Keyword matching can miss synonyms and context.
-- Project evidence is approximate.
-- The current scoring does not judge code quality.
-- The score should not be treated as hiring advice.
+## Partial Matches
+
+Partial matches are called out separately so related evidence is visible without overstating readiness. Examples:
+
+- SQLite can support SQL-related evidence.
+- Generic API work can partially support REST API evidence when REST-specific wording is missing.
+- General or desktop `.NET` evidence helps for .NET readiness but does not satisfy ASP.NET Core.
+
+## Limitations
+
+- The scorer is still heuristic and keyword-based.
+- It can miss synonyms, context, seniority nuance, and quality of implementation.
+- It does not inspect source code or repository history.
+- It should not be treated as hiring advice.
+
+## Future Gemini And ADK Role
+
+Future steps can use Gemini and Google ADK agents to improve requirement extraction, evidence reasoning, recommendations, and natural-language explanations. The deterministic scorer should remain useful as a transparent baseline and fallback.

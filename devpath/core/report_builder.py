@@ -19,11 +19,18 @@ def create_mock_report(
     primary_role = target_roles[0] if target_roles else "Junior Developer"
     project_names = [project.get("name", "Portfolio project") for project in projects]
     missing_skills = score["missing_skills"]
+    prioritized_gaps = score.get("prioritized_gaps", [])
+    gap_recommendations = [gap["recommendation"] for gap in prioritized_gaps[:3]]
+    job_requirements = score.get("job_requirements", {})
 
     return {
         "job_analysis": {
             "target_role": _first_line(job_text),
-            "detected_focus": "Junior .NET backend role with C#, SQL, Git, REST API, and English requirements.",
+            "detected_focus": _detected_focus(job_requirements),
+            "required_skills": job_requirements.get("required_skills", []),
+            "nice_to_have_skills": job_requirements.get("nice_to_have_skills", []),
+            "detected_seniority": job_requirements.get("detected_seniority", "Unknown"),
+            "detected_languages": job_requirements.get("detected_languages", []),
             "output_style": output_style,
             "cv_context_provided": bool(cv_text.strip()),
         },
@@ -31,18 +38,25 @@ def create_mock_report(
             "target_candidate_role": primary_role,
             "overall_score": score["overall_score"],
             "category_scores": score["category_scores"],
+            "category_details": score.get("category_details", {}),
             "strong_matches": score["strong_matches"],
             "partial_matches": score["partial_matches"],
+            "missing_skills": missing_skills,
+            "evidence_by_skill": score.get("evidence_by_skill", {}),
+            "prioritized_gaps": prioritized_gaps,
             "explanation": score["explanation"],
         },
         "portfolio_evidence": {
             "summary": "Portfolio evidence is strongest where projects show C#, .NET, database work, version control, or API concepts.",
             "projects_to_highlight": project_names[:3],
             "suggested_evidence_points": _portfolio_points(projects),
+            "evidence_by_skill": score.get("evidence_by_skill", {}),
         },
         "skill_gaps": {
             "missing_skills": missing_skills,
             "priority": missing_skills[:3],
+            "prioritized_gaps": prioritized_gaps,
+            "recommendations": gap_recommendations,
             "message": _gap_message(missing_skills),
         },
         "preparation_plan": {
@@ -61,6 +75,7 @@ def create_mock_report(
                 "Add tests or validation logic to one existing project.",
                 "Prepare a reusable interview answer bank for junior .NET roles.",
             ],
+            "gap_recommendations": gap_recommendations,
         },
         "application_drafts": {
             "cover_letter_draft": (
@@ -84,6 +99,7 @@ def create_mock_report(
                 "Which portfolio project best proves you are ready for this role?",
             ],
             "practice_focus": missing_skills[:3] or ["C# fundamentals", ".NET project explanation", "Git workflow"],
+            "prioritized_gaps": prioritized_gaps,
         },
         "privacy_notice": (
             "This mock report is generated locally from provided sample data. Review personal details before exporting "
@@ -112,3 +128,11 @@ def _gap_message(missing_skills: list[str]) -> str:
     if not missing_skills:
         return "No major required keyword gaps were detected in the mock analysis."
     return "Focus first on the missing required keywords that appear in the job posting."
+
+
+def _detected_focus(job_requirements: dict[str, Any]) -> str:
+    required = job_requirements.get("required_skills", [])
+    seniority = job_requirements.get("detected_seniority", "Unknown")
+    if required:
+        return f"{seniority} role with detected requirements: {', '.join(required)}."
+    return f"{seniority} role with no structured required skills detected by the mock scorer."
