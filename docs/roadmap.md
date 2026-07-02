@@ -8,7 +8,8 @@
 - [x] Step 2B - Richer scoring displayed in Streamlit
 - [x] Step 2C - Rich Markdown export
 - [x] Step 3A - Gemini integration foundation
-- [ ] Step 3B - Gemini-assisted narrative refinement
+- [x] Step 3B - Local Gemini smoke test
+- [ ] Step 3C - Gemini-assisted narrative refinement
 - [ ] Step 4 - ADK root agent and sub-agents
 - [ ] Step 5 - MCP tools
 - [ ] Step 6 - GitHub public repo import

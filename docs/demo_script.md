@@ -12,14 +12,16 @@ This is the current mock MVP demo script. It is not the final Kaggle video scrip
 8. Leave CV context empty or paste short non-sensitive sample text.
 9. Review the analysis settings and click `Generate Career Strategy`.
 10. Show that mock deterministic mode is the default.
-11. Optionally switch to `Gemini-assisted summary` and show the warning if no API key is configured.
-12. Later, when an API key is configured locally, show that Gemini adds a narrative summary without changing the deterministic score.
-13. Open the `Profile Match` tab and show the overall score, progress bar, category score breakdown, and category reasons.
-14. In `Profile Match`, show strong matches, partial matches, missing skills, and evidence by skill.
-15. Open the `Skill Gaps` tab and show prioritized recommendations.
-16. Open `Portfolio Evidence` and show the project cards plus portfolio evidence map.
-17. Open `Preparation Plan`, `Application Drafts`, and `Interview Prep` to show the mock guidance.
-18. Open `Export`, click `Export Markdown Report`, and show the generated file path.
-19. Open the exported Markdown report briefly.
-20. Point out the score breakdown, evidence by skill, prioritized recommendations, and privacy notice.
-21. Remind viewers that generated reports in `outputs/*.md` are ignored by Git.
+11. Optionally run `python scripts/check_gemini_connection.py` to show the local Gemini smoke-test workflow.
+12. If no key is configured, show the clear no-key message and explain that mock deterministic mode still works.
+13. Optionally switch to `Gemini-assisted summary` in Streamlit and show the warning if no API key is configured.
+14. Later, when an API key is configured locally, show that Gemini adds a narrative summary without changing the deterministic score.
+15. Open the `Profile Match` tab and show the overall score, progress bar, category score breakdown, and category reasons.
+16. In `Profile Match`, show strong matches, partial matches, missing skills, and evidence by skill.
+17. Open the `Skill Gaps` tab and show prioritized recommendations.
+18. Open `Portfolio Evidence` and show the project cards plus portfolio evidence map.
+19. Open `Preparation Plan`, `Application Drafts`, and `Interview Prep` to show the mock guidance.
+20. Open `Export`, click `Export Markdown Report`, and show the generated file path.
+21. Open the exported Markdown report briefly.
+22. Point out the score breakdown, evidence by skill, prioritized recommendations, and privacy notice.
+23. Remind viewers that generated reports in `outputs/*.md` are ignored by Git.

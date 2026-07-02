@@ -14,7 +14,7 @@ The final planned system will add Gemini-powered reasoning, a Google ADK root ag
 
 ## Current Status
 
-Current status: **Step 3A - optional Gemini integration foundation with deterministic mock mode as default.**
+Current status: **Step 3B - local Gemini smoke test with deterministic mock mode as default.**
 
 Gemini calls only happen if the user explicitly selects Gemini-assisted summary mode and configures an API key. Google ADK runtime logic, MCP server logic, and real GitHub API calls are not implemented yet.
 
@@ -38,6 +38,7 @@ Gemini calls only happen if the user explicitly selects Gemini-assisted summary 
 - Exported evidence-based score breakdown
 - Exported prioritized skill gaps and recommendations
 - Optional Gemini-assisted career summary
+- Local Gemini connection smoke-test script
 - Privacy masking utilities
 - Pytest test suite
 
@@ -66,6 +67,29 @@ streamlit run app.py
 python -m pytest --basetemp .pytest_tmp
 ```
 
+## Optional Gemini Local Test
+
+Mock deterministic mode works without a Gemini API key. To test the optional Gemini-assisted summary locally:
+
+```powershell
+Copy-Item .env.example .env
+```
+
+Manually edit `.env` and add your local key:
+
+```text
+GOOGLE_API_KEY=your_key_here
+GEMINI_MODEL=gemini-3.5-flash
+```
+
+Then run:
+
+```powershell
+python scripts/check_gemini_connection.py
+```
+
+`.env` is ignored by Git. Do not commit API keys. Gemini is used only for narrative summary generation; deterministic scoring remains the source of truth.
+
 ## Environment Variables
 
 The project reserves these variables for future integration work:
@@ -79,7 +103,7 @@ Use `.env.example` as the safe template. For optional Gemini-assisted summaries,
 
 ```text
 GOOGLE_API_KEY=your_key_here
-GEMINI_MODEL=gemini-2.5-flash
+GEMINI_MODEL=gemini-3.5-flash
 ```
 
 `GEMINI_API_KEY` is also supported as a fallback. Do not commit real keys. The deterministic score remains the source of truth even when Gemini-assisted summary mode is enabled.
@@ -88,6 +112,7 @@ GEMINI_MODEL=gemini-2.5-flash
 
 - `.env` is ignored and should contain local secrets only.
 - `.env.example` is safe to commit because it contains empty placeholders.
+- Gemini API keys must never be committed, pasted into prompts, shared in screenshots, or included in exported reports.
 - Generated reports in `outputs/*.md` are ignored by Git.
 - The current MVP makes no real external API calls unless Gemini-assisted summary mode is explicitly selected with an API key configured.
 - Do not paste secrets, passwords, private tokens, or sensitive personal data into the app.
