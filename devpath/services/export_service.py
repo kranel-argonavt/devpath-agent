@@ -38,6 +38,7 @@ def _report_to_markdown(report: dict[str, Any]) -> str:
         "",
         "## 1. Job Analysis",
         *_render_job_analysis(report.get("job_analysis", {})),
+        *_render_optional_ai_summary(report),
         "",
         "## 2. Profile Match",
         *_render_profile_match(profile_match, skill_gaps),
@@ -89,6 +90,13 @@ def _render_job_analysis(job_analysis: dict[str, Any]) -> list[str]:
     if job_analysis.get("job_source_url"):
         lines.insert(2, f"**Source URL:** {job_analysis['job_source_url']}")
     return lines
+
+
+def _render_optional_ai_summary(report: dict[str, Any]) -> list[str]:
+    summary = report.get("gemini_summary") or report.get("ai_summary")
+    if not summary:
+        return []
+    return ["", "### Gemini-Assisted Career Summary", str(summary)]
 
 
 def _render_profile_match(profile_match: dict[str, Any], skill_gaps: dict[str, Any]) -> list[str]:

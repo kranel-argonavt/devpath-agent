@@ -5,9 +5,11 @@ from typing import Any
 
 import streamlit as st
 
+from devpath.core.config import get_app_config
 from devpath.core.report_builder import create_mock_report
 from devpath.services.export_service import export_markdown_report
 from devpath.services.file_service import load_json_file, load_text_file
+from devpath.services.gemini_service import generate_gemini_career_summary
 from devpath.services.github_service import is_github_username_provided
 
 
@@ -90,8 +92,8 @@ def render_header() -> None:
         "and generate a focused career preparation plan."
     )
     st.info(
-        "Mock MVP: deterministic local logic only. Gemini, ADK, MCP, and GitHub API "
-        "integration are planned for later steps.",
+        "Mock deterministic mode remains the default. Gemini-assisted summaries are optional "
+        "and only run when selected with an API key configured.",
         icon="🧭",
     )
 
@@ -100,9 +102,9 @@ def render_sidebar() -> None:
     with st.sidebar:
         st.header("DevPath MVP")
         st.markdown(
-            "**Project status:** Step 1D - polished mock MVP  \n"
+            "**Project status:** Step 3A - optional Gemini foundation  \n"
             "**Mode:** local deterministic mock  \n"
-            "**External API calls:** disabled  \n"
+            "**External API calls:** disabled by default  \n"
             "**Data source:** sample JSON/TXT files"
         )
 
@@ -124,7 +126,6 @@ def render_sidebar() -> None:
 
         with st.expander("Planned later"):
             st.markdown(
-                "- Gemini API integration\n"
                 "- Google ADK root agent\n"
                 "- MCP server tools\n"
                 "- GitHub public repository import"
@@ -260,10 +261,12 @@ def render_cv_section() -> str:
 
 def render_analysis_settings_section() -> dict[str, Any]:
     st.header("6. Analysis Settings")
+    analysis_mode = st.selectbox("Analysis mode", ["Mock deterministic mode", "Gemini-assisted summary"])
     output_style = st.selectbox("Output style", ["Concise", "Detailed"])
     include_cover_letter = st.checkbox("Include cover letter draft", value=True)
     include_interview_prep = st.checkbox("Include interview prep", value=True)
     return {
+        "analysis_mode": analysis_mode,
         "output_style": output_style,
         "include_cover_letter": include_cover_letter,
         "include_interview_prep": include_interview_prep,
@@ -298,10 +301,25 @@ def handle_generate_report(
     if job_source_url.strip():
         report["job_analysis"]["job_source_url"] = job_source_url.strip()
 
+    if settings.get("analysis_mode") == "Gemini-assisted summary":
+        config = get_app_config()
+        if not config.gemini_enabled or not config.google_api_key:
+            st.warning("Gemini API key is not configured. The app will continue in mock deterministic mode.")
+        else:
+            try:
+                report["gemini_summary"] = generate_gemini_career_summary(
+                    report=report,
+                    api_key=config.google_api_key,
+                    model=config.gemini_model,
+                )
+                st.success("Gemini-assisted career summary generated. Deterministic score fields were unchanged.")
+            except RuntimeError as exc:
+                st.warning(f"Gemini-assisted summary could not be generated. Continuing with deterministic report. {exc}")
+
     st.session_state.report = report
     st.session_state.projects = projects
     st.session_state.analysis_settings = settings
-    st.success("Career strategy generated in mock mode.")
+    st.success("Career strategy generated.")
 
 
 def render_results_tabs(report: dict[str, Any], projects: list[dict[str, Any]], settings: dict[str, Any]) -> None:
@@ -323,7 +341,7 @@ def render_results_tabs(report: dict[str, Any], projects: list[dict[str, Any]], 
     )
 
     with tabs[0]:
-        render_job_analysis_tab(report["job_analysis"])
+        render_job_analysis_tab(report["job_analysis"], report.get("gemini_summary") or report.get("ai_summary", ""))
     with tabs[1]:
         render_profile_match_tab(report["profile_match"], report["skill_gaps"])
     with tabs[2]:
@@ -340,9 +358,13 @@ def render_results_tabs(report: dict[str, Any], projects: list[dict[str, Any]], 
         render_export_tab(report)
 
 
-def render_job_analysis_tab(job_analysis: dict[str, Any]) -> None:
+def render_job_analysis_tab(job_analysis: dict[str, Any], gemini_summary: str = "") -> None:
     st.subheader("Job Analysis")
     st.markdown(job_analysis.get("detected_focus", "No job analysis available."))
+
+    if gemini_summary:
+        st.markdown("### Gemini-assisted Career Summary")
+        st.info(gemini_summary)
 
     col_a, col_b, col_c = st.columns(3)
     col_a.metric("Detected role", job_analysis.get("target_role", "Unknown"))

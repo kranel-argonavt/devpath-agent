@@ -4,8 +4,11 @@
 - [x] Step 1B - Core helper functions and tests
 - [x] Step 1C - Streamlit mock workflow
 - [x] Step 1D - UI polish and README update
-- [ ] Step 2 - Improve scoring logic
-- [ ] Step 3 - Gemini integration
+- [x] Step 2A - Evidence-based deterministic scoring
+- [x] Step 2B - Richer scoring displayed in Streamlit
+- [x] Step 2C - Rich Markdown export
+- [x] Step 3A - Gemini integration foundation
+- [ ] Step 3B - Gemini-assisted narrative refinement
 - [ ] Step 4 - ADK root agent and sub-agents
 - [ ] Step 5 - MCP tools
 - [ ] Step 6 - GitHub public repo import
@@ -13,7 +16,7 @@
 
 ## Current Focus
 
-The project is still in mock MVP mode. The priority is a clear demo flow, explainable local behavior, reliable tests, and documentation that sets correct expectations.
+The project is still deterministic-first. The priority is a clear demo flow, explainable local behavior, optional Gemini narrative assistance, reliable tests, and documentation that sets correct expectations.
 
 ## Later Quality Improvements
 

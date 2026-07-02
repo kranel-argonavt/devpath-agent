@@ -68,6 +68,7 @@ def test_export_markdown_report_writes_rich_markdown_file(tmp_path: Path) -> Non
             "recruiter_message_draft": "GOOGLE_API_KEY=abc123",
         },
         "interview_prep": {"questions": ["What is .NET?"], "practice_focus": ["ASP.NET Core"]},
+        "gemini_summary": "Optional Gemini-assisted narrative summary.",
         "privacy_notice": "Review personal details before sharing.",
     }
 
@@ -83,6 +84,8 @@ def test_export_markdown_report_writes_rich_markdown_file(tmp_path: Path) -> Non
     assert "## 3. Evidence by Skill" in content
     assert "## 4. Prioritized Skill Gaps" in content
     assert "## 9. Privacy Notice" in content
+    assert "### Gemini-Assisted Career Summary" in content
+    assert "Optional Gemini-assisted narrative summary." in content
     assert "| Required Technical Skills | 28 | 35 |" in content
     assert "Project: TaskFlow Desktop" in content
     assert "High Priority: ASP.NET Core" in content

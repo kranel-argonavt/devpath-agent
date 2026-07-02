@@ -34,6 +34,7 @@ def create_mock_report(
             "output_style": output_style,
             "cv_context_provided": bool(cv_text.strip()),
         },
+        "gemini_summary": "",
         "profile_match": {
             "target_candidate_role": primary_role,
             "overall_score": score["overall_score"],
