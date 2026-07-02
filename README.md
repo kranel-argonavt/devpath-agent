@@ -8,13 +8,13 @@ Junior developers often struggle to understand whether they are truly ready for 
 
 ## Solution Overview
 
-The current MVP runs fully locally in Streamlit. It loads sample job, profile, and project data, applies deterministic keyword-based scoring, builds a mock career strategy report, and exports the result as Markdown.
+The current MVP runs fully locally in Streamlit. It loads sample job, profile, and project data, applies deterministic evidence-based scoring, builds a mock career strategy report, and exports the result as structured Markdown.
 
 The final planned system will add Gemini-powered reasoning, a Google ADK root agent with specialized sub-agents, MCP tools, and public GitHub repository import.
 
 ## Current Status
 
-Current status: **Step 2B - polished mock MVP with visible evidence-based scoring details.**
+Current status: **Step 2C - polished mock MVP with rich Markdown report export.**
 
 No Gemini API calls, Google ADK runtime logic, MCP server logic, real GitHub API calls, or real LLM calls are implemented yet.
 
@@ -34,6 +34,9 @@ No Gemini API calls, Google ADK runtime logic, MCP server logic, real GitHub API
 - Application draft mock output
 - Interview prep mock output
 - Markdown report export
+- Rich Markdown report export
+- Exported evidence-based score breakdown
+- Exported prioritized skill gaps and recommendations
 - Privacy masking utilities
 - Pytest test suite
 

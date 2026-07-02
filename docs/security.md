@@ -7,6 +7,7 @@ DevPath Agent is designed around cautious handling of candidate data. The curren
 - `.env` is ignored by Git.
 - `.env.example` is committed with empty placeholder values only.
 - Generated Markdown reports in `outputs/*.md` are ignored by Git.
+- Exported Markdown reports are passed through deterministic privacy masking before they are written.
 - The Streamlit app warns users not to paste secrets or sensitive personal data.
 - `devpath/core/privacy.py` provides deterministic masking utilities for emails, phone-like strings, and API-key-like values.
 

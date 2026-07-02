@@ -460,7 +460,7 @@ def render_interview_prep_tab(interview_prep: dict[str, Any], include_interview_
 def render_export_tab(report: dict[str, Any]) -> None:
     st.subheader("Export")
     st.info(report.get("privacy_notice", "Review personal details before exporting."))
-    st.caption("Generated Markdown files in outputs/*.md are ignored by Git.")
+    st.caption("The exported Markdown report is saved locally in outputs/. Generated reports are ignored by Git.")
 
     if st.button("Export Markdown Report"):
         try:

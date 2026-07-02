@@ -17,4 +17,6 @@ This is the current mock MVP demo script. It is not the final Kaggle video scrip
 13. Open `Portfolio Evidence` and show the project cards plus portfolio evidence map.
 14. Open `Preparation Plan`, `Application Drafts`, and `Interview Prep` to show the mock guidance.
 15. Open `Export`, click `Export Markdown Report`, and show the generated file path.
-16. Remind viewers that generated reports in `outputs/*.md` are ignored by Git.
+16. Open the exported Markdown report briefly.
+17. Point out the score breakdown, evidence by skill, prioritized recommendations, and privacy notice.
+18. Remind viewers that generated reports in `outputs/*.md` are ignored by Git.
