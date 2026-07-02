@@ -14,7 +14,7 @@ The final planned system will add Gemini-powered reasoning, a Google ADK root ag
 
 ## Current Status
 
-Current status: **Step 1D - polished mock MVP with deterministic local logic.**
+Current status: **Step 2B - polished mock MVP with visible evidence-based scoring details.**
 
 No Gemini API calls, Google ADK runtime logic, MCP server logic, real GitHub API calls, or real LLM calls are implemented yet.
 
@@ -23,7 +23,11 @@ No Gemini API calls, Google ADK runtime logic, MCP server logic, real GitHub API
 - Streamlit mock workflow UI
 - Sample job posting/profile/projects
 - Editable candidate profile
-- Deterministic keyword-based match scoring
+- Deterministic evidence-based match scoring
+- Evidence-based score breakdown
+- Category-level scoring details
+- Evidence by skill
+- Prioritized skill gaps with recommendations
 - Skill gap summary
 - Portfolio evidence display
 - Preparation plan

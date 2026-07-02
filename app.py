@@ -358,13 +358,15 @@ def render_profile_match_tab(profile_match: dict[str, Any], skill_gaps: dict[str
     score = int(profile_match.get("overall_score", 0))
     st.metric("Overall match score", f"{score}/100")
     st.progress(score / 100)
+    st.write(profile_match.get("explanation", "No explanation available."))
 
-    st.markdown("### Category Scores")
+    st.markdown("### Category Score Breakdown")
     category_scores = profile_match.get("category_scores", {})
     columns = st.columns(3)
     for index, (name, value) in enumerate(category_scores.items()):
         with columns[index % 3]:
             st.metric(name.replace("_", " ").title(), f"{value}")
+    render_category_details(profile_match.get("category_details", {}), category_scores)
 
     match_col, partial_col, gap_col = st.columns(3)
     with match_col:
@@ -375,10 +377,11 @@ def render_profile_match_tab(profile_match: dict[str, Any], skill_gaps: dict[str
         render_bullets(profile_match.get("partial_matches", []), "No partial matches detected yet.")
     with gap_col:
         st.markdown("### Missing Skills")
-        render_bullets(skill_gaps.get("missing_skills", []), "No major required skill gaps detected.")
+        missing_skills = skill_gaps.get("missing_skills") or profile_match.get("missing_skills", [])
+        render_bullets(missing_skills, "No major required skill gaps detected.")
 
-    with st.expander("Why this score?"):
-        st.write(profile_match.get("explanation", "No explanation available."))
+    st.markdown("### Evidence by Skill")
+    render_evidence_by_skill(profile_match.get("evidence_by_skill", {}))
 
 
 def render_portfolio_evidence_tab(portfolio_evidence: dict[str, Any], projects: list[dict[str, Any]]) -> None:
@@ -386,6 +389,8 @@ def render_portfolio_evidence_tab(portfolio_evidence: dict[str, Any], projects: 
     st.write(portfolio_evidence.get("summary", "No portfolio summary available."))
     with st.expander("Suggested evidence points", expanded=True):
         render_bullets(portfolio_evidence.get("suggested_evidence_points", []), "No evidence points available.")
+    st.markdown("### Portfolio Evidence Map")
+    render_evidence_by_skill(portfolio_evidence.get("evidence_by_skill", {}), project_only=True)
     render_project_cards(projects)
 
 
@@ -400,6 +405,9 @@ def render_skill_gaps_tab(skill_gaps: dict[str, Any]) -> None:
     with priority_col:
         st.markdown("### Priority")
         render_bullets(skill_gaps.get("priority", []), "Keep strengthening portfolio evidence.")
+
+    st.markdown("### Prioritized Gaps And Recommendations")
+    render_prioritized_gaps(skill_gaps.get("prioritized_gaps", []))
 
 
 def render_preparation_plan_tab(preparation_plan: dict[str, Any]) -> None:
@@ -463,6 +471,61 @@ def render_export_tab(report: dict[str, Any]) -> None:
                 st.code(preview, language="markdown")
         except OSError as exc:
             st.error(f"Could not export Markdown report: {exc}")
+
+
+def render_category_details(category_details: dict[str, Any], category_scores: dict[str, Any]) -> None:
+    if not category_details:
+        if not category_scores:
+            st.info("No category score details available yet.")
+        return
+
+    for key, detail in category_details.items():
+        label = key.replace("_", " ").title()
+        earned = detail.get("earned", category_scores.get(key, 0))
+        max_score = detail.get("max", "")
+        reason = detail.get("reason", "No reason provided.")
+        score_label = f"{earned} / {max_score}" if max_score != "" else str(earned)
+        with st.expander(f"{label}: {score_label}"):
+            st.write(f"Reason: {reason}")
+
+
+def render_evidence_by_skill(evidence_by_skill: dict[str, list[str]], project_only: bool = False) -> None:
+    if not evidence_by_skill:
+        st.info("No skill evidence available yet.")
+        return
+
+    visible_evidence: dict[str, list[str]] = {}
+    for skill, sources in evidence_by_skill.items():
+        filtered_sources = [source for source in sources if not project_only or source.startswith("Project: ")]
+        if filtered_sources:
+            visible_evidence[skill] = filtered_sources
+
+    if not visible_evidence:
+        st.info("No project-based skill evidence available yet.")
+        return
+
+    for skill, sources in sorted(visible_evidence.items()):
+        with st.expander(skill):
+            render_bullets(sources, "No evidence sources listed.")
+
+
+def render_prioritized_gaps(prioritized_gaps: list[dict[str, Any]]) -> None:
+    if not prioritized_gaps:
+        st.info("No prioritized gaps detected. Keep strengthening the evidence already present.")
+        return
+
+    for gap in prioritized_gaps:
+        priority = gap.get("priority", "Priority")
+        skill = gap.get("skill", "Unknown skill")
+        reason = gap.get("reason", "No reason provided.")
+        recommendation = gap.get("recommendation", "No recommendation provided.")
+        title = f"{priority} Priority: {skill}"
+        with st.expander(title, expanded=priority.lower() == "high"):
+            if priority.lower() == "high":
+                st.warning(reason)
+            else:
+                st.info(reason)
+            st.markdown(f"**Recommendation:** {recommendation}")
 
 
 def render_project_cards(projects: list[dict[str, Any]]) -> None:

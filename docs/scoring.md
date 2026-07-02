@@ -1,6 +1,6 @@
 # Scoring
 
-Step 2A improves DevPath Agent scoring while keeping it fully deterministic. The current scorer does not use Gemini, Google ADK, MCP tools, GitHub APIs, or any real LLM calls.
+Step 2A improved DevPath Agent scoring while keeping it fully deterministic. Step 2B exposes that richer scoring output in the Streamlit UI. The current scorer does not use Gemini, Google ADK, MCP tools, GitHub APIs, or any real LLM calls.
 
 ## Current Deterministic Approach
 
@@ -46,6 +46,19 @@ The result includes:
 - `explanation`.
 
 Profile evidence comes from candidate fields such as skills, languages, education, and location preference. Portfolio evidence comes from flexible project fields such as name, technologies, summary, description, stack, features, and highlights.
+
+## Streamlit Display In Step 2B
+
+The Streamlit mock workflow now displays:
+
+- overall score and progress;
+- category scores with earned/max values and reasons;
+- strong matches, partial matches, and missing skills in separate columns;
+- evidence by skill;
+- portfolio evidence mapped to projects;
+- prioritized gaps with recommendations.
+
+These UI sections consume the deterministic report data and remain safe if optional keys are missing.
 
 ## Weighted Matrix
 
