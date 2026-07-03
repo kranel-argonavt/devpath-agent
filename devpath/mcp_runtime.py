@@ -9,6 +9,9 @@ import sys
 from typing import Any
 
 
+DEFAULT_MCP_SERVER_ARGS = ("-m", "mcp_server.server")
+
+
 @dataclass(frozen=True)
 class MCPRuntimeCallResult:
     """Result returned after calling a tool through MCP runtime."""
@@ -28,7 +31,7 @@ async def call_mcp_tool_stdio_async(
     """Call a local MCP tool through a stdio server process."""
 
     command = server_command or sys.executable
-    args = server_args or ["-m", "mcp_server.server"]
+    args = server_args or list(DEFAULT_MCP_SERVER_ARGS)
 
     try:
         from mcp import ClientSession, StdioServerParameters
@@ -77,8 +80,16 @@ def call_mcp_tool_stdio(
 def extract_mcp_result_data(raw_result: Any) -> Any:
     """Extract Python/JSON data from common MCP result shapes."""
 
-    if raw_result is None or isinstance(raw_result, str | int | float | bool | list | dict):
+    if raw_result is None or isinstance(raw_result, int | float | bool | dict):
         return raw_result
+
+    if isinstance(raw_result, str):
+        return _parse_json_if_possible(raw_result)
+
+    if isinstance(raw_result, list):
+        if all(_is_plain_value(item) for item in raw_result):
+            return raw_result
+        return [_extract_content_item(item) for item in raw_result]
 
     for attr in ("structured_content", "structuredContent"):
         value = getattr(raw_result, attr, None)
@@ -109,8 +120,16 @@ def extract_mcp_result_data(raw_result: Any) -> Any:
 
 
 def _extract_content_item(item: Any) -> Any:
-    if item is None or isinstance(item, str | int | float | bool | list | dict):
+    if item is None or isinstance(item, int | float | bool | dict):
         return item
+
+    if isinstance(item, str):
+        return _parse_json_if_possible(item)
+
+    if isinstance(item, list):
+        if all(_is_plain_value(value) for value in item):
+            return item
+        return [_extract_content_item(value) for value in item]
 
     text = getattr(item, "text", None)
     if text is not None:
@@ -128,6 +147,10 @@ def _extract_content_item(item: Any) -> Any:
             pass
 
     return repr(item)
+
+
+def _is_plain_value(value: Any) -> bool:
+    return value is None or isinstance(value, str | int | float | bool | list | dict)
 
 
 def _parse_json_if_possible(value: str) -> Any:

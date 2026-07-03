@@ -88,10 +88,10 @@ Summarize:
 - Streamlit calls a workflow facade.
 - The workflow uses a tool router.
 - The tool router can use direct Python services or local MCP-style tools.
-- ADK and MCP runtime routing are planned next.
+- ADK runtime routing through MCP is planned next.
 - Deterministic scoring remains the source of truth.
 
-## Optional Step 6A Runtime Proof
+## Optional Step 6A.1 Runtime Proof
 
 Run:
 
@@ -99,4 +99,4 @@ Run:
 python scripts/check_mcp_runtime.py
 ```
 
-Explain that selected tools are called through a local MCP stdio runtime while deterministic scoring remains the source of truth. If the local SDK/runtime is unavailable, show the clean diagnostic message and explain that the default Streamlit workflow is unaffected.
+Explain that selected tools are called through a local MCP stdio runtime using the installed MCP SDK while deterministic scoring remains the source of truth. If the local SDK/runtime is unavailable, show the clean diagnostic message and explain that the default Streamlit workflow is unaffected.

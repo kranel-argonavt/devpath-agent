@@ -19,10 +19,12 @@
 - Step 5B - MCP local smoke test workflow
 - Step 5C - Local MCP-style tools connected to workflow
 - Step 5D - Polish agent/tool architecture docs and demo evidence
+- Step 6A - MCP runtime adapter and selected tool smoke test
+- Step 6A.1 - MCP runtime smoke test verified with installed SDK
 
 ## Current
 
-- Step 6A - MCP runtime adapter and selected tool smoke test
+- Ready for Step 6B planning
 
 ## Next
 

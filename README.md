@@ -30,7 +30,7 @@ The deterministic report remains the source of truth. Gemini can add concise nar
 
 ## Current Status
 
-Current status: **Step 6A - MCP runtime adapter and selected tool smoke test.**
+Current status: **Step 6A.1 - MCP runtime smoke test verified with the installed SDK.**
 
 Implemented today:
 
@@ -49,6 +49,7 @@ Implemented today:
 - MCP-compatible server skeleton and MCP-style tool registry
 - Tool backend selector: direct Python services or local MCP-style tools
 - Experimental MCP stdio runtime adapter for selected manual tool calls
+- Local MCP runtime smoke test succeeds with selected deterministic tools
 - Local Gemini, ADK, and MCP smoke-test scripts
 - Pytest suite for deterministic helpers, workflow, tools, and smoke scripts
 
@@ -120,7 +121,7 @@ Run the experimental local MCP runtime smoke test:
 python scripts/check_mcp_runtime.py
 ```
 
-This starts a local MCP stdio server process and calls selected deterministic tools through MCP runtime. It is separate from the default Streamlit workflow. If the installed MCP SDK/runtime behaves differently, the script should print a clean diagnostic message instead of exposing secrets.
+This starts a local MCP stdio server process and calls selected deterministic tools through MCP runtime. It is separate from the default Streamlit workflow. Step 6A.1 verifies this path against the installed MCP SDK using `ClientSession`, `StdioServerParameters`, `stdio_client`, and `FastMCP.run(transport="stdio")`.
 
 ## Optional Gemini Setup
 

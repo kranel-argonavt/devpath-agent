@@ -1,6 +1,14 @@
 """Tests for the MCP runtime adapter without starting a real MCP server."""
 
-from devpath.mcp_runtime import MCPRuntimeCallResult, call_mcp_tool_stdio, extract_mcp_result_data
+import importlib
+
+from devpath import mcp_runtime
+from devpath.mcp_runtime import (
+    DEFAULT_MCP_SERVER_ARGS,
+    MCPRuntimeCallResult,
+    call_mcp_tool_stdio,
+    extract_mcp_result_data,
+)
 from scripts.check_mcp_runtime import main as mcp_runtime_smoke_main
 
 
@@ -8,6 +16,7 @@ def test_extract_mcp_result_data_handles_simple_values() -> None:
     assert extract_mcp_result_data({"ok": True}) == {"ok": True}
     assert extract_mcp_result_data(["a", "b"]) == ["a", "b"]
     assert extract_mcp_result_data("plain text") == "plain text"
+    assert extract_mcp_result_data('{"ok": true}') == {"ok": True}
 
 
 def test_extract_mcp_result_data_handles_structured_content() -> None:
@@ -37,6 +46,19 @@ def test_extract_mcp_result_data_handles_text_content_plain_text() -> None:
     assert extract_mcp_result_data(FakeResult()) == "masked text"
 
 
+def test_extract_mcp_result_data_handles_content_object_list() -> None:
+    class FakeJsonContent:
+        text = '{"required_skills": ["C#"]}'
+
+    class FakeTextContent:
+        text = "plain note"
+
+    assert extract_mcp_result_data([FakeJsonContent(), FakeTextContent()]) == [
+        {"required_skills": ["C#"]},
+        "plain note",
+    ]
+
+
 def test_call_mcp_tool_stdio_uses_async_adapter(monkeypatch) -> None:
     async def fake_async(tool_name, arguments, *, server_command=None, server_args=None):
         return MCPRuntimeCallResult(tool_name=tool_name, data={"arguments": arguments}, raw_result=None)
@@ -47,6 +69,18 @@ def test_call_mcp_tool_stdio_uses_async_adapter(monkeypatch) -> None:
 
     assert result.tool_name == "sample_tool"
     assert result.data == {"arguments": {"value": 1}}
+
+
+def test_default_mcp_server_args_launch_local_module() -> None:
+    assert DEFAULT_MCP_SERVER_ARGS == ("-m", "mcp_server.server")
+
+
+def test_importing_runtime_and_server_is_safe() -> None:
+    imported_runtime = importlib.import_module("devpath.mcp_runtime")
+    imported_server = importlib.import_module("mcp_server.server")
+
+    assert imported_runtime is mcp_runtime
+    assert hasattr(imported_server, "server")
 
 
 def test_mcp_runtime_smoke_script_with_fake_runtime_caller(capsys) -> None:

@@ -48,5 +48,5 @@ DevPath Agent is designed around cautious handling of candidate data. The curren
 - No private repository access.
 - No production secret storage.
 - No automatic LLM calls.
-- No MCP runtime transport execution.
+- No MCP runtime transport execution in automated tests or the default Streamlit workflow.
 - No automatic MCP runtime startup.

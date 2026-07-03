@@ -76,7 +76,7 @@ ADK runtime routing is not the default app runtime yet.
 
 No MCP stdio, HTTP, SSE, or Streamable HTTP transport is started automatically or during tests.
 
-## Step 6A MCP Runtime Proof
+## Step 6A.1 MCP Runtime Proof
 
 ```text
 Manual MCP runtime smoke test
@@ -90,7 +90,7 @@ MCP tools
 deterministic services
 ```
 
-`scripts/check_mcp_runtime.py` is a controlled local runtime proof. It starts a local stdio MCP server process only when explicitly run. Streamlit still does not use MCP runtime by default, and ADK tools are not routed through MCP runtime yet.
+`scripts/check_mcp_runtime.py` is a controlled local runtime proof. It starts a local stdio MCP server process only when explicitly run and calls selected deterministic tools through the installed MCP SDK. Streamlit still does not use MCP runtime by default, and ADK tools are not routed through MCP runtime yet.
 
 ## Gemini Layer
 
