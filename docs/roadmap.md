@@ -13,14 +13,15 @@
 - [x] Step 4A - ADK root agent skeleton and deterministic tools
 - [x] Step 4B - Local ADK smoke test and agent validation workflow
 - [x] Step 4C - Agent workflow facade for Streamlit integration
-- [ ] Step 4D - Route selected app workflow through ADK runtime
-- [ ] Step 5 - MCP tools
+- [x] Step 5A - MCP server skeleton and deterministic tool contracts
+- [ ] Step 5B - Local MCP smoke test
+- [ ] Step 5C - Route selected ADK tools through MCP runtime
 - [ ] Step 6 - GitHub public repo import
 - [ ] Step 7 - Demo video and Kaggle writeup
 
 ## Current Focus
 
-The project is still deterministic-first. The current focus is keeping Streamlit on one workflow facade while preserving deterministic scoring and preparing for future ADK runtime routing.
+The project is still deterministic-first. The current focus is stable MCP-style tool contracts, safe imports, and tests that validate the future tool layer without starting external runtimes.
 
 ## Later Quality Improvements
 
@@ -28,4 +29,4 @@ The project is still deterministic-first. The current focus is keeping Streamlit
 - Add richer portfolio evidence mapping.
 - Expand report exports and demo assets.
 - Route selected Streamlit actions through the ADK root agent when the workflow facade is stable.
-- Add MCP and GitHub integrations only after deterministic tools remain reliable.
+- Add MCP runtime routing and GitHub integrations only after deterministic tools remain reliable.

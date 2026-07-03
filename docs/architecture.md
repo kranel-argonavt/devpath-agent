@@ -1,6 +1,6 @@
 # Architecture
 
-The current architecture remains simple and testable. Deterministic scoring is still the source of truth, Gemini is only an optional narrative layer, Step 4A added an ADK-compatible skeleton, Step 4B added local validation, and Step 4C adds a workflow facade for Streamlit integration.
+The current architecture remains simple and testable. Deterministic scoring is still the source of truth, Gemini is only an optional narrative layer, Step 4 added the ADK-compatible workflow foundation, and Step 5A adds an MCP-compatible deterministic tool layer.
 
 ## Current App Runtime
 
@@ -70,6 +70,18 @@ Markdown export
 
 The workflow facade gives the app one stable orchestration entry point. Mock deterministic mode and Gemini-assisted mode both use the same workflow path. Gemini insights are attached as narrative-only output and do not modify deterministic score fields.
 
+## Step 5A Tool Layer
+
+```text
+MCP server skeleton
+   |
+MCP-style deterministic tools
+   |
+core scoring / report / privacy / export services
+```
+
+The MCP server skeleton is importable and testable. It exposes stable tool contracts for scoring, portfolio evidence, report building, privacy masking, and Markdown export. The Streamlit app does not yet route through MCP runtime, and tests do not start stdio, HTTP, SSE, or Streamable HTTP transports.
+
 ## Future Agent Flow
 
 ```text
@@ -79,7 +91,7 @@ Sub-agents
    |
 MCP tools
    |
-Gemini + deterministic tools
+deterministic services + optional Gemini narrative
 ```
 
 ## Current Modules
@@ -97,11 +109,13 @@ Gemini + deterministic tools
 - `devpath/agent_tools.py` wraps deterministic scoring, report, portfolio, and privacy helpers as future ADK tools.
 - `devpath/agent_workflow.py` coordinates deterministic report generation and optional Gemini insights for the Streamlit app.
 - `scripts/check_adk_agent.py` validates the local ADK skeleton without starting an ADK runtime server.
+- `mcp_server/server.py` exposes an import-safe MCP server skeleton or fallback metadata.
+- `mcp_server/tools/` exposes MCP-style deterministic tool contracts and a local registry.
 
 ## Agent Modules
 
 - `devpath/agent.py` is the ADK root agent entry point.
 - `devpath/sub_agents/` contains role-focused sub-agent skeletons.
-- `mcp_server/` will expose selected tools through a future MCP server.
+- `mcp_server/` exposes MCP-style deterministic tool contracts. Runtime transport integration is planned later.
 
 When ready for manual ADK runtime exploration, use ADK CLI commands such as `adk run` or `adk web` according to the official ADK documentation. Those commands are intentionally outside the automated test suite.

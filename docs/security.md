@@ -10,8 +10,12 @@ DevPath Agent is designed around cautious handling of candidate data. The curren
 - Gemini API keys must never be pasted into prompts, commits, README files, screenshots, or exported reports.
 - Generated Markdown reports in `outputs/*.md` are ignored by Git.
 - Exported Markdown reports, including Gemini-assisted sections, are passed through deterministic privacy masking before they are written.
+- MCP export tools use the same privacy-masked Markdown export path.
+- MCP-style tools do not call external APIs in Step 5A.
+- MCP runtime transports are not started in automated tests.
 - The Streamlit app warns users not to paste secrets or sensitive personal data.
 - Do not paste secrets into job posting, CV, profile, or project fields.
+- Do not pass secrets into MCP tool inputs.
 - `devpath/core/privacy.py` provides deterministic masking utilities for emails, phone-like strings, and API-key-like values.
 - Gemini-assisted output must not overwrite deterministic scores, missing skills, prioritized gaps, or evidence mappings.
 
@@ -27,6 +31,7 @@ DevPath Agent is designed around cautious handling of candidate data. The curren
 - No private repository access.
 - No real GitHub API calls.
 - No automatic Gemini or other LLM calls.
+- No MCP runtime transport execution.
 
 ## Future Integration Rules
 

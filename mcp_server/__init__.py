@@ -1,1 +1,1 @@
-"""Placeholder package for a future MCP server and its tool definitions."""
+"""MCP-compatible server skeleton and deterministic tool contracts for DevPath."""
