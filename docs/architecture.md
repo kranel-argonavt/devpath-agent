@@ -1,105 +1,15 @@
 # Architecture
 
-The current architecture remains simple and testable. Deterministic scoring is still the source of truth, Gemini is only an optional narrative layer, Step 4 added the ADK-compatible workflow foundation, and Step 5 connects the workflow to either direct services or local MCP-style tools without starting a runtime transport.
+DevPath Agent is deterministic-first. Scoring, evidence, gaps, and category details are calculated locally and remain the source of truth. Gemini, ADK, and MCP layers are currently used as optional narrative, skeleton, or tool-contract layers around that deterministic core.
 
-## Current App Runtime
-
-```text
-Streamlit UI
-   |
-agent_workflow.run_career_strategy_workflow
-   |
-Deterministic services
-   |
-Scoring/report/privacy
-   |
-Markdown export
-```
-
-## Optional Gemini Layer
+## Runtime Path Today
 
 ```text
 Streamlit UI
    |
-Deterministic scoring/report/export
+WorkflowInput
    |
-Optional Gemini-assisted narrative summary
-```
-
-Gemini-assisted mode can improve the written career summary, but it must not change the numeric match score, category scores, missing skills, or evidence mapping.
-
-## Step 4A Agent Foundation
-
-```text
-ADK root_agent
-   |
-Deterministic tools
-   |
-Scoring/report/privacy
-```
-
-The root agent and sub-agents are importable skeletons. They expose planned responsibilities and deterministic tools, but the Streamlit app does not fully route generation through ADK yet.
-
-## Step 4B Local Validation
-
-```text
-scripts/check_adk_agent.py
-   |
-root_agent import + sub-agent factories
-   |
-deterministic tool smoke checks
-```
-
-The smoke test validates project structure, ADK availability or fallback metadata, deterministic tools, and basic scoring/privacy behavior. It does not start `adk run`, `adk web`, Gemini, MCP, GitHub, or any external API.
-
-## Current Step 4C Runtime
-
-```text
-Streamlit UI
-   |
-devpath.agent_workflow.run_career_strategy_workflow
-   |
-deterministic report builder / agent tools
-   |
-optional Gemini structured insights
-   |
-final report
-   |
-Markdown export
-```
-
-The workflow facade gives the app one stable orchestration entry point. Mock deterministic mode and Gemini-assisted mode both use the same workflow path. Gemini insights are attached as narrative-only output and do not modify deterministic score fields.
-
-## Step 5A Tool Layer
-
-```text
-MCP server skeleton
-   |
-MCP-style deterministic tools
-   |
-core scoring / report / privacy / export services
-```
-
-The MCP server skeleton is importable and testable. It exposes stable tool contracts for scoring, portfolio evidence, report building, privacy masking, and Markdown export. The Streamlit app does not yet route through MCP runtime, and tests do not start stdio, HTTP, SSE, or Streamable HTTP transports.
-
-## Step 5B Local Validation
-
-```text
-scripts/check_mcp_tools.py
-   |
-MCP server metadata + tool registry
-   |
-deterministic scoring / report / privacy / export checks
-```
-
-The MCP smoke test validates the local MCP-compatible tool layer without starting a real MCP transport. Streamlit still uses `agent_workflow.run_career_strategy_workflow` directly.
-
-## Step 5C Workflow Routing
-
-```text
-Streamlit UI
-   |
-agent_workflow
+run_career_strategy_workflow
    |
 tool_router
    |-- Direct Python services
@@ -107,47 +17,93 @@ tool_router
    |
 deterministic report
    |
-optional Gemini structured insights
+optional Gemini insights
+   |
+UI tabs + Markdown export
 ```
 
-The local MCP-style backend calls `MCP_TOOL_REGISTRY` in-process. It does not start stdio, HTTP, SSE, or Streamable HTTP transports. Direct Python services remain the default backend.
+Direct Python services are the default backend. Local MCP-style tools run in-process through `MCP_TOOL_REGISTRY`; no MCP transport is started.
 
-## Future Agent Flow
+## Deterministic Source Of Truth
+
+The following values are deterministic:
+
+- Overall score
+- Category scores
+- Category details
+- Strong matches
+- Partial matches
+- Missing skills
+- Evidence by skill
+- Prioritized gaps
+
+Gemini and future agents can explain, summarize, or orchestrate these values, but they must not overwrite them.
+
+## Workflow Layer
+
+- `devpath/agent_workflow.py` receives `WorkflowInput` from Streamlit.
+- It builds the deterministic report through `devpath/tool_router.py`.
+- It optionally attaches Gemini structured insights.
+- It returns `WorkflowResult` with the final report and user-facing warnings.
+
+If Gemini is selected but no API key is configured, the workflow returns the deterministic report and a warning. If Gemini fails, the workflow also falls back safely.
+
+## Tool Router
+
+`devpath/tool_router.py` supports two local backends:
+
+- `Direct Python services`
+- `Local MCP-style tools`
+
+The direct backend calls deterministic Python helpers. The MCP-style backend calls the local MCP tool registry in-process. Unknown backend names normalize to the direct backend.
+
+## ADK Layer
+
+- `devpath/agent.py` exports `root_agent`.
+- `devpath/sub_agents/` contains planned specialized agents.
+- `devpath/agent_tools.py` exposes deterministic tools for future agent orchestration.
+- `scripts/check_adk_agent.py` validates the local ADK-compatible skeleton.
+
+ADK runtime routing is not the default app runtime yet.
+
+## MCP Layer
+
+- `mcp_server/server.py` exposes the MCP server skeleton.
+- `mcp_server/tools/` contains deterministic MCP-style wrappers.
+- `MCP_TOOL_REGISTRY` exposes stable tool names.
+- `scripts/check_mcp_tools.py` validates the local MCP-style tool layer.
+
+No MCP stdio, HTTP, SSE, or Streamable HTTP transport is started automatically or during tests.
+
+## Gemini Layer
+
+- Gemini is optional.
+- Gemini calls only happen when the user selects Gemini-assisted mode and provides a local API key.
+- Gemini returns structured narrative sections such as summary, top actions, portfolio positioning, gap strategy, and interview focus.
+- Gemini does not calculate or modify deterministic scores.
+
+## Current Smoke Tests
+
+```powershell
+python scripts/check_gemini_connection.py
+python scripts/check_adk_agent.py
+python scripts/check_mcp_tools.py
+```
+
+These scripts validate integration readiness without changing the deterministic source of truth. Automated tests do not require real API keys.
+
+## Future Architecture
 
 ```text
-ADK Root Agent
+Streamlit UI
    |
-Sub-agents
+ADK root_agent
    |
-MCP tools
+sub-agents
+   |
+MCP runtime tools
    |
 deterministic services + optional Gemini narrative
 ```
 
-## Current Modules
-
-- `app.py` renders the Streamlit mock workflow and optional Gemini-assisted summary mode.
-- `devpath/core/config.py` loads optional Gemini configuration from environment variables.
-- `devpath/services/gemini_service.py` isolates Gemini calls behind a small wrapper.
-- `devpath/services/file_service.py` loads local JSON and text files.
-- `devpath/core/scoring.py` calculates deterministic evidence-based scores.
-- `devpath/core/privacy.py` masks emails, phone-like strings, and API-key-like values.
-- `devpath/core/report_builder.py` assembles structured mock reports.
-- `devpath/services/export_service.py` writes privacy-masked Markdown reports.
-- `devpath/services/github_service.py` remains placeholder-only for future GitHub work.
-- `devpath/agent.py` exposes the ADK-compatible root agent skeleton.
-- `devpath/agent_tools.py` wraps deterministic scoring, report, portfolio, and privacy helpers as future ADK tools.
-- `devpath/agent_workflow.py` coordinates deterministic report generation and optional Gemini insights for the Streamlit app.
-- `devpath/tool_router.py` selects direct deterministic services or local MCP-style tools.
-- `scripts/check_adk_agent.py` validates the local ADK skeleton without starting an ADK runtime server.
-- `mcp_server/server.py` exposes an import-safe MCP server skeleton or fallback metadata.
-- `mcp_server/tools/` exposes MCP-style deterministic tool contracts and a local registry.
-- `scripts/check_mcp_tools.py` validates MCP-style tools locally with temporary export output only.
-
-## Agent Modules
-
-- `devpath/agent.py` is the ADK root agent entry point.
-- `devpath/sub_agents/` contains role-focused sub-agent skeletons.
-- `mcp_server/` exposes MCP-style deterministic tool contracts. Runtime transport integration is planned later.
-
-When ready for manual ADK runtime exploration, use ADK CLI commands such as `adk run` or `adk web` according to the official ADK documentation. Those commands are intentionally outside the automated test suite.
+GitHub public repository import is planned later and should remain public-repo-only unless a secure permission model is added.

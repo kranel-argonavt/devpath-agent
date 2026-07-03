@@ -1,47 +1,91 @@
 # Demo Script
 
-This is the current mock MVP demo script. It is not the final Kaggle video script yet.
+This script is designed for a 2-4 minute capstone video.
 
-1. Open the project and run `streamlit run app.py`.
-2. Point out the mock mode notice: deterministic local logic only, with external API calls disabled.
-3. In `1. Job Posting`, select `Load sample job posting`.
-4. In `2. Candidate Profile`, select `Load sample profile` and briefly show the editable fields.
-5. In `3. Portfolio Source`, show the local sample projects and expand one project card.
-6. Optionally open the GitHub source option and explain that it is placeholder-only for now.
-7. In `4. Target Role`, keep or choose the target junior developer role.
-8. Leave CV context empty or paste short non-sensitive sample text.
-9. Review the analysis settings and click `Generate Career Strategy`.
-10. Show that mock deterministic mode is the default.
-11. Optionally run `python scripts/check_gemini_connection.py` to show the local Gemini smoke-test workflow.
-12. If no key is configured, show the clear no-key message and explain that mock deterministic mode still works.
-13. Optionally switch to `Gemini-assisted summary` in Streamlit and show the warning if no API key is configured.
-14. Later, when an API key is configured locally, select `Gemini-assisted summary`, generate the career strategy, and show the structured Gemini sections.
-15. Point out `AI Career Strategy Summary`, `Top 3 Application Actions`, `Best Portfolio Evidence to Mention`, `Skill Gap Strategy`, and `Interview Focus Areas`.
-16. Explain that the score, evidence, matches, and gaps are deterministic; Gemini only improves the narrative explanation.
-17. Open the `Profile Match` tab and show the overall score, progress bar, category score breakdown, and category reasons.
-18. In `Profile Match`, show strong matches, partial matches, missing skills, and evidence by skill.
-19. Open the `Skill Gaps` tab and show prioritized recommendations.
-20. Open `Portfolio Evidence` and show the project cards plus portfolio evidence map.
-21. Open `Preparation Plan`, `Application Drafts`, and `Interview Prep` to show the mock guidance.
-22. Open `Export`, click `Export Markdown Report`, and show the generated file path.
-23. Open the exported Markdown report briefly.
-24. Point out the Gemini-assisted section, score breakdown, evidence by skill, prioritized recommendations, and privacy notice.
-25. Remind viewers that generated reports in `outputs/*.md` are ignored by Git.
-26. Optional Step 4A code walkthrough: open `devpath/agent.py` and show that `root_agent` now exists.
-27. Open `devpath/agent_tools.py` and explain that deterministic scoring, report building, portfolio summaries, and privacy masking are ready for ADK orchestration.
-28. Explain that the Streamlit app still uses deterministic services directly; full ADK runtime routing is planned for a later step.
-29. Optional Step 4B validation: run `python scripts/check_adk_agent.py`.
-30. Show that `root_agent`, sub-agents, deterministic tools, ADK availability, and fallback metadata are reported.
-31. Explain that this smoke test does not start ADK runtime commands and makes no external API calls.
-32. Optional Step 4C architecture note: explain that Streamlit now calls `devpath.agent_workflow.run_career_strategy_workflow`.
-33. Show that mock mode and Gemini-assisted mode both use the same workflow facade.
-34. Explain that deterministic scoring remains the source of truth and Gemini insights are attached as narrative-only output.
-35. Optional Step 5A code walkthrough: open `mcp_server/server.py` and `mcp_server/tools/`.
-36. Explain that MCP-style tools wrap deterministic project logic for scoring, reports, privacy, portfolio evidence, and export.
-37. Point out that the MCP server skeleton is importable/testable, but Streamlit and ADK do not yet route through MCP runtime.
-38. Optional Step 5B validation: run `python scripts/check_mcp_tools.py`.
-39. Show that MCP server metadata, tool registry, scoring, privacy, report, and export tools work locally.
-40. Explain that full MCP runtime integration is planned later and no transport is started in the smoke test.
-41. Step 5C UI note: show the `Tool backend` selector in Analysis Settings.
-42. Run the same job analysis with `Direct Python services` and `Local MCP-style tools`.
-43. Explain that both paths use deterministic scoring and the MCP-style path runs in-process through the registry without starting an MCP transport.
+## 1. Introduce The Problem
+
+Junior developers often see job postings with many requirements and do not know what they match, what they lack, or what to prepare first. DevPath Agent turns a job posting, profile, and portfolio into a focused career preparation plan.
+
+## 2. Open The App
+
+Run:
+
+```powershell
+streamlit run app.py
+```
+
+Show the header and explain that the default mode is deterministic and local.
+
+## 3. Load Sample Inputs
+
+1. In `1. Job Posting`, select `Load sample job posting`.
+2. In `2. Candidate Profile`, select `Load sample profile`.
+3. In `3. Portfolio Source`, keep `Local sample projects`.
+4. Briefly expand one project card.
+5. Keep a junior target role.
+6. Leave CV context empty or use short non-sensitive sample text.
+
+## 4. Generate Deterministic Report
+
+Keep:
+
+- Analysis mode: `Mock deterministic mode`
+- Tool backend: `Direct Python services`
+
+Click `Generate Career Strategy`.
+
+Show:
+
+- `Profile Match` overall score and category breakdown
+- `Evidence by Skill`
+- `Skill Gaps` and prioritized recommendations
+- `Preparation Plan`
+
+Explain that scoring, gaps, and evidence are deterministic.
+
+## 5. Show MCP-Style Backend
+
+Switch `Tool backend` to `Local MCP-style tools` and generate again.
+
+Explain:
+
+- This path uses the local MCP-style registry in-process.
+- No MCP transport is started.
+- The deterministic score remains the source of truth.
+
+## 6. Optional Gemini Demo
+
+If a local API key is configured:
+
+1. Select `Gemini-assisted summary`.
+2. Generate the report.
+3. Show `Gemini-assisted Career Strategy`.
+4. Point out AI career summary, top actions, portfolio positioning, skill gap strategy, and interview focus areas.
+
+If no key is configured, show the warning and explain that the app continues in deterministic mode.
+
+## 7. Export Markdown
+
+Open `Export`, click `Export Markdown Report`, and show the generated path. Mention that exported Markdown is privacy-masked and `outputs/*.md` is ignored by Git.
+
+## 8. Mention Smoke Tests
+
+Run or mention:
+
+```powershell
+python scripts/check_gemini_connection.py
+python scripts/check_adk_agent.py
+python scripts/check_mcp_tools.py
+```
+
+Explain that these validate optional Gemini connectivity, ADK skeleton structure, and MCP-style deterministic tools without requiring production runtime integration.
+
+## 9. Close With Architecture
+
+Summarize:
+
+- Streamlit calls a workflow facade.
+- The workflow uses a tool router.
+- The tool router can use direct Python services or local MCP-style tools.
+- ADK and MCP runtime routing are planned next.
+- Deterministic scoring remains the source of truth.

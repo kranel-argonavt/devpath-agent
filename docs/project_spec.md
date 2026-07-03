@@ -1,41 +1,55 @@
 # Project Specification
 
-DevPath Agent is a Kaggle capstone project for junior software developers who want a clearer path from job posting to preparation plan. The app compares a target role with a candidate profile and portfolio evidence, then creates a structured career strategy report.
+DevPath Agent is a Kaggle capstone project for junior software developers who want a clearer path from a job posting to a preparation strategy.
 
-## Current Mock MVP
+## Current MVP
 
-The current Step 1D MVP is a polished Streamlit workflow using deterministic local logic only. It can load sample data, let the user edit profile fields, display project evidence, generate a mock match report, and export Markdown.
+The current MVP is a Streamlit app backed by deterministic local logic. It loads or accepts a job posting, candidate profile, portfolio projects, and optional CV context. It then generates a structured report with match scoring, evidence, gaps, recommendations, application drafts, interview prep, and Markdown export.
 
-## Planned Final System
+The app also includes optional Gemini-assisted structured insights, an ADK-compatible agent skeleton, MCP-style deterministic tool contracts, and smoke-test scripts for local validation.
 
-The final system is planned as an agent-assisted career copilot with a Google ADK root agent, specialized sub-agents, MCP tools, Gemini-based reasoning, and optional public GitHub repository import.
+## Target Users
+
+- Junior software developers preparing for their first or next role.
+- Candidates who need to connect portfolio projects to job requirements.
+- Career changers who want a clear preparation plan before applying.
+- Capstone reviewers evaluating explainable agent architecture.
 
 ## Inputs
 
 - Job posting text
 - Optional job source URL
 - Candidate profile fields
-- Portfolio projects
+- Portfolio project data
 - Optional CV context
-- Analysis settings
+- Target role
+- Analysis mode
+- Tool backend selection
 
 ## Outputs
 
 - Job analysis summary
-- Profile match score
-- Category scores
-- Strong matches and partial matches
-- Missing skills
-- Preparation plan
-- Application draft text
-- Interview prep questions
-- Markdown export
+- Overall deterministic match score
+- Category score breakdown
+- Strong matches, partial matches, and missing skills
+- Evidence by skill
+- Prioritized gaps and recommendations
+- 7-day, 14-day, and 30-day preparation plan
+- Cover letter and recruiter message drafts
+- Interview questions and practice focus
+- Optional Gemini-assisted narrative sections
+- Privacy-masked Markdown report
 
-## Non-Goals For Current MVP
+## Current Non-Goals
 
-- No real LLM calls
-- No Gemini API integration
-- No Google ADK runtime logic
-- No real MCP server behavior
-- No GitHub API calls
-- No LinkedIn scraping
+- No full ADK runtime routing.
+- No MCP runtime transport.
+- No GitHub API integration.
+- No private repository access.
+- No LinkedIn scraping.
+- No LLM-based score calculation.
+- No automated tests that call real external APIs.
+
+## Planned Final System
+
+The planned final system will combine the Streamlit UI, Google ADK root agent, specialized sub-agents, MCP runtime tools, optional Gemini narrative assistance, and public GitHub repository evidence mapping. Deterministic scoring should remain the transparent source of truth.
