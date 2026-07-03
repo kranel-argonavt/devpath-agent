@@ -38,10 +38,10 @@ def _report_to_markdown(report: dict[str, Any]) -> str:
         "",
         "## 1. Job Analysis",
         *_render_job_analysis(report.get("job_analysis", {})),
-        *_render_optional_ai_summary(report),
         "",
         "## 2. Profile Match",
         *_render_profile_match(profile_match, skill_gaps),
+        *_render_gemini_insights(report),
         "",
         "## 3. Evidence by Skill",
         *_render_evidence_by_skill(
@@ -92,11 +92,39 @@ def _render_job_analysis(job_analysis: dict[str, Any]) -> list[str]:
     return lines
 
 
-def _render_optional_ai_summary(report: dict[str, Any]) -> list[str]:
-    summary = report.get("gemini_summary") or report.get("ai_summary")
-    if not summary:
+def _render_gemini_insights(report: dict[str, Any]) -> list[str]:
+    insights = report.get("gemini_insights", {})
+    summary = ""
+    if isinstance(insights, dict):
+        summary = insights.get("career_summary", "")
+    summary = summary or report.get("gemini_summary") or report.get("ai_summary")
+    if not insights and not summary:
         return []
-    return ["", "### Gemini-Assisted Career Summary", str(summary)]
+
+    if not isinstance(insights, dict):
+        insights = {}
+
+    return [
+        "",
+        "## Gemini-assisted Career Strategy",
+        "",
+        "Gemini-assisted content is narrative-only. Deterministic scoring remains the source of truth.",
+        "",
+        "### AI Career Strategy Summary",
+        str(summary or "No Gemini career summary available."),
+        "",
+        "### Top 3 Application Actions",
+        *_render_numbered(insights.get("top_actions", []), "No Gemini action items available."),
+        "",
+        "### Best Portfolio Evidence to Mention",
+        *_render_bullets(insights.get("portfolio_positioning", []), "No Gemini portfolio positioning available."),
+        "",
+        "### Skill Gap Strategy",
+        *_render_bullets(insights.get("skill_gap_strategy", []), "No Gemini gap strategy available."),
+        "",
+        "### Interview Focus Areas",
+        *_render_bullets(insights.get("interview_focus", []), "No Gemini interview focus areas available."),
+    ]
 
 
 def _render_profile_match(profile_match: dict[str, Any], skill_gaps: dict[str, Any]) -> list[str]:

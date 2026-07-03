@@ -17,17 +17,17 @@ if str(PROJECT_ROOT) not in sys.path:
 from devpath.core.config import AppConfig, get_app_config
 from devpath.core.report_builder import create_mock_report
 from devpath.services.file_service import load_json_file, load_text_file
-from devpath.services.gemini_service import generate_gemini_career_summary
+from devpath.services.gemini_service import generate_gemini_career_insights
 
 
 def main(
     config: AppConfig | None = None,
-    summary_generator: Callable[[dict[str, Any], str, str], str] | None = None,
+    summary_generator: Callable[[dict[str, Any], str, str], dict[str, Any]] | None = None,
 ) -> int:
     """Run a local Gemini smoke test without exposing secrets."""
 
     app_config = config or get_app_config()
-    generator = summary_generator or generate_gemini_career_summary
+    generator = summary_generator or generate_gemini_career_insights
 
     if not app_config.gemini_enabled or not app_config.google_api_key:
         print(
@@ -58,7 +58,7 @@ def main(
         output_style="Concise",
     )
     try:
-        summary = generator(
+        insights = generator(
             report=report,
             api_key=app_config.google_api_key,
             model=app_config.gemini_model,
@@ -69,8 +69,11 @@ def main(
 
     print("Gemini smoke test succeeded.")
     print(f"Model: {app_config.gemini_model}")
-    print("Summary preview:")
-    print(summary[:800].strip())
+    print("Career summary preview:")
+    print(str(insights.get("career_summary", "")).strip()[:800])
+    print("Top actions:")
+    for index, action in enumerate(insights.get("top_actions", [])[:3], start=1):
+        print(f"{index}. {action}")
     return 0
 
 

@@ -9,7 +9,7 @@
 - [x] Step 2C - Rich Markdown export
 - [x] Step 3A - Gemini integration foundation
 - [x] Step 3B - Local Gemini smoke test
-- [ ] Step 3C - Gemini-assisted narrative refinement
+- [x] Step 3C - Structured Gemini-assisted output
 - [ ] Step 4 - ADK root agent and sub-agents
 - [ ] Step 5 - MCP tools
 - [ ] Step 6 - GitHub public repo import
@@ -17,7 +17,7 @@
 
 ## Current Focus
 
-The project is still deterministic-first. The priority is a clear demo flow, explainable local behavior, optional Gemini narrative assistance, reliable tests, and documentation that sets correct expectations.
+The project is still deterministic-first. The priority is a clear demo flow, explainable local behavior, optional structured Gemini narrative assistance, reliable tests, and documentation that sets correct expectations.
 
 ## Later Quality Improvements
 

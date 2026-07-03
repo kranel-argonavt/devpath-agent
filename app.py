@@ -1,4 +1,4 @@
-"""Streamlit mock workflow for DevPath Agent Step 1D."""
+"""Streamlit mock workflow for DevPath Agent."""
 
 from pathlib import Path
 from typing import Any
@@ -9,7 +9,7 @@ from devpath.core.config import get_app_config
 from devpath.core.report_builder import create_mock_report
 from devpath.services.export_service import export_markdown_report
 from devpath.services.file_service import load_json_file, load_text_file
-from devpath.services.gemini_service import generate_gemini_career_summary
+from devpath.services.gemini_service import generate_gemini_career_insights
 from devpath.services.github_service import is_github_username_provided
 
 
@@ -102,7 +102,7 @@ def render_sidebar() -> None:
     with st.sidebar:
         st.header("DevPath MVP")
         st.markdown(
-            "**Project status:** Step 3A - optional Gemini foundation  \n"
+            "**Project status:** Step 3C - structured Gemini-assisted output  \n"
             "**Mode:** local deterministic mock  \n"
             "**External API calls:** disabled by default  \n"
             "**Data source:** sample JSON/TXT files"
@@ -307,11 +307,13 @@ def handle_generate_report(
             st.warning("Gemini API key is not configured. The app will continue in mock deterministic mode.")
         else:
             try:
-                report["gemini_summary"] = generate_gemini_career_summary(
+                insights = generate_gemini_career_insights(
                     report=report,
                     api_key=config.google_api_key,
                     model=config.gemini_model,
                 )
+                report["gemini_insights"] = insights
+                report["gemini_summary"] = insights.get("career_summary", "")
                 st.success("Gemini-assisted career summary generated. Deterministic score fields were unchanged.")
             except RuntimeError as exc:
                 st.warning(f"Gemini-assisted summary could not be generated. Continuing with deterministic report. {exc}")
@@ -341,7 +343,11 @@ def render_results_tabs(report: dict[str, Any], projects: list[dict[str, Any]], 
     )
 
     with tabs[0]:
-        render_job_analysis_tab(report["job_analysis"], report.get("gemini_summary") or report.get("ai_summary", ""))
+        render_job_analysis_tab(
+            report["job_analysis"],
+            report.get("gemini_insights", {}),
+            report.get("gemini_summary") or report.get("ai_summary", ""),
+        )
     with tabs[1]:
         render_profile_match_tab(report["profile_match"], report["skill_gaps"])
     with tabs[2]:
@@ -358,13 +364,15 @@ def render_results_tabs(report: dict[str, Any], projects: list[dict[str, Any]], 
         render_export_tab(report)
 
 
-def render_job_analysis_tab(job_analysis: dict[str, Any], gemini_summary: str = "") -> None:
+def render_job_analysis_tab(
+    job_analysis: dict[str, Any],
+    gemini_insights: dict[str, Any] | None = None,
+    gemini_summary: str = "",
+) -> None:
     st.subheader("Job Analysis")
     st.markdown(job_analysis.get("detected_focus", "No job analysis available."))
 
-    if gemini_summary:
-        st.markdown("### Gemini-assisted Career Summary")
-        st.info(gemini_summary)
+    render_gemini_insights(gemini_insights or {}, gemini_summary)
 
     col_a, col_b, col_c = st.columns(3)
     col_a.metric("Detected role", job_analysis.get("target_role", "Unknown"))
@@ -373,6 +381,41 @@ def render_job_analysis_tab(job_analysis: dict[str, Any], gemini_summary: str = 
 
     if job_analysis.get("job_source_url"):
         st.markdown(f"**Source URL:** {job_analysis['job_source_url']}")
+
+
+def render_gemini_insights(gemini_insights: dict[str, Any], gemini_summary: str = "") -> None:
+    if not gemini_insights and not gemini_summary:
+        return
+
+    if not isinstance(gemini_insights, dict):
+        gemini_insights = {}
+
+    st.markdown("### Gemini-assisted Career Strategy")
+    st.caption("Gemini improves the narrative explanation only. The numeric score and evidence are deterministic.")
+
+    career_summary = gemini_insights.get("career_summary") or gemini_summary
+    st.markdown("#### AI Career Strategy Summary")
+    if career_summary:
+        st.info(career_summary)
+    else:
+        st.write("No Gemini career summary available yet.")
+
+    st.markdown("#### Top 3 Application Actions")
+    render_numbered(gemini_insights.get("top_actions", []), "No Gemini action items available yet.")
+
+    col_a, col_b = st.columns(2)
+    with col_a:
+        st.markdown("#### Best Portfolio Evidence to Mention")
+        render_bullets(
+            gemini_insights.get("portfolio_positioning", []),
+            "No Gemini portfolio positioning available yet.",
+        )
+    with col_b:
+        st.markdown("#### Skill Gap Strategy")
+        render_bullets(gemini_insights.get("skill_gap_strategy", []), "No Gemini gap strategy available yet.")
+
+    st.markdown("#### Interview Focus Areas")
+    render_bullets(gemini_insights.get("interview_focus", []), "No Gemini interview focus areas available yet.")
 
 
 def render_profile_match_tab(profile_match: dict[str, Any], skill_gaps: dict[str, Any]) -> None:
@@ -580,6 +623,14 @@ def render_bullets(items: list[str], empty_message: str) -> None:
         return
     for item in items:
         st.markdown(f"- {item}")
+
+
+def render_numbered(items: list[str], empty_message: str) -> None:
+    if not items:
+        st.write(empty_message)
+        return
+    for index, item in enumerate(items, start=1):
+        st.markdown(f"{index}. {item}")
 
 
 def build_project_evidence_line(technologies: list[str], summary: str) -> str:

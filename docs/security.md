@@ -9,10 +9,11 @@ DevPath Agent is designed around cautious handling of candidate data. The curren
 - Gemini API keys must stay in local `.env` files or environment variables, never in Git.
 - Gemini API keys must never be pasted into prompts, commits, README files, screenshots, or exported reports.
 - Generated Markdown reports in `outputs/*.md` are ignored by Git.
-- Exported Markdown reports are passed through deterministic privacy masking before they are written.
+- Exported Markdown reports, including Gemini-assisted sections, are passed through deterministic privacy masking before they are written.
 - The Streamlit app warns users not to paste secrets or sensitive personal data.
+- Do not paste secrets into job posting, CV, profile, or project fields.
 - `devpath/core/privacy.py` provides deterministic masking utilities for emails, phone-like strings, and API-key-like values.
-- Gemini-assisted summaries must not overwrite deterministic scores, missing skills, or evidence mappings.
+- Gemini-assisted output must not overwrite deterministic scores, missing skills, prioritized gaps, or evidence mappings.
 
 ## Privacy Module Roles
 

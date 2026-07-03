@@ -8,13 +8,13 @@ Junior developers often struggle to understand whether they are truly ready for 
 
 ## Solution Overview
 
-The current MVP runs in Streamlit. It loads sample job, profile, and project data, applies deterministic evidence-based scoring, builds a mock career strategy report, and exports the result as structured Markdown. Gemini-assisted summaries are optional and disabled by default.
+The current MVP runs in Streamlit. It loads sample job, profile, and project data, applies deterministic evidence-based scoring, builds a mock career strategy report, and exports the result as structured Markdown. Gemini-assisted structured insights are optional and disabled by default.
 
 The final planned system will add Gemini-powered reasoning, a Google ADK root agent with specialized sub-agents, MCP tools, and public GitHub repository import.
 
 ## Current Status
 
-Current status: **Step 3B - local Gemini smoke test with deterministic mock mode as default.**
+Current status: **Step 3C - structured Gemini-assisted output with deterministic mock mode as default.**
 
 Gemini calls only happen if the user explicitly selects Gemini-assisted summary mode and configures an API key. Google ADK runtime logic, MCP server logic, and real GitHub API calls are not implemented yet.
 
@@ -37,14 +37,14 @@ Gemini calls only happen if the user explicitly selects Gemini-assisted summary 
 - Rich Markdown report export
 - Exported evidence-based score breakdown
 - Exported prioritized skill gaps and recommendations
-- Optional Gemini-assisted career summary
+- Optional structured Gemini-assisted career summary
+- AI career summary, top actions, portfolio positioning, skill gap strategy, and interview focus areas
 - Local Gemini connection smoke-test script
 - Privacy masking utilities
 - Pytest test suite
 
 ## Planned Features
 
-- Deeper Gemini-assisted report refinement
 - Google ADK root agent and sub-agents
 - MCP server tools
 - GitHub public repository import
@@ -79,7 +79,7 @@ Manually edit `.env` and add your local key:
 
 ```text
 GOOGLE_API_KEY=your_key_here
-GEMINI_MODEL=gemini-3.5-flash
+GEMINI_MODEL=gemini-3.5-flash/gemini-2.5-flash/...
 ```
 
 Then run:
@@ -88,7 +88,7 @@ Then run:
 python scripts/check_gemini_connection.py
 ```
 
-`.env` is ignored by Git. Do not commit API keys. Gemini is used only for narrative summary generation; deterministic scoring remains the source of truth.
+`.env` is ignored by Git. Do not commit API keys. Gemini is used only for structured narrative explanation; deterministic scoring remains the source of truth.
 
 ## Environment Variables
 
@@ -103,10 +103,10 @@ Use `.env.example` as the safe template. For optional Gemini-assisted summaries,
 
 ```text
 GOOGLE_API_KEY=your_key_here
-GEMINI_MODEL=gemini-3.5-flash
+GEMINI_MODEL=gemini-3.5-flash/gemini-2.5-flash/...
 ```
 
-`GEMINI_API_KEY` is also supported as a fallback. Do not commit real keys. The deterministic score remains the source of truth even when Gemini-assisted summary mode is enabled.
+`GEMINI_API_KEY` is also supported as a fallback. Do not commit real keys. Gemini does not calculate the match score. The deterministic score remains the source of truth even when Gemini-assisted summary mode is enabled.
 
 ## Security Notes
 
