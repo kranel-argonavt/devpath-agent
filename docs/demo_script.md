@@ -39,3 +39,6 @@ This is the current mock MVP demo script. It is not the final Kaggle video scrip
 35. Optional Step 5A code walkthrough: open `mcp_server/server.py` and `mcp_server/tools/`.
 36. Explain that MCP-style tools wrap deterministic project logic for scoring, reports, privacy, portfolio evidence, and export.
 37. Point out that the MCP server skeleton is importable/testable, but Streamlit and ADK do not yet route through MCP runtime.
+38. Optional Step 5B validation: run `python scripts/check_mcp_tools.py`.
+39. Show that MCP server metadata, tool registry, scoring, privacy, report, and export tools work locally.
+40. Explain that full MCP runtime integration is planned later and no transport is started in the smoke test.

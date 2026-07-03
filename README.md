@@ -8,13 +8,13 @@ Junior developers often struggle to understand whether they are truly ready for 
 
 ## Solution Overview
 
-The current MVP runs in Streamlit. It loads sample job, profile, and project data, applies deterministic evidence-based scoring, builds a mock career strategy report, and exports the result as structured Markdown. Gemini-assisted structured insights are optional and disabled by default. Step 4 added the ADK-compatible agent foundation and workflow facade. Step 5A adds an MCP-compatible server skeleton and deterministic tool contracts for future agent/runtime integration.
+The current MVP runs in Streamlit. It loads sample job, profile, and project data, applies deterministic evidence-based scoring, builds a mock career strategy report, and exports the result as structured Markdown. Gemini-assisted structured insights are optional and disabled by default. Step 4 added the ADK-compatible agent foundation and workflow facade. Step 5A added MCP-compatible tool contracts, and Step 5B adds local MCP tool validation without starting a runtime transport.
 
 The final planned system will add Gemini-powered reasoning, a Google ADK root agent with specialized sub-agents, MCP tools, and public GitHub repository import.
 
 ## Current Status
 
-Current status: **Step 5A - MCP server skeleton and deterministic tool contracts.**
+Current status: **Step 5B - local MCP smoke test workflow.**
 
 Gemini calls only happen if the user explicitly selects Gemini-assisted summary mode and configures an API key. The Streamlit app calls `devpath.agent_workflow.run_career_strategy_workflow`, which still uses deterministic report generation as the source of truth. The MCP skeleton is importable and testable, but Streamlit does not yet route through MCP runtime. Full ADK/MCP runtime routing and real GitHub API calls are planned for later steps.
 
@@ -49,6 +49,7 @@ Gemini calls only happen if the user explicitly selects Gemini-assisted summary 
 - MCP-compatible server skeleton
 - MCP-style deterministic tool contracts
 - Local tool registry for scoring, report, privacy, portfolio, and export tools
+- Local MCP smoke-test script
 - Privacy masking utilities
 - Pytest test suite
 
@@ -110,6 +111,16 @@ python scripts/check_adk_agent.py
 This imports `root_agent`, validates sub-agent factories, checks deterministic tools, and runs a tiny scoring/privacy smoke check. It does not start the ADK runtime, does not run `adk run` or `adk web`, and does not make external API calls.
 
 When ready for manual ADK runtime exploration, use ADK CLI commands such as `adk run` or `adk web` according to the official ADK documentation. These commands are not required for the current MVP tests.
+
+## MCP Local Smoke Test
+
+Validate the MCP-compatible tool registry and deterministic tool wrappers:
+
+```powershell
+python scripts/check_mcp_tools.py
+```
+
+This checks MCP server metadata, the local tool registry, scoring, portfolio, report, privacy, and export tools. It does not start an MCP transport and does not make external API calls.
 
 ## Environment Variables
 

@@ -14,14 +14,14 @@
 - [x] Step 4B - Local ADK smoke test and agent validation workflow
 - [x] Step 4C - Agent workflow facade for Streamlit integration
 - [x] Step 5A - MCP server skeleton and deterministic tool contracts
-- [ ] Step 5B - Local MCP smoke test
+- [x] Step 5B - Local MCP smoke test
 - [ ] Step 5C - Route selected ADK tools through MCP runtime
 - [ ] Step 6 - GitHub public repo import
 - [ ] Step 7 - Demo video and Kaggle writeup
 
 ## Current Focus
 
-The project is still deterministic-first. The current focus is stable MCP-style tool contracts, safe imports, and tests that validate the future tool layer without starting external runtimes.
+The project is still deterministic-first. The current focus is validating MCP-style tool contracts locally, keeping exports privacy-masked, and avoiding runtime transport startup until a later step.
 
 ## Later Quality Improvements
 

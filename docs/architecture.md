@@ -1,6 +1,6 @@
 # Architecture
 
-The current architecture remains simple and testable. Deterministic scoring is still the source of truth, Gemini is only an optional narrative layer, Step 4 added the ADK-compatible workflow foundation, and Step 5A adds an MCP-compatible deterministic tool layer.
+The current architecture remains simple and testable. Deterministic scoring is still the source of truth, Gemini is only an optional narrative layer, Step 4 added the ADK-compatible workflow foundation, Step 5A added MCP-compatible deterministic tool contracts, and Step 5B adds local MCP tool validation.
 
 ## Current App Runtime
 
@@ -82,6 +82,18 @@ core scoring / report / privacy / export services
 
 The MCP server skeleton is importable and testable. It exposes stable tool contracts for scoring, portfolio evidence, report building, privacy masking, and Markdown export. The Streamlit app does not yet route through MCP runtime, and tests do not start stdio, HTTP, SSE, or Streamable HTTP transports.
 
+## Step 5B Local Validation
+
+```text
+scripts/check_mcp_tools.py
+   |
+MCP server metadata + tool registry
+   |
+deterministic scoring / report / privacy / export checks
+```
+
+The MCP smoke test validates the local MCP-compatible tool layer without starting a real MCP transport. Streamlit still uses `agent_workflow.run_career_strategy_workflow` directly.
+
 ## Future Agent Flow
 
 ```text
@@ -111,6 +123,7 @@ deterministic services + optional Gemini narrative
 - `scripts/check_adk_agent.py` validates the local ADK skeleton without starting an ADK runtime server.
 - `mcp_server/server.py` exposes an import-safe MCP server skeleton or fallback metadata.
 - `mcp_server/tools/` exposes MCP-style deterministic tool contracts and a local registry.
+- `scripts/check_mcp_tools.py` validates MCP-style tools locally with temporary export output only.
 
 ## Agent Modules
 

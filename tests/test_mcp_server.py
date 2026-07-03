@@ -45,6 +45,17 @@ def test_mcp_server_requires_no_api_key() -> None:
     assert created is not None
 
 
+def test_local_mcp_smoke_script_exits_cleanly(capsys) -> None:
+    from scripts.check_mcp_tools import main
+
+    result = main()
+    output = capsys.readouterr().out
+
+    assert result == 0
+    assert "DevPath MCP smoke test" in output
+    assert "MCP smoke test succeeded" in output
+
+
 def _server_name(server) -> str:
     if isinstance(server, dict):
         return str(server.get("name", ""))
