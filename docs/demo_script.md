@@ -42,3 +42,6 @@ This is the current mock MVP demo script. It is not the final Kaggle video scrip
 38. Optional Step 5B validation: run `python scripts/check_mcp_tools.py`.
 39. Show that MCP server metadata, tool registry, scoring, privacy, report, and export tools work locally.
 40. Explain that full MCP runtime integration is planned later and no transport is started in the smoke test.
+41. Step 5C UI note: show the `Tool backend` selector in Analysis Settings.
+42. Run the same job analysis with `Direct Python services` and `Local MCP-style tools`.
+43. Explain that both paths use deterministic scoring and the MCP-style path runs in-process through the registry without starting an MCP transport.

@@ -8,15 +8,15 @@ Junior developers often struggle to understand whether they are truly ready for 
 
 ## Solution Overview
 
-The current MVP runs in Streamlit. It loads sample job, profile, and project data, applies deterministic evidence-based scoring, builds a mock career strategy report, and exports the result as structured Markdown. Gemini-assisted structured insights are optional and disabled by default. Step 4 added the ADK-compatible agent foundation and workflow facade. Step 5A added MCP-compatible tool contracts, and Step 5B adds local MCP tool validation without starting a runtime transport.
+The current MVP runs in Streamlit. It loads sample job, profile, and project data, applies deterministic evidence-based scoring, builds a mock career strategy report, and exports the result as structured Markdown. Gemini-assisted structured insights are optional and disabled by default. Step 4 added the ADK-compatible agent foundation and workflow facade. Step 5 adds MCP-compatible tool contracts, local MCP validation, and an in-process tool backend selector.
 
 The final planned system will add Gemini-powered reasoning, a Google ADK root agent with specialized sub-agents, MCP tools, and public GitHub repository import.
 
 ## Current Status
 
-Current status: **Step 5B - local MCP smoke test workflow.**
+Current status: **Step 5C - workflow backend selector for direct services or local MCP-style tools.**
 
-Gemini calls only happen if the user explicitly selects Gemini-assisted summary mode and configures an API key. The Streamlit app calls `devpath.agent_workflow.run_career_strategy_workflow`, which still uses deterministic report generation as the source of truth. The MCP skeleton is importable and testable, but Streamlit does not yet route through MCP runtime. Full ADK/MCP runtime routing and real GitHub API calls are planned for later steps.
+Gemini calls only happen if the user explicitly selects Gemini-assisted summary mode and configures an API key. The Streamlit app calls `devpath.agent_workflow.run_career_strategy_workflow`, which still uses deterministic report generation as the source of truth. The workflow can use direct deterministic services or local MCP-style tools in-process. No MCP transport is started yet. Full ADK/MCP runtime routing and real GitHub API calls are planned for later steps.
 
 ## Implemented Features
 
@@ -50,6 +50,8 @@ Gemini calls only happen if the user explicitly selects Gemini-assisted summary 
 - MCP-style deterministic tool contracts
 - Local tool registry for scoring, report, privacy, portfolio, and export tools
 - Local MCP smoke-test script
+- Workflow backend selector for direct deterministic services or local MCP-style tools
+- Local MCP-style tools run in-process through the registry
 - Privacy masking utilities
 - Pytest test suite
 
@@ -186,6 +188,18 @@ MCP server skeleton
    -> core scoring / report / privacy / export services
 ```
 
+Step 5C workflow routing:
+
+```text
+Streamlit UI
+   -> agent_workflow
+   -> tool_router
+      -> Direct Python services
+      -> Local MCP-style tool registry
+   -> deterministic report
+   -> optional Gemini structured insights
+```
+
 Future agent flow:
 
 ```text
@@ -201,6 +215,7 @@ Streamlit UI
 - `data/` contains sample job, profile, and project inputs.
 - `devpath/agent.py` exposes the ADK-compatible `root_agent` skeleton.
 - `devpath/agent_tools.py` exposes deterministic tools for future agent orchestration.
+- `devpath/tool_router.py` selects direct deterministic services or local MCP-style tools.
 - `devpath/core/` contains deterministic scoring, privacy, config, and report helpers.
 - `devpath/services/` contains local file loading, export, and future GitHub service placeholders.
 - `devpath/sub_agents/` contains ADK-compatible specialized agent skeletons.

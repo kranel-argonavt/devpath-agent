@@ -1,6 +1,6 @@
 # Architecture
 
-The current architecture remains simple and testable. Deterministic scoring is still the source of truth, Gemini is only an optional narrative layer, Step 4 added the ADK-compatible workflow foundation, Step 5A added MCP-compatible deterministic tool contracts, and Step 5B adds local MCP tool validation.
+The current architecture remains simple and testable. Deterministic scoring is still the source of truth, Gemini is only an optional narrative layer, Step 4 added the ADK-compatible workflow foundation, and Step 5 connects the workflow to either direct services or local MCP-style tools without starting a runtime transport.
 
 ## Current App Runtime
 
@@ -94,6 +94,24 @@ deterministic scoring / report / privacy / export checks
 
 The MCP smoke test validates the local MCP-compatible tool layer without starting a real MCP transport. Streamlit still uses `agent_workflow.run_career_strategy_workflow` directly.
 
+## Step 5C Workflow Routing
+
+```text
+Streamlit UI
+   |
+agent_workflow
+   |
+tool_router
+   |-- Direct Python services
+   |-- Local MCP-style tool registry
+   |
+deterministic report
+   |
+optional Gemini structured insights
+```
+
+The local MCP-style backend calls `MCP_TOOL_REGISTRY` in-process. It does not start stdio, HTTP, SSE, or Streamable HTTP transports. Direct Python services remain the default backend.
+
 ## Future Agent Flow
 
 ```text
@@ -120,6 +138,7 @@ deterministic services + optional Gemini narrative
 - `devpath/agent.py` exposes the ADK-compatible root agent skeleton.
 - `devpath/agent_tools.py` wraps deterministic scoring, report, portfolio, and privacy helpers as future ADK tools.
 - `devpath/agent_workflow.py` coordinates deterministic report generation and optional Gemini insights for the Streamlit app.
+- `devpath/tool_router.py` selects direct deterministic services or local MCP-style tools.
 - `scripts/check_adk_agent.py` validates the local ADK skeleton without starting an ADK runtime server.
 - `mcp_server/server.py` exposes an import-safe MCP server skeleton or fallback metadata.
 - `mcp_server/tools/` exposes MCP-style deterministic tool contracts and a local registry.

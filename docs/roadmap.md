@@ -15,13 +15,14 @@
 - [x] Step 4C - Agent workflow facade for Streamlit integration
 - [x] Step 5A - MCP server skeleton and deterministic tool contracts
 - [x] Step 5B - Local MCP smoke test
-- [ ] Step 5C - Route selected ADK tools through MCP runtime
+- [x] Step 5C - Connect MCP-style tools to workflow/tool layer
+- [ ] Step 5D - Route selected ADK tools through MCP runtime
 - [ ] Step 6 - GitHub public repo import
 - [ ] Step 7 - Demo video and Kaggle writeup
 
 ## Current Focus
 
-The project is still deterministic-first. The current focus is validating MCP-style tool contracts locally, keeping exports privacy-masked, and avoiding runtime transport startup until a later step.
+The project is still deterministic-first. The current focus is the local tool backend selector: direct Python services by default, with optional in-process MCP-style tools for future runtime integration.
 
 ## Later Quality Improvements
 

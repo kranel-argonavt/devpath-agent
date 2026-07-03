@@ -9,6 +9,7 @@ from devpath.agent_workflow import WorkflowInput, run_career_strategy_workflow
 from devpath.services.export_service import export_markdown_report
 from devpath.services.file_service import load_json_file, load_text_file
 from devpath.services.github_service import is_github_username_provided
+from devpath.tool_router import DIRECT_BACKEND, list_tool_backends
 
 
 ROOT_DIR = Path(__file__).parent
@@ -100,7 +101,7 @@ def render_sidebar() -> None:
     with st.sidebar:
         st.header("DevPath MVP")
         st.markdown(
-            "**Project status:** Step 4C - workflow facade for Streamlit  \n"
+            "**Project status:** Step 5C - local tool backend selector  \n"
             "**Mode:** local deterministic mock  \n"
             "**External API calls:** disabled by default  \n"
             "**Data source:** sample JSON/TXT files  \n"
@@ -262,11 +263,18 @@ def render_cv_section() -> str:
 def render_analysis_settings_section() -> dict[str, Any]:
     st.header("6. Analysis Settings")
     analysis_mode = st.selectbox("Analysis mode", ["Mock deterministic mode", "Gemini-assisted summary"])
+    tool_backend = st.selectbox(
+        "Tool backend",
+        list_tool_backends(),
+        index=0,
+        help="Local MCP-style tools use the MCP tool registry in-process. No MCP transport is started yet.",
+    )
     output_style = st.selectbox("Output style", ["Concise", "Detailed"])
     include_cover_letter = st.checkbox("Include cover letter draft", value=True)
     include_interview_prep = st.checkbox("Include interview prep", value=True)
     return {
         "analysis_mode": analysis_mode,
+        "tool_backend": tool_backend,
         "output_style": output_style,
         "include_cover_letter": include_cover_letter,
         "include_interview_prep": include_interview_prep,
@@ -299,6 +307,7 @@ def handle_generate_report(
         target_role=(profile.get("target_roles") or ["Junior Software Developer"])[0],
         output_style=settings["output_style"],
         analysis_mode=settings.get("analysis_mode", "Mock deterministic mode"),
+        tool_backend=settings.get("tool_backend", DIRECT_BACKEND),
     )
     result = run_career_strategy_workflow(workflow_input)
     report = result.report

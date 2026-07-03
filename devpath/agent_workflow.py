@@ -11,8 +11,8 @@ from dataclasses import dataclass
 from typing import Any
 
 from devpath.core.config import AppConfig, get_app_config
-from devpath.core.report_builder import create_mock_report
 from devpath.services.gemini_service import generate_gemini_career_insights
+from devpath.tool_router import DIRECT_BACKEND, MCP_STYLE_BACKEND, build_report_with_backend
 
 
 MOCK_MODE = "Mock deterministic mode"
@@ -41,6 +41,7 @@ class WorkflowInput:
     target_role: str = "Junior Software Developer"
     output_style: str = "Concise"
     analysis_mode: str = MOCK_MODE
+    tool_backend: str = DIRECT_BACKEND
 
 
 @dataclass(frozen=True)
@@ -62,13 +63,28 @@ def run_career_strategy_workflow(
 
     warnings: list[str] = []
     profile = _profile_with_target_role(workflow_input.profile, workflow_input.target_role)
-    deterministic_report = create_mock_report(
-        job_text=workflow_input.job_text,
-        profile=profile,
-        projects=workflow_input.projects,
-        cv_text=workflow_input.cv_text,
-        output_style=workflow_input.output_style,
-    )
+    try:
+        deterministic_report = build_report_with_backend(
+            job_text=workflow_input.job_text,
+            profile=profile,
+            projects=workflow_input.projects,
+            cv_text=workflow_input.cv_text,
+            output_style=workflow_input.output_style,
+            tool_backend=workflow_input.tool_backend,
+        )
+    except RuntimeError:
+        if workflow_input.tool_backend == MCP_STYLE_BACKEND:
+            warnings.append("Local MCP-style tools could not be used. Falling back to direct deterministic services.")
+            deterministic_report = build_report_with_backend(
+                job_text=workflow_input.job_text,
+                profile=profile,
+                projects=workflow_input.projects,
+                cv_text=workflow_input.cv_text,
+                output_style=workflow_input.output_style,
+                tool_backend=DIRECT_BACKEND,
+            )
+        else:
+            raise
     report = deepcopy(deterministic_report)
     deterministic_fields = _deterministic_profile_match_snapshot(report)
 
