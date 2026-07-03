@@ -1,6 +1,6 @@
 # Architecture
 
-The current architecture remains simple and testable. Deterministic scoring is still the source of truth, Gemini is only an optional narrative layer, and Step 4A adds an ADK-compatible skeleton without changing the Streamlit runtime path.
+The current architecture remains simple and testable. Deterministic scoring is still the source of truth, Gemini is only an optional narrative layer, Step 4A added an ADK-compatible skeleton, and Step 4B adds a local validation workflow without changing the Streamlit runtime path.
 
 ## Current App Runtime
 
@@ -38,6 +38,18 @@ Scoring/report/privacy
 
 The root agent and sub-agents are importable skeletons. They expose planned responsibilities and deterministic tools, but the Streamlit app does not fully route generation through ADK yet.
 
+## Step 4B Local Validation
+
+```text
+scripts/check_adk_agent.py
+   |
+root_agent import + sub-agent factories
+   |
+deterministic tool smoke checks
+```
+
+The smoke test validates project structure, ADK availability or fallback metadata, deterministic tools, and basic scoring/privacy behavior. It does not start `adk run`, `adk web`, Gemini, MCP, GitHub, or any external API.
+
 ## Future Agent Flow
 
 ```text
@@ -63,9 +75,12 @@ Gemini + deterministic tools
 - `devpath/services/github_service.py` remains placeholder-only for future GitHub work.
 - `devpath/agent.py` exposes the ADK-compatible root agent skeleton.
 - `devpath/agent_tools.py` wraps deterministic scoring, report, portfolio, and privacy helpers as future ADK tools.
+- `scripts/check_adk_agent.py` validates the local ADK skeleton without starting an ADK runtime server.
 
 ## Agent Modules
 
 - `devpath/agent.py` is the ADK root agent entry point.
 - `devpath/sub_agents/` contains role-focused sub-agent skeletons.
 - `mcp_server/` will expose selected tools through a future MCP server.
+
+When ready for manual ADK runtime exploration, use ADK CLI commands such as `adk run` or `adk web` according to the official ADK documentation. Those commands are intentionally outside the automated test suite.

@@ -8,13 +8,13 @@ Junior developers often struggle to understand whether they are truly ready for 
 
 ## Solution Overview
 
-The current MVP runs in Streamlit. It loads sample job, profile, and project data, applies deterministic evidence-based scoring, builds a mock career strategy report, and exports the result as structured Markdown. Gemini-assisted structured insights are optional and disabled by default. Step 4A adds a Google ADK-compatible agent skeleton and deterministic tools for future orchestration.
+The current MVP runs in Streamlit. It loads sample job, profile, and project data, applies deterministic evidence-based scoring, builds a mock career strategy report, and exports the result as structured Markdown. Gemini-assisted structured insights are optional and disabled by default. Step 4A added a Google ADK-compatible agent skeleton and deterministic tools for future orchestration. Step 4B adds a local ADK smoke-test workflow for validating the skeleton safely.
 
 The final planned system will add Gemini-powered reasoning, a Google ADK root agent with specialized sub-agents, MCP tools, and public GitHub repository import.
 
 ## Current Status
 
-Current status: **Step 4A - Google ADK-compatible agent skeleton with deterministic tool wiring.**
+Current status: **Step 4B - local ADK smoke test and agent validation workflow.**
 
 Gemini calls only happen if the user explicitly selects Gemini-assisted summary mode and configures an API key. The Streamlit app still uses the deterministic workflow directly. Full ADK runtime routing, MCP server logic, and real GitHub API calls are planned for later steps.
 
@@ -43,6 +43,7 @@ Gemini calls only happen if the user explicitly selects Gemini-assisted summary 
 - Google ADK-compatible root agent skeleton
 - Planned sub-agent architecture
 - Deterministic tools exposed for future agent use
+- Local ADK agent smoke-test script
 - Privacy masking utilities
 - Pytest test suite
 
@@ -92,6 +93,18 @@ python scripts/check_gemini_connection.py
 ```
 
 `.env` is ignored by Git. Do not commit API keys. Gemini is used only for structured narrative explanation; deterministic scoring remains the source of truth.
+
+## ADK Local Smoke Test
+
+Validate the local ADK-compatible agent skeleton and deterministic tools:
+
+```powershell
+python scripts/check_adk_agent.py
+```
+
+This imports `root_agent`, validates sub-agent factories, checks deterministic tools, and runs a tiny scoring/privacy smoke check. It does not start the ADK runtime, does not run `adk run` or `adk web`, and does not make external API calls.
+
+When ready for manual ADK runtime exploration, use ADK CLI commands such as `adk run` or `adk web` according to the official ADK documentation. These commands are not required for the current MVP tests.
 
 ## Environment Variables
 

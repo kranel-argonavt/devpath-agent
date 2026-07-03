@@ -30,3 +30,6 @@ This is the current mock MVP demo script. It is not the final Kaggle video scrip
 26. Optional Step 4A code walkthrough: open `devpath/agent.py` and show that `root_agent` now exists.
 27. Open `devpath/agent_tools.py` and explain that deterministic scoring, report building, portfolio summaries, and privacy masking are ready for ADK orchestration.
 28. Explain that the Streamlit app still uses deterministic services directly; full ADK runtime routing is planned for a later step.
+29. Optional Step 4B validation: run `python scripts/check_adk_agent.py`.
+30. Show that `root_agent`, sub-agents, deterministic tools, ADK availability, and fallback metadata are reported.
+31. Explain that this smoke test does not start ADK runtime commands and makes no external API calls.

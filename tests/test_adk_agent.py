@@ -55,6 +55,17 @@ def test_sub_agent_factories_create_agents_without_api_key() -> None:
         assert _agent_value(sub_agent, "description")
 
 
+def test_local_adk_smoke_script_exits_cleanly(capsys) -> None:
+    from scripts.check_adk_agent import main
+
+    result = main()
+    output = capsys.readouterr().out
+
+    assert result == 0
+    assert "DevPath ADK agent smoke test" in output
+    assert "ADK smoke test succeeded" in output
+
+
 def _agent_value(agent, key: str):
     if isinstance(agent, dict):
         return agent.get(key)

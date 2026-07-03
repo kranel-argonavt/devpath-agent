@@ -11,14 +11,15 @@
 - [x] Step 3B - Local Gemini smoke test
 - [x] Step 3C - Structured Gemini-assisted output
 - [x] Step 4A - ADK root agent skeleton and deterministic tools
-- [ ] Step 4B - Route selected app workflow through ADK runtime
+- [x] Step 4B - Local ADK smoke test and agent validation workflow
+- [ ] Step 4C - Route selected app workflow through ADK runtime
 - [ ] Step 5 - MCP tools
 - [ ] Step 6 - GitHub public repo import
 - [ ] Step 7 - Demo video and Kaggle writeup
 
 ## Current Focus
 
-The project is still deterministic-first. The current focus is an importable ADK-compatible skeleton, deterministic tool wiring, reliable tests, and documentation that makes the boundary between mock workflow and future agent runtime clear.
+The project is still deterministic-first. The current focus is validating the local ADK-compatible skeleton, deterministic tool wiring, and documentation that makes the boundary between mock workflow and future agent runtime clear.
 
 ## Later Quality Improvements
 
