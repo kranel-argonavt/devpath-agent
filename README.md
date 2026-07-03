@@ -30,7 +30,7 @@ The deterministic report remains the source of truth. Gemini can add concise nar
 
 ## Current Status
 
-Current status: **Step 5D - polished architecture documentation and demo evidence.**
+Current status: **Step 6A - MCP runtime adapter and selected tool smoke test.**
 
 Implemented today:
 
@@ -48,6 +48,7 @@ Implemented today:
 - Deterministic agent tools
 - MCP-compatible server skeleton and MCP-style tool registry
 - Tool backend selector: direct Python services or local MCP-style tools
+- Experimental MCP stdio runtime adapter for selected manual tool calls
 - Local Gemini, ADK, and MCP smoke-test scripts
 - Pytest suite for deterministic helpers, workflow, tools, and smoke scripts
 
@@ -108,7 +109,18 @@ Run local smoke tests:
 python scripts/check_gemini_connection.py
 python scripts/check_adk_agent.py
 python scripts/check_mcp_tools.py
+python scripts/check_mcp_runtime.py
 ```
+
+## MCP Runtime Smoke Test
+
+Run the experimental local MCP runtime smoke test:
+
+```powershell
+python scripts/check_mcp_runtime.py
+```
+
+This starts a local MCP stdio server process and calls selected deterministic tools through MCP runtime. It is separate from the default Streamlit workflow. If the installed MCP SDK/runtime behaves differently, the script should print a clean diagnostic message instead of exposing secrets.
 
 ## Optional Gemini Setup
 
@@ -150,6 +162,7 @@ Do not commit `.env`.
 - `devpath/sub_agents/`: ADK-compatible sub-agent skeletons.
 - `devpath/agent_tools.py`: deterministic tools for future agent orchestration.
 - `mcp_server/`: MCP server skeleton and MCP-style deterministic tools.
+- `devpath/mcp_runtime.py`: experimental local MCP stdio runtime adapter.
 - `scripts/`: local smoke-test scripts.
 - `docs/`: project specification, architecture, security, scoring, roadmap, and demo notes.
 - `tests/`: deterministic test suite.

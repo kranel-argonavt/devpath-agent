@@ -49,3 +49,26 @@ def _attach_metadata(mcp_server: Any) -> None:
 
 
 server = create_mcp_server()
+
+
+def main() -> int:
+    """Run the MCP server over stdio only when explicitly requested."""
+
+    if FastMCP is None:
+        print("MCP SDK is not available. Install dependencies with pip install -r requirements.txt.")
+        return 1
+
+    runtime_server = create_mcp_server()
+    if isinstance(runtime_server, dict) or not hasattr(runtime_server, "run"):
+        print("MCP server could not be created with the installed MCP SDK.")
+        return 1
+
+    try:
+        runtime_server.run(transport="stdio")
+    except TypeError:
+        runtime_server.run()
+    return 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())

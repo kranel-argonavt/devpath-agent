@@ -76,9 +76,10 @@ Run or mention:
 python scripts/check_gemini_connection.py
 python scripts/check_adk_agent.py
 python scripts/check_mcp_tools.py
+python scripts/check_mcp_runtime.py
 ```
 
-Explain that these validate optional Gemini connectivity, ADK skeleton structure, and MCP-style deterministic tools without requiring production runtime integration.
+Explain that these validate optional Gemini connectivity, ADK skeleton structure, MCP-style deterministic tools, and selected local MCP runtime calls without requiring production runtime integration.
 
 ## 9. Close With Architecture
 
@@ -89,3 +90,13 @@ Summarize:
 - The tool router can use direct Python services or local MCP-style tools.
 - ADK and MCP runtime routing are planned next.
 - Deterministic scoring remains the source of truth.
+
+## Optional Step 6A Runtime Proof
+
+Run:
+
+```powershell
+python scripts/check_mcp_runtime.py
+```
+
+Explain that selected tools are called through a local MCP stdio runtime while deterministic scoring remains the source of truth. If the local SDK/runtime is unavailable, show the clean diagnostic message and explain that the default Streamlit workflow is unaffected.

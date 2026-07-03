@@ -18,14 +18,14 @@
 - Step 5A - MCP server skeleton and tool contracts
 - Step 5B - MCP local smoke test workflow
 - Step 5C - Local MCP-style tools connected to workflow
+- Step 5D - Polish agent/tool architecture docs and demo evidence
 
 ## Current
 
-- Step 5D - Polish agent/tool architecture docs and demo evidence
+- Step 6A - MCP runtime adapter and selected tool smoke test
 
 ## Next
 
-- Step 6A - MCP runtime adapter and selected tool smoke test
 - Step 6B - Route selected ADK tools through MCP runtime
 - Step 6C - Experimental ADK+MCP workflow route
 - Step 6D - Streamlit experimental ADK+MCP mode

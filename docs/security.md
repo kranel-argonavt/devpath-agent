@@ -39,6 +39,8 @@ DevPath Agent is designed around cautious handling of candidate data. The curren
 - Tests do not start MCP runtime transports.
 - Tests do not call GitHub or other external APIs.
 - MCP-style tools do not call external APIs in the current implementation.
+- The MCP runtime smoke test is local stdio only and must be run explicitly.
+- Do not pass secrets into MCP runtime tool arguments.
 
 ## Current Non-Goals
 
@@ -47,3 +49,4 @@ DevPath Agent is designed around cautious handling of candidate data. The curren
 - No production secret storage.
 - No automatic LLM calls.
 - No MCP runtime transport execution.
+- No automatic MCP runtime startup.

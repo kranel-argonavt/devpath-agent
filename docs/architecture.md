@@ -72,8 +72,25 @@ ADK runtime routing is not the default app runtime yet.
 - `mcp_server/tools/` contains deterministic MCP-style wrappers.
 - `MCP_TOOL_REGISTRY` exposes stable tool names.
 - `scripts/check_mcp_tools.py` validates the local MCP-style tool layer.
+- `devpath/mcp_runtime.py` can call selected MCP tools through a local stdio runtime for manual smoke testing.
 
 No MCP stdio, HTTP, SSE, or Streamable HTTP transport is started automatically or during tests.
+
+## Step 6A MCP Runtime Proof
+
+```text
+Manual MCP runtime smoke test
+   |
+devpath.mcp_runtime
+   |
+local MCP stdio server
+   |
+MCP tools
+   |
+deterministic services
+```
+
+`scripts/check_mcp_runtime.py` is a controlled local runtime proof. It starts a local stdio MCP server process only when explicitly run. Streamlit still does not use MCP runtime by default, and ADK tools are not routed through MCP runtime yet.
 
 ## Gemini Layer
 
@@ -88,6 +105,7 @@ No MCP stdio, HTTP, SSE, or Streamable HTTP transport is started automatically o
 python scripts/check_gemini_connection.py
 python scripts/check_adk_agent.py
 python scripts/check_mcp_tools.py
+python scripts/check_mcp_runtime.py
 ```
 
 These scripts validate integration readiness without changing the deterministic source of truth. Automated tests do not require real API keys.
