@@ -1,11 +1,13 @@
 # Architecture
 
-The current architecture remains simple and testable. Deterministic scoring is still the source of truth, Gemini is only an optional narrative layer, Step 4A added an ADK-compatible skeleton, and Step 4B adds a local validation workflow without changing the Streamlit runtime path.
+The current architecture remains simple and testable. Deterministic scoring is still the source of truth, Gemini is only an optional narrative layer, Step 4A added an ADK-compatible skeleton, Step 4B added local validation, and Step 4C adds a workflow facade for Streamlit integration.
 
 ## Current App Runtime
 
 ```text
 Streamlit UI
+   |
+agent_workflow.run_career_strategy_workflow
    |
 Deterministic services
    |
@@ -50,6 +52,24 @@ deterministic tool smoke checks
 
 The smoke test validates project structure, ADK availability or fallback metadata, deterministic tools, and basic scoring/privacy behavior. It does not start `adk run`, `adk web`, Gemini, MCP, GitHub, or any external API.
 
+## Current Step 4C Runtime
+
+```text
+Streamlit UI
+   |
+devpath.agent_workflow.run_career_strategy_workflow
+   |
+deterministic report builder / agent tools
+   |
+optional Gemini structured insights
+   |
+final report
+   |
+Markdown export
+```
+
+The workflow facade gives the app one stable orchestration entry point. Mock deterministic mode and Gemini-assisted mode both use the same workflow path. Gemini insights are attached as narrative-only output and do not modify deterministic score fields.
+
 ## Future Agent Flow
 
 ```text
@@ -75,6 +95,7 @@ Gemini + deterministic tools
 - `devpath/services/github_service.py` remains placeholder-only for future GitHub work.
 - `devpath/agent.py` exposes the ADK-compatible root agent skeleton.
 - `devpath/agent_tools.py` wraps deterministic scoring, report, portfolio, and privacy helpers as future ADK tools.
+- `devpath/agent_workflow.py` coordinates deterministic report generation and optional Gemini insights for the Streamlit app.
 - `scripts/check_adk_agent.py` validates the local ADK skeleton without starting an ADK runtime server.
 
 ## Agent Modules

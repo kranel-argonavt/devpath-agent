@@ -33,3 +33,6 @@ This is the current mock MVP demo script. It is not the final Kaggle video scrip
 29. Optional Step 4B validation: run `python scripts/check_adk_agent.py`.
 30. Show that `root_agent`, sub-agents, deterministic tools, ADK availability, and fallback metadata are reported.
 31. Explain that this smoke test does not start ADK runtime commands and makes no external API calls.
+32. Optional Step 4C architecture note: explain that Streamlit now calls `devpath.agent_workflow.run_career_strategy_workflow`.
+33. Show that mock mode and Gemini-assisted mode both use the same workflow facade.
+34. Explain that deterministic scoring remains the source of truth and Gemini insights are attached as narrative-only output.

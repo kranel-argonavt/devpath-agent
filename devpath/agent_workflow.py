@@ -1,0 +1,119 @@
+"""Workflow facade for career strategy generation.
+
+This module gives Streamlit a single orchestration entry point while keeping
+deterministic scoring as the source of truth. Full ADK runtime routing is
+planned for a later step.
+"""
+
+from collections.abc import Callable
+from copy import deepcopy
+from dataclasses import dataclass
+from typing import Any
+
+from devpath.core.config import AppConfig, get_app_config
+from devpath.core.report_builder import create_mock_report
+from devpath.services.gemini_service import generate_gemini_career_insights
+
+
+MOCK_MODE = "Mock deterministic mode"
+GEMINI_MODE = "Gemini-assisted summary"
+
+DETERMINISTIC_PROFILE_MATCH_FIELDS = [
+    "overall_score",
+    "category_scores",
+    "category_details",
+    "strong_matches",
+    "partial_matches",
+    "missing_skills",
+    "evidence_by_skill",
+    "prioritized_gaps",
+]
+
+
+@dataclass(frozen=True)
+class WorkflowInput:
+    """Input payload for the career strategy workflow facade."""
+
+    job_text: str
+    profile: dict[str, Any]
+    projects: list[dict[str, Any]]
+    cv_text: str = ""
+    target_role: str = "Junior Software Developer"
+    output_style: str = "Concise"
+    analysis_mode: str = MOCK_MODE
+
+
+@dataclass(frozen=True)
+class WorkflowResult:
+    """Result payload returned by the career strategy workflow facade."""
+
+    report: dict[str, Any]
+    mode_used: str
+    warnings: list[str]
+
+
+def run_career_strategy_workflow(
+    workflow_input: WorkflowInput,
+    *,
+    config: AppConfig | None = None,
+    gemini_generator: Callable[[dict[str, Any], str, str], dict[str, Any]] | None = None,
+) -> WorkflowResult:
+    """Run deterministic career strategy generation with optional Gemini insights."""
+
+    warnings: list[str] = []
+    profile = _profile_with_target_role(workflow_input.profile, workflow_input.target_role)
+    deterministic_report = create_mock_report(
+        job_text=workflow_input.job_text,
+        profile=profile,
+        projects=workflow_input.projects,
+        cv_text=workflow_input.cv_text,
+        output_style=workflow_input.output_style,
+    )
+    report = deepcopy(deterministic_report)
+    deterministic_fields = _deterministic_profile_match_snapshot(report)
+
+    if workflow_input.analysis_mode == MOCK_MODE:
+        return WorkflowResult(report=report, mode_used=MOCK_MODE, warnings=warnings)
+
+    if workflow_input.analysis_mode != GEMINI_MODE:
+        warnings.append("Unknown analysis mode. The app continued in deterministic mode.")
+        return WorkflowResult(report=report, mode_used=MOCK_MODE, warnings=warnings)
+
+    app_config = config or get_app_config()
+    if not app_config.gemini_enabled or not app_config.google_api_key:
+        warnings.append("Gemini API key is not configured. The app continued in deterministic mode.")
+        return WorkflowResult(report=report, mode_used=MOCK_MODE, warnings=warnings)
+
+    generator = gemini_generator or generate_gemini_career_insights
+    try:
+        insights = generator(
+            deepcopy(report),
+            app_config.google_api_key,
+            app_config.gemini_model,
+        )
+    except Exception:
+        warnings.append("Gemini-assisted insights could not be generated. Continuing with deterministic report.")
+        return WorkflowResult(report=report, mode_used=MOCK_MODE, warnings=warnings)
+
+    report["gemini_insights"] = insights
+    report["gemini_summary"] = str(insights.get("career_summary", "")) if isinstance(insights, dict) else ""
+    _restore_deterministic_profile_match_fields(report, deterministic_fields)
+    return WorkflowResult(report=report, mode_used=GEMINI_MODE, warnings=warnings)
+
+
+def _profile_with_target_role(profile: dict[str, Any], target_role: str) -> dict[str, Any]:
+    profile_copy = deepcopy(profile)
+    if target_role:
+        profile_copy["target_roles"] = [target_role]
+    return profile_copy
+
+
+def _deterministic_profile_match_snapshot(report: dict[str, Any]) -> dict[str, Any]:
+    profile_match = report.get("profile_match", {})
+    return {field: deepcopy(profile_match.get(field)) for field in DETERMINISTIC_PROFILE_MATCH_FIELDS}
+
+
+def _restore_deterministic_profile_match_fields(report: dict[str, Any], snapshot: dict[str, Any]) -> None:
+    profile_match = report.setdefault("profile_match", {})
+    for field, value in snapshot.items():
+        profile_match[field] = deepcopy(value)

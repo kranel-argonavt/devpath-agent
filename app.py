@@ -5,11 +5,9 @@ from typing import Any
 
 import streamlit as st
 
-from devpath.core.config import get_app_config
-from devpath.core.report_builder import create_mock_report
+from devpath.agent_workflow import WorkflowInput, run_career_strategy_workflow
 from devpath.services.export_service import export_markdown_report
 from devpath.services.file_service import load_json_file, load_text_file
-from devpath.services.gemini_service import generate_gemini_career_insights
 from devpath.services.github_service import is_github_username_provided
 
 
@@ -102,7 +100,7 @@ def render_sidebar() -> None:
     with st.sidebar:
         st.header("DevPath MVP")
         st.markdown(
-            "**Project status:** Step 4A - ADK skeleton and deterministic tools  \n"
+            "**Project status:** Step 4C - workflow facade for Streamlit  \n"
             "**Mode:** local deterministic mock  \n"
             "**External API calls:** disabled by default  \n"
             "**Data source:** sample JSON/TXT files  \n"
@@ -293,32 +291,24 @@ def handle_generate_report(
         st.error("Please load portfolio projects before generating a career strategy.")
         return
 
-    report = create_mock_report(
+    workflow_input = WorkflowInput(
         job_text=job_text,
         profile=profile,
         projects=projects,
         cv_text=cv_text,
+        target_role=(profile.get("target_roles") or ["Junior Software Developer"])[0],
         output_style=settings["output_style"],
+        analysis_mode=settings.get("analysis_mode", "Mock deterministic mode"),
     )
+    result = run_career_strategy_workflow(workflow_input)
+    report = result.report
     if job_source_url.strip():
         report["job_analysis"]["job_source_url"] = job_source_url.strip()
 
-    if settings.get("analysis_mode") == "Gemini-assisted summary":
-        config = get_app_config()
-        if not config.gemini_enabled or not config.google_api_key:
-            st.warning("Gemini API key is not configured. The app will continue in mock deterministic mode.")
-        else:
-            try:
-                insights = generate_gemini_career_insights(
-                    report=report,
-                    api_key=config.google_api_key,
-                    model=config.gemini_model,
-                )
-                report["gemini_insights"] = insights
-                report["gemini_summary"] = insights.get("career_summary", "")
-                st.success("Gemini-assisted career summary generated. Deterministic score fields were unchanged.")
-            except RuntimeError as exc:
-                st.warning(f"Gemini-assisted summary could not be generated. Continuing with deterministic report. {exc}")
+    for warning in result.warnings:
+        st.warning(warning)
+    if result.mode_used == "Gemini-assisted summary":
+        st.success("Gemini-assisted career insights generated. Deterministic score fields were unchanged.")
 
     st.session_state.report = report
     st.session_state.projects = projects

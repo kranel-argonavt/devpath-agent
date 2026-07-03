@@ -8,15 +8,15 @@ Junior developers often struggle to understand whether they are truly ready for 
 
 ## Solution Overview
 
-The current MVP runs in Streamlit. It loads sample job, profile, and project data, applies deterministic evidence-based scoring, builds a mock career strategy report, and exports the result as structured Markdown. Gemini-assisted structured insights are optional and disabled by default. Step 4A added a Google ADK-compatible agent skeleton and deterministic tools for future orchestration. Step 4B adds a local ADK smoke-test workflow for validating the skeleton safely.
+The current MVP runs in Streamlit. It loads sample job, profile, and project data, applies deterministic evidence-based scoring, builds a mock career strategy report, and exports the result as structured Markdown. Gemini-assisted structured insights are optional and disabled by default. Step 4A added a Google ADK-compatible agent skeleton and deterministic tools for future orchestration. Step 4B added a local ADK smoke-test workflow. Step 4C adds a workflow facade that Streamlit calls as the single orchestration entry point.
 
 The final planned system will add Gemini-powered reasoning, a Google ADK root agent with specialized sub-agents, MCP tools, and public GitHub repository import.
 
 ## Current Status
 
-Current status: **Step 4B - local ADK smoke test and agent validation workflow.**
+Current status: **Step 4C - agent workflow facade for Streamlit integration.**
 
-Gemini calls only happen if the user explicitly selects Gemini-assisted summary mode and configures an API key. The Streamlit app still uses the deterministic workflow directly. Full ADK runtime routing, MCP server logic, and real GitHub API calls are planned for later steps.
+Gemini calls only happen if the user explicitly selects Gemini-assisted summary mode and configures an API key. The Streamlit app now calls `devpath.agent_workflow.run_career_strategy_workflow`, which still uses deterministic report generation as the source of truth. Full ADK runtime routing, MCP server logic, and real GitHub API calls are planned for later steps.
 
 ## Implemented Features
 
@@ -44,6 +44,8 @@ Gemini calls only happen if the user explicitly selects Gemini-assisted summary 
 - Planned sub-agent architecture
 - Deterministic tools exposed for future agent use
 - Local ADK agent smoke-test script
+- Agent workflow facade used by Streamlit
+- Optional Gemini insights attached as narrative-only report output
 - Privacy masking utilities
 - Pytest test suite
 
@@ -150,6 +152,16 @@ Step 4A agent foundation:
 ADK root_agent
    -> deterministic tools
    -> scoring/report/privacy
+```
+
+Current Step 4C runtime:
+
+```text
+Streamlit UI
+   -> agent_workflow.run_career_strategy_workflow
+   -> deterministic report builder / agent tools
+   -> optional Gemini structured insights
+   -> Markdown export
 ```
 
 Future agent flow:
