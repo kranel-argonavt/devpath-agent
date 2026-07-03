@@ -62,6 +62,7 @@ The direct backend calls deterministic Python helpers. The MCP-style backend cal
 - `devpath/agent.py` exports `root_agent`.
 - `devpath/sub_agents/` contains planned specialized agents.
 - `devpath/agent_tools.py` exposes deterministic tools for future agent orchestration.
+- `devpath/adk_mcp_tools.py` exposes selected experimental wrappers that can call MCP runtime tools.
 - `scripts/check_adk_agent.py` validates the local ADK-compatible skeleton.
 
 ADK runtime routing is not the default app runtime yet.
@@ -92,6 +93,22 @@ deterministic services
 
 `scripts/check_mcp_runtime.py` is a controlled local runtime proof. It starts a local stdio MCP server process only when explicitly run and calls selected deterministic tools through the installed MCP SDK. Streamlit still does not use MCP runtime by default, and ADK tools are not routed through MCP runtime yet.
 
+## Step 6B ADK-MCP Tool Bridge
+
+```text
+ADK-style tool wrapper
+   |
+devpath.mcp_runtime
+   |
+local MCP stdio server
+   |
+MCP deterministic tools
+   |
+core scoring/privacy logic
+```
+
+`scripts/check_adk_mcp_tools.py` validates that selected ADK-style wrappers can call local MCP runtime tools. This is selected-tool bridging only: Streamlit is not routed through ADK+MCP runtime yet, and deterministic scoring remains the source of truth.
+
 ## Gemini Layer
 
 - Gemini is optional.
@@ -106,6 +123,7 @@ python scripts/check_gemini_connection.py
 python scripts/check_adk_agent.py
 python scripts/check_mcp_tools.py
 python scripts/check_mcp_runtime.py
+python scripts/check_adk_mcp_tools.py
 ```
 
 These scripts validate integration readiness without changing the deterministic source of truth. Automated tests do not require real API keys.

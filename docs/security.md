@@ -40,6 +40,8 @@ DevPath Agent is designed around cautious handling of candidate data. The curren
 - Tests do not call GitHub or other external APIs.
 - MCP-style tools do not call external APIs in the current implementation.
 - The MCP runtime smoke test is local stdio only and must be run explicitly.
+- The ADK-MCP bridge uses local stdio runtime only for selected deterministic tools.
+- Automated tests use dependency injection for the ADK-MCP bridge and do not start runtime transports.
 - Do not pass secrets into MCP runtime tool arguments.
 
 ## Current Non-Goals

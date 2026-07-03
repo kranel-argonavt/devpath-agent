@@ -77,9 +77,10 @@ python scripts/check_gemini_connection.py
 python scripts/check_adk_agent.py
 python scripts/check_mcp_tools.py
 python scripts/check_mcp_runtime.py
+python scripts/check_adk_mcp_tools.py
 ```
 
-Explain that these validate optional Gemini connectivity, ADK skeleton structure, MCP-style deterministic tools, and selected local MCP runtime calls without requiring production runtime integration.
+Explain that these validate optional Gemini connectivity, ADK skeleton structure, MCP-style deterministic tools, selected local MCP runtime calls, and the selected ADK-MCP bridge without requiring production runtime integration.
 
 ## 9. Close With Architecture
 
@@ -100,3 +101,13 @@ python scripts/check_mcp_runtime.py
 ```
 
 Explain that selected tools are called through a local MCP stdio runtime using the installed MCP SDK while deterministic scoring remains the source of truth. If the local SDK/runtime is unavailable, show the clean diagnostic message and explain that the default Streamlit workflow is unaffected.
+
+## Optional Step 6B ADK-MCP Bridge Proof
+
+Run:
+
+```powershell
+python scripts/check_adk_mcp_tools.py
+```
+
+Explain that selected ADK-style tool wrappers now call local MCP runtime tools. This proves the bridge path without routing the full Streamlit workflow through ADK or MCP runtime yet.

@@ -37,6 +37,8 @@ Responsibilities:
 - Use deterministic scoring tools as the source of truth. Do not invent or modify numeric match scores.
 - Prefer structured evidence from the provided profile, projects, CV context, and job posting.
 - Do not call external APIs unless a future integration explicitly provides an approved tool.
+- Selected ADK-style wrappers can route deterministic calls through the local MCP runtime
+  experimentally, but direct deterministic tools remain the primary safe path.
 """
 
 ROOT_AGENT_TOOLS = [
@@ -88,6 +90,11 @@ def _metadata(sub_agents: list[Any], adk_available: bool) -> dict[str, Any]:
         "description": ROOT_AGENT_DESCRIPTION,
         "instruction": ROOT_AGENT_INSTRUCTION,
         "tools": [tool.__name__ for tool in ROOT_AGENT_TOOLS],
+        "experimental_mcp_runtime_tools": [
+            "mask_personal_data",
+            "analyze_job_posting",
+            "calculate_match_score",
+        ],
         "sub_agents": sub_agents,
         "adk_available": adk_available,
     }

@@ -21,14 +21,14 @@
 - Step 5D - Polish agent/tool architecture docs and demo evidence
 - Step 6A - MCP runtime adapter and selected tool smoke test
 - Step 6A.1 - MCP runtime smoke test verified with installed SDK
+- Step 6B - Route selected ADK tools through MCP runtime
 
 ## Current
 
-- Ready for Step 6B planning
+- Ready for Step 6C planning
 
 ## Next
 
-- Step 6B - Route selected ADK tools through MCP runtime
 - Step 6C - Experimental ADK+MCP workflow route
 - Step 6D - Streamlit experimental ADK+MCP mode
 - Step 7A - GitHub public repository import foundation
