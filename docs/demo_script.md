@@ -27,3 +27,6 @@ This is the current mock MVP demo script. It is not the final Kaggle video scrip
 23. Open the exported Markdown report briefly.
 24. Point out the Gemini-assisted section, score breakdown, evidence by skill, prioritized recommendations, and privacy notice.
 25. Remind viewers that generated reports in `outputs/*.md` are ignored by Git.
+26. Optional Step 4A code walkthrough: open `devpath/agent.py` and show that `root_agent` now exists.
+27. Open `devpath/agent_tools.py` and explain that deterministic scoring, report building, portfolio summaries, and privacy masking are ready for ADK orchestration.
+28. Explain that the Streamlit app still uses deterministic services directly; full ADK runtime routing is planned for a later step.

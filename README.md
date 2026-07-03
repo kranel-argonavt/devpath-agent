@@ -8,15 +8,15 @@ Junior developers often struggle to understand whether they are truly ready for 
 
 ## Solution Overview
 
-The current MVP runs in Streamlit. It loads sample job, profile, and project data, applies deterministic evidence-based scoring, builds a mock career strategy report, and exports the result as structured Markdown. Gemini-assisted structured insights are optional and disabled by default.
+The current MVP runs in Streamlit. It loads sample job, profile, and project data, applies deterministic evidence-based scoring, builds a mock career strategy report, and exports the result as structured Markdown. Gemini-assisted structured insights are optional and disabled by default. Step 4A adds a Google ADK-compatible agent skeleton and deterministic tools for future orchestration.
 
 The final planned system will add Gemini-powered reasoning, a Google ADK root agent with specialized sub-agents, MCP tools, and public GitHub repository import.
 
 ## Current Status
 
-Current status: **Step 3C - structured Gemini-assisted output with deterministic mock mode as default.**
+Current status: **Step 4A - Google ADK-compatible agent skeleton with deterministic tool wiring.**
 
-Gemini calls only happen if the user explicitly selects Gemini-assisted summary mode and configures an API key. Google ADK runtime logic, MCP server logic, and real GitHub API calls are not implemented yet.
+Gemini calls only happen if the user explicitly selects Gemini-assisted summary mode and configures an API key. The Streamlit app still uses the deterministic workflow directly. Full ADK runtime routing, MCP server logic, and real GitHub API calls are planned for later steps.
 
 ## Implemented Features
 
@@ -40,12 +40,15 @@ Gemini calls only happen if the user explicitly selects Gemini-assisted summary 
 - Optional structured Gemini-assisted career summary
 - AI career summary, top actions, portfolio positioning, skill gap strategy, and interview focus areas
 - Local Gemini connection smoke-test script
+- Google ADK-compatible root agent skeleton
+- Planned sub-agent architecture
+- Deterministic tools exposed for future agent use
 - Privacy masking utilities
 - Pytest test suite
 
 ## Planned Features
 
-- Google ADK root agent and sub-agents
+- Full Google ADK runtime routing from the Streamlit workflow
 - MCP server tools
 - GitHub public repository import
 - Better evidence-based scoring
@@ -128,6 +131,14 @@ Streamlit UI
    -> Markdown export
 ```
 
+Step 4A agent foundation:
+
+```text
+ADK root_agent
+   -> deterministic tools
+   -> scoring/report/privacy
+```
+
 Future agent flow:
 
 ```text
@@ -141,9 +152,11 @@ Streamlit UI
 
 - `app.py` contains the Streamlit mock workflow.
 - `data/` contains sample job, profile, and project inputs.
+- `devpath/agent.py` exposes the ADK-compatible `root_agent` skeleton.
+- `devpath/agent_tools.py` exposes deterministic tools for future agent orchestration.
 - `devpath/core/` contains deterministic scoring, privacy, config, and report helpers.
 - `devpath/services/` contains local file loading, export, and future GitHub service placeholders.
-- `devpath/sub_agents/` contains placeholders for future specialized agents.
+- `devpath/sub_agents/` contains ADK-compatible specialized agent skeletons.
 - `mcp_server/` contains placeholders for future MCP server tools.
 - `docs/` contains project specification, architecture, security, scoring, roadmap, and demo notes.
 - `tests/` contains deterministic helper tests.

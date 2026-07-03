@@ -102,10 +102,12 @@ def render_sidebar() -> None:
     with st.sidebar:
         st.header("DevPath MVP")
         st.markdown(
-            "**Project status:** Step 3C - structured Gemini-assisted output  \n"
+            "**Project status:** Step 4A - ADK skeleton and deterministic tools  \n"
             "**Mode:** local deterministic mock  \n"
             "**External API calls:** disabled by default  \n"
-            "**Data source:** sample JSON/TXT files"
+            "**Data source:** sample JSON/TXT files  \n"
+            "**ADK agent skeleton:** available  \n"
+            "**ADK runtime routing:** planned"
         )
 
         st.divider()

@@ -10,18 +10,20 @@
 - [x] Step 3A - Gemini integration foundation
 - [x] Step 3B - Local Gemini smoke test
 - [x] Step 3C - Structured Gemini-assisted output
-- [ ] Step 4 - ADK root agent and sub-agents
+- [x] Step 4A - ADK root agent skeleton and deterministic tools
+- [ ] Step 4B - Route selected app workflow through ADK runtime
 - [ ] Step 5 - MCP tools
 - [ ] Step 6 - GitHub public repo import
 - [ ] Step 7 - Demo video and Kaggle writeup
 
 ## Current Focus
 
-The project is still deterministic-first. The priority is a clear demo flow, explainable local behavior, optional structured Gemini narrative assistance, reliable tests, and documentation that sets correct expectations.
+The project is still deterministic-first. The current focus is an importable ADK-compatible skeleton, deterministic tool wiring, reliable tests, and documentation that makes the boundary between mock workflow and future agent runtime clear.
 
 ## Later Quality Improvements
 
 - Improve requirement extraction from job postings.
 - Add richer portfolio evidence mapping.
 - Expand report exports and demo assets.
-- Add agent and API integrations only after the local workflow is stable.
+- Route selected Streamlit actions through the ADK root agent when the skeleton is stable.
+- Add MCP and GitHub integrations only after deterministic tools remain reliable.
