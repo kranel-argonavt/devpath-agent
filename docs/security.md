@@ -45,6 +45,14 @@ DevPath Agent is designed around cautious handling of candidate data. The curren
 - Gemini failures fall back to deterministic mode.
 - Gemini-assisted output must not overwrite deterministic scores, missing skills, prioritized gaps, or evidence mappings.
 
+## Full Agent Workflow Safety
+
+- The full ADK-style workflow does not require API keys.
+- The full workflow is deterministic orchestration around local tools and services.
+- Agents record trace metadata but must not expose raw secrets or private tokens.
+- `profile_matcher` uses deterministic scoring and must not invent or modify numeric scores.
+- Automated tests for the full workflow do not call external APIs or live ADK runtime services.
+
 ## Runtime Boundaries
 
 - Tests do not make real Gemini calls.

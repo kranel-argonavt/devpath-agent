@@ -115,7 +115,8 @@ def render_sidebar() -> None:
             "**External API calls:** disabled by default except explicit GitHub public import  \n"
             "**Data source:** sample files or public GitHub repo metadata  \n"
             "**ADK agent skeleton:** available  \n"
-            "**ADK runtime routing:** planned"
+            "**Full agent workflow:** available via smoke test  \n"
+            "**Streamlit full agent mode:** planned"
         )
 
         st.divider()

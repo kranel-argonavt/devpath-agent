@@ -65,7 +65,27 @@ Explain:
 - The `Workflow Runtime` section shows whether MCP runtime was used, which tools were selected, and whether fallback happened.
 - The deterministic score remains the source of truth.
 
-## 6. Optional GitHub Public Repository Import
+## 6. Optional Full Agent Workflow Smoke Test
+
+Run:
+
+```powershell
+python scripts/check_full_agent_workflow.py
+```
+
+Show that the full ADK-style workflow executes each named stage:
+
+- `privacy_guard`
+- `job_analyzer`
+- `portfolio_evidence`
+- `profile_matcher`
+- `gap_planner`
+- `application_writer`
+- `interview_coach`
+
+Explain that this is deterministic orchestration and trace generation. It does not require a live ADK runtime, and `profile_matcher` still uses deterministic scoring as the source of truth.
+
+## 7. Optional GitHub Public Repository Import
 
 In `3. Portfolio Source`, select `GitHub public repositories`.
 
@@ -79,7 +99,7 @@ Demo steps:
 6. Generate a career strategy using the imported repositories as portfolio projects.
 7. Open `Portfolio Evidence` and show `GitHub Repository Evidence`.
 
-## 7. Optional Gemini Demo
+## 8. Optional Gemini Demo
 
 If a local API key is configured:
 
@@ -90,11 +110,11 @@ If a local API key is configured:
 
 If no key is configured, show the warning and explain that the app continues in deterministic mode.
 
-## 8. Export Markdown
+## 9. Export Markdown
 
 Open `Export`, click `Export Markdown Report`, and show the generated path. Mention that exported Markdown is privacy-masked, includes the `Workflow Runtime` section, and `outputs/*.md` is ignored by Git.
 
-## 9. Mention Smoke Tests
+## 10. Mention Smoke Tests
 
 Run or mention:
 
@@ -104,18 +124,20 @@ python scripts/check_adk_agent.py
 python scripts/check_mcp_tools.py
 python scripts/check_mcp_runtime.py
 python scripts/check_adk_mcp_tools.py
+python scripts/check_full_agent_workflow.py
 ```
 
-Explain that these validate optional Gemini connectivity, ADK skeleton structure, MCP-style deterministic tools, selected local MCP runtime calls, and the selected ADK-MCP bridge without requiring production runtime integration.
+Explain that these validate optional Gemini connectivity, ADK skeleton structure, MCP-style deterministic tools, selected local MCP runtime calls, the selected ADK-MCP bridge, and the full ADK-style deterministic workflow without requiring production runtime integration.
 
-## 10. Close With Architecture
+## 11. Close With Architecture
 
 Summarize:
 
 - Streamlit calls a workflow facade.
 - The workflow uses a tool router.
 - The tool router can use direct Python services or local MCP-style tools.
-- Full ADK runtime orchestration is planned next.
+- Full ADK-style deterministic orchestration now exists with trace metadata.
+- Streamlit full agent mode and trace polish are planned next.
 - Deterministic scoring remains the source of truth.
 
 ## Optional Step 6A.1 Runtime Proof

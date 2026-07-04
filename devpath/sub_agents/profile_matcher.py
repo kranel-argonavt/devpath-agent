@@ -18,7 +18,8 @@ DESCRIPTION = "Compares candidate evidence against a target job using determinis
 INSTRUCTION = """
 Call deterministic scoring tools and explain score categories, strong matches, partial matches,
 and gaps. Use deterministic scoring tools as the source of truth. Never invent or modify
-numeric match scores.
+numeric match scores. In the full workflow, this stage is responsible for producing the
+report's deterministic profile_match section.
 """
 TOOLS = [calculate_match_score_tool]
 

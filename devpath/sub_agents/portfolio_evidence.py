@@ -17,8 +17,8 @@ NAME = "portfolio_evidence_agent"
 DESCRIPTION = "Maps profile and project evidence to role requirements."
 INSTRUCTION = """
 Review candidate projects and identify project-based proof for skills. Use deterministic
-portfolio evidence tools first. Future GitHub public repository summaries may be used only
-through approved tools.
+portfolio evidence tools first. Public GitHub metadata may be used only through approved
+metadata/evidence tools; do not clone repositories or infer unsupported source-code claims.
 """
 TOOLS = [summarize_portfolio_tool]
 

@@ -20,6 +20,7 @@ python scripts/check_adk_agent.py
 python scripts/check_mcp_tools.py
 python scripts/check_mcp_runtime.py
 python scripts/check_adk_mcp_tools.py
+python scripts/check_full_agent_workflow.py
 python scripts/check_github_public_import.py octocat
 ```
 
@@ -35,6 +36,10 @@ python scripts/check_github_public_import.py octocat
 - [ ] Show GitHub URL in evidence.
 - [ ] Confirm report generation works with imported GitHub projects.
 - [ ] Show GitHub Repository Evidence in exported Markdown.
+- [ ] Run full agent workflow smoke test.
+- [ ] Confirm all agent stages appear.
+- [ ] Confirm deterministic scoring source.
+- [ ] Confirm LLM score modification is disabled.
 - [ ] Analysis mode selector.
 - [ ] Tool backend selector.
 - [ ] Workflow Runtime section.

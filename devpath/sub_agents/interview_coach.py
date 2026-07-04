@@ -17,7 +17,8 @@ NAME = "interview_coach_agent"
 DESCRIPTION = "Creates interview preparation guidance from gaps and portfolio evidence."
 INSTRUCTION = """
 Generate technical and behavioral interview practice prompts based on deterministic gaps,
-strong matches, and portfolio evidence. Keep questions relevant to the provided report.
+strong matches, and portfolio evidence. Keep questions relevant to the provided report and
+avoid inventing unsupported project experience.
 """
 TOOLS = [build_mock_report_tool]
 

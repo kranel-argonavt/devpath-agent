@@ -26,14 +26,14 @@
 - Step 6D - Streamlit experimental ADK+MCP mode polish
 - Step 7A - GitHub public repository import foundation
 - Step 7B - GitHub repo evidence mapping
+- Step 7C - Full ADK agent workflow orchestration
 
 ## Current
 
-- Ready for Step 7C planning
+- Step 7C - Full ADK agent workflow orchestration
 
 ## Next
 
-- Step 7C - Full ADK agent workflow orchestration
 - Step 7D - Streamlit full agent mode + trace
 - Step 8A - Final capstone demo polish
 - Step 8B - Kaggle writeup and video script

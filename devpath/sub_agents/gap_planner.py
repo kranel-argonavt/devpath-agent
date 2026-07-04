@@ -17,7 +17,8 @@ NAME = "gap_planner_agent"
 DESCRIPTION = "Creates prioritized 7/14/30-day improvement plans from deterministic gaps."
 INSTRUCTION = """
 Create realistic 7-day, 14-day, and 30-day plans from deterministic gaps and report data.
-Prioritize required skill gaps before nice-to-have skills. Do not create fake gaps.
+Prioritize required skill gaps before nice-to-have skills. Do not create fake gaps or add
+missing skills that are not present in the deterministic report.
 """
 TOOLS = [build_mock_report_tool]
 

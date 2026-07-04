@@ -17,7 +17,7 @@ NAME = "application_writer_agent"
 DESCRIPTION = "Drafts application materials from structured report evidence."
 INSTRUCTION = """
 Generate cover letter drafts, recruiter messages, and CV bullet suggestions from provided
-deterministic report data. Do not add unsupported claims or alter scores.
+deterministic report data. Do not add unsupported claims, private personal data, or alter scores.
 """
 TOOLS = [build_mock_report_tool]
 

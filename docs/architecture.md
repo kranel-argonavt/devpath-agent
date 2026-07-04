@@ -1,6 +1,6 @@
 # Architecture
 
-DevPath Agent is deterministic-first. Scoring, evidence, gaps, and category details are calculated locally and remain the source of truth. Gemini, ADK, and MCP layers are currently used as optional narrative, skeleton, or tool-contract layers around that deterministic core.
+DevPath Agent is deterministic-first. Scoring, evidence, gaps, and category details are calculated locally and remain the source of truth. Gemini, ADK, and MCP layers explain, orchestrate, or route deterministic tools around that core.
 
 ## Runtime Path Today
 
@@ -43,7 +43,7 @@ GitHub evidence mapper
 existing scoring/report workflow
 ```
 
-GitHub import feeds the portfolio source in Streamlit. GitHub public metadata is mapped into deterministic evidence through language, topics, description, URL, and repository signals, then passed into the existing scoring/report/export workflow. It uses public repository metadata only and does not require a token, access private repositories, scrape HTML, clone repositories, or download source code. It does not replace deterministic scoring. Full agent orchestration will be implemented after the GitHub portfolio block.
+GitHub import feeds the portfolio source in Streamlit. GitHub public metadata is mapped into deterministic evidence through language, topics, description, URL, and repository signals, then passed into the existing scoring/report/export workflow. It uses public repository metadata only and does not require a token, access private repositories, scrape HTML, clone repositories, or download source code. It does not replace deterministic scoring.
 
 ## Deterministic Source Of Truth
 
@@ -85,9 +85,37 @@ The direct backend calls deterministic Python helpers. The MCP-style backend cal
 - `devpath/sub_agents/` contains planned specialized agents.
 - `devpath/agent_tools.py` exposes deterministic tools for future agent orchestration.
 - `devpath/adk_mcp_tools.py` exposes selected experimental wrappers that can call MCP runtime tools.
+- `devpath/full_agent_workflow.py` runs the full ADK-style deterministic workflow and records an agent trace.
 - `scripts/check_adk_agent.py` validates the local ADK-compatible skeleton.
+- `scripts/check_full_agent_workflow.py` validates the deterministic full agent workflow.
 
-ADK runtime routing is not the default app runtime yet.
+Live ADK runtime routing is not the default app runtime yet. The full agent workflow is an ADK-style deterministic orchestration facade that remains import-safe and testable without a live ADK server.
+
+## Step 7C Full ADK-Style Workflow
+
+```text
+Full ADK-style workflow
+   |
+privacy_guard
+   |
+job_analyzer
+   |
+portfolio_evidence
+   |
+profile_matcher
+   |
+deterministic scoring tool
+   |
+gap_planner
+   |
+application_writer
+   |
+interview_coach
+   |
+final report
+```
+
+`run_full_agent_workflow` coordinates the named stages, calls deterministic services, and adds `agent_workflow` plus serialized `agent_trace` metadata to the report. Automated tests do not require live ADK runtime execution. MCP runtime can still be used by selected backends, but the full workflow defaults to deterministic direct behavior unless configured otherwise.
 
 ## MCP Layer
 
@@ -184,6 +212,7 @@ python scripts/check_adk_agent.py
 python scripts/check_mcp_tools.py
 python scripts/check_mcp_runtime.py
 python scripts/check_adk_mcp_tools.py
+python scripts/check_full_agent_workflow.py
 python scripts/check_github_public_import.py octocat
 ```
 
@@ -203,4 +232,4 @@ MCP runtime tools
 deterministic services + optional Gemini narrative
 ```
 
-Full ADK agent workflow orchestration is planned next. GitHub features should remain public-repo-only unless a secure permission model is added.
+Streamlit full agent mode and trace polish are planned next. GitHub features should remain public-repo-only unless a secure permission model is added.

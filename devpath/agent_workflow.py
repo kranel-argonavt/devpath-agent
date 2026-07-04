@@ -152,6 +152,27 @@ def run_career_strategy_workflow(
     return WorkflowResult(report=report, mode_used=GEMINI_MODE, warnings=warnings)
 
 
+def run_career_strategy_agent_workflow(
+    workflow_input: WorkflowInput,
+) -> WorkflowResult:
+    """Run the deterministic full ADK-style agent workflow as an opt-in path."""
+
+    from devpath.full_agent_workflow import FullAgentWorkflowInput, run_full_agent_workflow
+
+    result = run_full_agent_workflow(
+        FullAgentWorkflowInput(
+            job_text=workflow_input.job_text,
+            profile=workflow_input.profile,
+            projects=workflow_input.projects,
+            target_role=workflow_input.target_role,
+            cv_text=workflow_input.cv_text,
+            tool_backend=workflow_input.tool_backend,
+            analysis_mode=workflow_input.analysis_mode,
+        )
+    )
+    return WorkflowResult(report=result.report, mode_used=MOCK_MODE, warnings=result.warnings)
+
+
 def _profile_with_target_role(profile: dict[str, Any], target_role: str) -> dict[str, Any]:
     profile_copy = deepcopy(profile)
     if target_role:

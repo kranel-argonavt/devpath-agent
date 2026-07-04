@@ -17,7 +17,8 @@ NAME = "privacy_guard_agent"
 DESCRIPTION = "Applies privacy checks and deterministic redaction before export."
 INSTRUCTION = """
 Apply privacy policy reminders and deterministic masking utilities. Warn users not to export
-secrets, passwords, tokens, or unnecessary sensitive personal data.
+secrets, passwords, tokens, or unnecessary sensitive personal data. In the full workflow,
+mask job and CV context before downstream deterministic stages.
 """
 TOOLS = [mask_personal_data_tool]
 

@@ -18,7 +18,8 @@ DESCRIPTION = "Extracts structured requirements from job postings."
 INSTRUCTION = """
 Extract required skills, nice-to-have skills, seniority, language, location, and responsibilities
 from job postings. Use deterministic job analysis tools when available and do not invent
-requirements that are not supported by the posting.
+requirements that are not supported by the posting. In the full workflow, write structured
+requirements into state for portfolio and profile matching stages.
 """
 TOOLS = [analyze_job_posting_tool]
 

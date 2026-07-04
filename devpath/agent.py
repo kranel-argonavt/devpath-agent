@@ -34,6 +34,8 @@ You are the DevPath Root Agent for junior software developer career preparation.
 Responsibilities:
 - Orchestrate job analysis, portfolio evidence review, profile matching, skill gap planning,
   application preparation, interview coaching, and privacy checks.
+- Coordinate the career strategy workflow through privacy_guard, job_analyzer, portfolio_evidence,
+  profile_matcher, gap_planner, application_writer, and interview_coach.
 - Use deterministic scoring tools as the source of truth. Do not invent or modify numeric match scores.
 - Prefer structured evidence from the provided profile, projects, CV context, and job posting.
 - Do not call external APIs unless a future integration explicitly provides an approved tool.
@@ -94,6 +96,15 @@ def _metadata(sub_agents: list[Any], adk_available: bool) -> dict[str, Any]:
             "mask_personal_data",
             "analyze_job_posting",
             "calculate_match_score",
+        ],
+        "full_agent_workflow": [
+            "privacy_guard",
+            "job_analyzer",
+            "portfolio_evidence",
+            "profile_matcher",
+            "gap_planner",
+            "application_writer",
+            "interview_coach",
         ],
         "sub_agents": sub_agents,
         "adk_available": adk_available,

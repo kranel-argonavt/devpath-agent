@@ -31,7 +31,7 @@ The deterministic report remains the source of truth. Gemini can add concise nar
 
 ## Current Status
 
-Current status: **Step 7B - GitHub public repository evidence mapping.**
+Current status: **Step 7C - Full ADK-style deterministic agent workflow orchestration.**
 
 Implemented today:
 
@@ -56,12 +56,13 @@ Implemented today:
 - Workflow runtime metadata in the UI and exported Markdown
 - GitHub public repository metadata import as a portfolio source
 - GitHub public repository metadata mapped into portfolio evidence
+- Full ADK-style deterministic agent workflow with named stages and trace metadata
 - Local Gemini, ADK, and MCP smoke-test scripts
 - Pytest suite for deterministic helpers, workflow, tools, and smoke scripts
 
 Not implemented yet:
 
-- Full ADK runtime routing
+- Live ADK runtime routing in Streamlit
 - Full MCP runtime workflow integration
 - GitHub source-code evidence mapping
 - GitHub private repository access
@@ -78,6 +79,20 @@ Not implemented yet:
 - `devpath/tool_router.py` lets the workflow use direct deterministic services, the local MCP-style registry in-process, or experimental ADK-MCP runtime wrappers.
 
 Streamlit does **not** yet run a full ADK runtime. The experimental ADK-MCP backend is selected manually and only routes selected deterministic tools through local MCP stdio with safe fallback.
+
+## Full Agent Workflow Orchestration
+
+The project now includes a full ADK-style deterministic workflow facade in `devpath/full_agent_workflow.py`. It runs the career strategy process through named stages:
+
+- `privacy_guard`
+- `job_analyzer`
+- `portfolio_evidence`
+- `profile_matcher`
+- `gap_planner`
+- `application_writer`
+- `interview_coach`
+
+These stages orchestrate existing deterministic tools and services, produce an agent trace, and attach workflow metadata to the report. Deterministic scoring remains the source of truth; agents must not invent or modify numeric match scores.
 
 ## Setup
 
@@ -119,6 +134,7 @@ python scripts/check_adk_agent.py
 python scripts/check_mcp_tools.py
 python scripts/check_mcp_runtime.py
 python scripts/check_adk_mcp_tools.py
+python scripts/check_full_agent_workflow.py
 python scripts/check_github_public_import.py octocat
 ```
 
@@ -197,6 +213,7 @@ Do not commit `.env`.
 - `app.py`: Streamlit mock workflow.
 - `data/`: sample job posting, profile, and portfolio projects.
 - `devpath/agent_workflow.py`: single workflow facade used by Streamlit.
+- `devpath/full_agent_workflow.py`: opt-in full ADK-style deterministic workflow with agent trace.
 - `devpath/tool_router.py`: local backend selector for direct services or MCP-style tools.
 - `devpath/core/`: deterministic scoring, privacy, config, and report helpers.
 - `devpath/services/`: file loading, export, Gemini wrapper, and public GitHub metadata import.
