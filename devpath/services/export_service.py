@@ -36,6 +36,9 @@ def _report_to_markdown(report: dict[str, Any]) -> str:
     sections = [
         "# DevPath Agent Career Strategy Report",
         "",
+        "## Workflow Runtime",
+        *_render_workflow_runtime(report.get("runtime_route", {})),
+        "",
         "## 1. Job Analysis",
         *_render_job_analysis(report.get("job_analysis", {})),
         "",
@@ -71,6 +74,29 @@ def _report_to_markdown(report: dict[str, Any]) -> str:
         "",
     ]
     return mask_personal_data("\n".join(sections).strip() + "\n")
+
+
+def _render_workflow_runtime(runtime_route: dict[str, Any]) -> list[str]:
+    if not runtime_route:
+        return ["- Runtime metadata: Not available."]
+
+    requested_backend = runtime_route.get("requested_tool_backend") or runtime_route.get("tool_backend", "Unknown")
+    selected_tools = runtime_route.get("selected_tools") or []
+    notes = runtime_route.get("notes") or []
+    lines = [
+        f"- Requested backend: {requested_backend}",
+        f"- Backend used: {runtime_route.get('tool_backend', 'Unknown')}",
+        f"- MCP runtime used: {_yes_no(runtime_route.get('mcp_runtime_used'))}",
+        f"- Experimental route: {_yes_no(runtime_route.get('experimental'))}",
+        f"- Fallback used: {_yes_no(runtime_route.get('fallback_used'))}",
+        f"- Selected tools: {', '.join(str(tool) for tool in selected_tools) if selected_tools else 'None'}",
+        "- Notes:",
+    ]
+    if notes:
+        lines.extend(f"  - {note}" for note in notes)
+    else:
+        lines.append("  - No runtime notes available.")
+    return lines
 
 
 def _render_job_analysis(job_analysis: dict[str, Any]) -> list[str]:
@@ -299,6 +325,10 @@ def _table_cell(value: Any) -> str:
 
 def _titleize(key: str) -> str:
     return key.replace("_", " ").title()
+
+
+def _yes_no(value: Any) -> str:
+    return "Yes" if bool(value) else "No"
 
 
 def _strip_trailing_blank(lines: list[str]) -> list[str]:

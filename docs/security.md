@@ -44,6 +44,8 @@ DevPath Agent is designed around cautious handling of candidate data. The curren
 - The experimental ADK-MCP backend uses local stdio runtime only and falls back to direct deterministic services on failure.
 - Automated tests use dependency injection for the ADK-MCP bridge and do not start runtime transports.
 - Do not pass secrets into MCP runtime tool arguments.
+- Runtime metadata is safe to display because it contains backend names, selected tool names, and status flags only.
+- Exported runtime metadata must not include tool inputs, secrets, API keys, or pasted user content.
 
 ## Current Non-Goals
 

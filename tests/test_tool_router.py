@@ -35,6 +35,10 @@ def test_build_report_with_direct_backend_returns_profile_match_data() -> None:
     assert report["runtime_route"] == {
         "tool_backend": DIRECT_BACKEND,
         "mcp_runtime_used": False,
+        "experimental": False,
+        "fallback_used": False,
+        "selected_tools": [],
+        "notes": ["Default deterministic backend."],
     }
 
 
@@ -51,6 +55,10 @@ def test_build_report_with_mcp_style_backend_returns_profile_match_data() -> Non
     assert report["runtime_route"] == {
         "tool_backend": MCP_STYLE_BACKEND,
         "mcp_runtime_used": False,
+        "experimental": False,
+        "fallback_used": False,
+        "selected_tools": ["local MCP-style wrappers"],
+        "notes": ["Uses local MCP-style registry without starting runtime transport."],
     }
 
 
@@ -102,9 +110,41 @@ def test_build_report_with_experimental_adk_mcp_backend_uses_wrappers(monkeypatc
     assert report["profile_match"]["overall_score"] == direct_report["profile_match"]["overall_score"]
     assert report["runtime_route"]["tool_backend"] == ADK_MCP_RUNTIME_BACKEND
     assert report["runtime_route"]["mcp_runtime_used"] is True
+    assert report["runtime_route"]["experimental"] is True
+    assert report["runtime_route"]["fallback_used"] is False
     assert report["runtime_route"]["selected_tools"] == ["analyze_job_posting", "calculate_match_score"]
-    assert report["runtime_route"]["score_consistent"] is True
+    assert report["runtime_route"]["notes"] == [
+        "Selected ADK-style wrappers routed through local MCP stdio runtime."
+    ]
     assert calls == [("analyze", _job_text()), ("score", _job_text())]
+
+
+def test_experimental_adk_mcp_backend_preserves_score_when_runtime_score_is_incompatible(monkeypatch) -> None:
+    direct_report = build_report_with_backend(
+        _job_text(),
+        _profile(),
+        _projects(),
+        tool_backend=DIRECT_BACKEND,
+    )
+
+    def fake_analyze(job_text):
+        return {"required_skills": ["C#", ".NET"]}
+
+    def fake_score(job_text, profile, projects):
+        return {"overall_score": 1}
+
+    monkeypatch.setattr("devpath.adk_mcp_tools.analyze_job_posting_via_mcp_tool", fake_analyze)
+    monkeypatch.setattr("devpath.adk_mcp_tools.calculate_match_score_via_mcp_tool", fake_score)
+
+    report = build_report_with_backend(
+        _job_text(),
+        _profile(),
+        _projects(),
+        tool_backend=ADK_MCP_RUNTIME_BACKEND,
+    )
+
+    assert report["profile_match"]["overall_score"] == direct_report["profile_match"]["overall_score"]
+    assert "Runtime score result was incompatible" in " ".join(report["runtime_route"]["notes"])
 
 
 def test_experimental_adk_mcp_backend_raises_for_wrapper_failure(monkeypatch) -> None:

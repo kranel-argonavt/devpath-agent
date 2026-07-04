@@ -88,6 +88,15 @@ def run_career_strategy_workflow(
                 output_style=workflow_input.output_style,
                 tool_backend=DIRECT_BACKEND,
             )
+            _mark_backend_fallback(
+                deterministic_report,
+                requested_backend=MCP_STYLE_BACKEND,
+                notes=[
+                    "Local MCP-style tools could not be used.",
+                    "Fell back to direct deterministic services.",
+                ],
+                experimental=False,
+            )
         elif workflow_input.tool_backend == ADK_MCP_RUNTIME_BACKEND:
             warnings.append(
                 "Experimental ADK-MCP runtime tools could not be used. Falling back to direct deterministic services."
@@ -99,6 +108,15 @@ def run_career_strategy_workflow(
                 cv_text=workflow_input.cv_text,
                 output_style=workflow_input.output_style,
                 tool_backend=DIRECT_BACKEND,
+            )
+            _mark_backend_fallback(
+                deterministic_report,
+                requested_backend=ADK_MCP_RUNTIME_BACKEND,
+                notes=[
+                    "Experimental ADK-MCP runtime tools could not be used.",
+                    "Fell back to direct deterministic services.",
+                ],
+                experimental=True,
             )
         else:
             raise
@@ -150,3 +168,21 @@ def _restore_deterministic_profile_match_fields(report: dict[str, Any], snapshot
     profile_match = report.setdefault("profile_match", {})
     for field, value in snapshot.items():
         profile_match[field] = deepcopy(value)
+
+
+def _mark_backend_fallback(
+    report: dict[str, Any],
+    *,
+    requested_backend: str,
+    notes: list[str],
+    experimental: bool,
+) -> None:
+    report["runtime_route"] = {
+        "tool_backend": DIRECT_BACKEND,
+        "requested_tool_backend": requested_backend,
+        "mcp_runtime_used": False,
+        "experimental": experimental,
+        "fallback_used": True,
+        "selected_tools": [],
+        "notes": notes,
+    }

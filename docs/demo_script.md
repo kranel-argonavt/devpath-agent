@@ -36,6 +36,7 @@ Click `Generate Career Strategy`.
 
 Show:
 
+- `Workflow Runtime` section with backend used and fallback status
 - `Profile Match` overall score and category breakdown
 - `Evidence by Skill`
 - `Skill Gaps` and prioritized recommendations
@@ -51,6 +52,7 @@ Explain:
 
 - This path uses the local MCP-style registry in-process.
 - No MCP transport is started.
+- The `Workflow Runtime` section shows backend metadata.
 - The deterministic score remains the source of truth.
 
 Optionally switch `Tool backend` to `Experimental ADK-MCP runtime tools` and generate again.
@@ -60,6 +62,7 @@ Explain:
 - This path routes selected job-analysis and match-score calls through ADK-style wrappers and local MCP stdio runtime.
 - Direct Python services remain the default.
 - If the runtime path fails, the workflow falls back to direct deterministic services with a warning.
+- The `Workflow Runtime` section shows whether MCP runtime was used, which tools were selected, and whether fallback happened.
 - The deterministic score remains the source of truth.
 
 ## 6. Optional Gemini Demo
@@ -75,7 +78,7 @@ If no key is configured, show the warning and explain that the app continues in 
 
 ## 7. Export Markdown
 
-Open `Export`, click `Export Markdown Report`, and show the generated path. Mention that exported Markdown is privacy-masked and `outputs/*.md` is ignored by Git.
+Open `Export`, click `Export Markdown Report`, and show the generated path. Mention that exported Markdown is privacy-masked, includes the `Workflow Runtime` section, and `outputs/*.md` is ignored by Git.
 
 ## 8. Mention Smoke Tests
 
@@ -130,3 +133,14 @@ Tool backend -> Experimental ADK-MCP runtime tools
 ```
 
 Generate the report and explain that the workflow can now use the selected ADK-MCP runtime route while still preserving deterministic scoring and safe fallback behavior.
+
+## Optional Step 6D Runtime Metadata Demo
+
+Show:
+
+- Tool backend selector.
+- A generated report with `Direct Python services`.
+- The `Workflow Runtime` section.
+- A generated report with `Experimental ADK-MCP runtime tools`.
+- Whether MCP runtime was used or fallback happened.
+- Exported Markdown with the `Workflow Runtime` section.

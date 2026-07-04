@@ -31,7 +31,7 @@ The deterministic report remains the source of truth. Gemini can add concise nar
 
 ## Current Status
 
-Current status: **Step 6C - experimental ADK-MCP runtime backend available through the workflow.**
+Current status: **Step 6D - Streamlit displays workflow runtime metadata for demo-ready backend transparency.**
 
 Implemented today:
 
@@ -53,6 +53,7 @@ Implemented today:
 - Local MCP runtime smoke test succeeds with selected deterministic tools
 - Experimental ADK-MCP bridge wrappers for selected deterministic tools
 - Experimental ADK-MCP runtime tool backend with safe direct fallback
+- Workflow runtime metadata in the UI and exported Markdown
 - Local Gemini, ADK, and MCP smoke-test scripts
 - Pytest suite for deterministic helpers, workflow, tools, and smoke scripts
 
@@ -138,6 +139,8 @@ python scripts/check_adk_mcp_tools.py
 This validates that selected ADK-style tool wrappers can call deterministic tools through the local MCP stdio runtime. The default Streamlit workflow does not use this runtime path yet.
 
 The Streamlit workflow can also select `Experimental ADK-MCP runtime tools` as a tool backend. Direct Python services remain the default, and the experimental route falls back to direct deterministic services if the local runtime cannot be used.
+
+The UI now displays workflow runtime metadata, including selected backend, backend used, MCP runtime usage, experimental route status, fallback status, selected tools, and notes. The same safe metadata is included in exported Markdown reports.
 
 ## Optional Gemini Setup
 

@@ -18,6 +18,8 @@ streamlit run app.py
 python scripts/check_gemini_connection.py
 python scripts/check_adk_agent.py
 python scripts/check_mcp_tools.py
+python scripts/check_mcp_runtime.py
+python scripts/check_adk_mcp_tools.py
 ```
 
 ## UI Points To Show
@@ -27,11 +29,16 @@ python scripts/check_mcp_tools.py
 - [ ] Portfolio source.
 - [ ] Analysis mode selector.
 - [ ] Tool backend selector.
+- [ ] Workflow Runtime section.
+- [ ] Selected backend.
+- [ ] MCP runtime used status.
+- [ ] Fallback status.
 - [ ] Profile Match tab.
 - [ ] Evidence by Skill.
 - [ ] Skill Gaps tab.
 - [ ] Gemini-assisted Career Strategy if API key is configured.
 - [ ] Markdown export.
+- [ ] Export Markdown and verify Workflow Runtime section.
 
 ## Safety Checks
 

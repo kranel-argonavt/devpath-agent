@@ -272,6 +272,11 @@ def render_analysis_settings_section() -> dict[str, Any]:
             "start a local MCP stdio runtime for selected tools and fall back safely if unavailable."
         ),
     )
+    st.caption(
+        "Direct Python services: stable deterministic backend. "
+        "Local MCP-style tools: uses MCP-style local wrappers without runtime transport. "
+        "Experimental ADK-MCP runtime tools: starts local MCP stdio runtime for selected tools and falls back safely if unavailable."
+    )
     output_style = st.selectbox("Output style", ["Concise", "Detailed"])
     include_cover_letter = st.checkbox("Include cover letter draft", value=True)
     include_interview_prep = st.checkbox("Include interview prep", value=True)
@@ -332,6 +337,7 @@ def render_results_tabs(report: dict[str, Any], projects: list[dict[str, Any]], 
     st.divider()
     st.header("7. Results")
     st.caption("Review the mock analysis, then export a Markdown report when the result looks useful.")
+    render_workflow_runtime(report.get("runtime_route", {}))
 
     tabs = st.tabs(
         [
@@ -366,6 +372,42 @@ def render_results_tabs(report: dict[str, Any], projects: list[dict[str, Any]], 
         render_interview_prep_tab(report["interview_prep"], settings["include_interview_prep"])
     with tabs[7]:
         render_export_tab(report)
+
+
+def render_workflow_runtime(runtime_route: dict[str, Any]) -> None:
+    if not runtime_route:
+        st.info("Workflow Runtime: no runtime metadata available for this report.")
+        return
+
+    requested_backend = runtime_route.get("requested_tool_backend") or runtime_route.get("tool_backend", "Unknown")
+    backend_used = runtime_route.get("tool_backend", "Unknown")
+    mcp_runtime_used = bool(runtime_route.get("mcp_runtime_used"))
+    experimental = bool(runtime_route.get("experimental"))
+    fallback_used = bool(runtime_route.get("fallback_used"))
+    selected_tools = runtime_route.get("selected_tools") or []
+    notes = runtime_route.get("notes") or []
+
+    if fallback_used:
+        st.warning("Workflow Runtime: fallback was used. The report was generated with direct deterministic services.")
+    elif experimental and mcp_runtime_used:
+        st.info("Workflow Runtime: experimental ADK-MCP runtime route succeeded for selected tools.")
+    else:
+        st.success("Workflow Runtime: stable deterministic route used.")
+
+    with st.expander("Workflow Runtime", expanded=True):
+        col_a, col_b, col_c = st.columns(3)
+        col_a.metric("Backend selected", str(requested_backend))
+        col_b.metric("Backend used", str(backend_used))
+        col_c.metric("MCP runtime used", "Yes" if mcp_runtime_used else "No")
+
+        col_d, col_e = st.columns(2)
+        col_d.metric("Experimental route", "Yes" if experimental else "No")
+        col_e.metric("Fallback used", "Yes" if fallback_used else "No")
+
+        st.markdown("**Selected tools:**")
+        render_bullets(selected_tools, "No runtime tools were selected for this backend.")
+        st.markdown("**Notes:**")
+        render_bullets(notes, "No runtime notes available.")
 
 
 def render_job_analysis_tab(

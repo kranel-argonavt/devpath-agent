@@ -51,12 +51,13 @@ If Gemini is selected but no API key is configured, the workflow returns the det
 
 ## Tool Router
 
-`devpath/tool_router.py` supports two local backends:
+`devpath/tool_router.py` supports three local backends:
 
 - `Direct Python services`
 - `Local MCP-style tools`
+- `Experimental ADK-MCP runtime tools`
 
-The direct backend calls deterministic Python helpers. The MCP-style backend calls the local MCP tool registry in-process. Unknown backend names normalize to the direct backend.
+The direct backend calls deterministic Python helpers. The MCP-style backend calls the local MCP tool registry in-process. The experimental backend validates selected ADK-MCP runtime calls and falls back safely through the workflow if unavailable. Unknown backend names normalize to the direct backend.
 
 ## ADK Layer
 
@@ -131,6 +132,22 @@ deterministic tools
 ```
 
 The Step 6C backend is opt-in. It builds the report shape through deterministic report logic, validates selected job-analysis and match-score calls through ADK-MCP wrappers, records runtime route metadata, and falls back to direct deterministic services if runtime startup or tool calls fail.
+
+## Step 6D Runtime Transparency
+
+Step 6D makes the experimental ADK-MCP route visible and demo-friendly in Streamlit, while keeping Direct Python services as the default.
+
+The report now carries safe `runtime_route` metadata:
+
+- Selected/requested backend
+- Actual backend used
+- MCP runtime usage
+- Experimental route status
+- Fallback status
+- Selected tools
+- Human-readable notes
+
+This metadata is displayed in the Streamlit `Workflow Runtime` section and exported to Markdown. It does not include tool inputs, secrets, API keys, or private user data.
 
 ## Gemini Layer
 

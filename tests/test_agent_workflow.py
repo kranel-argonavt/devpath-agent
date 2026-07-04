@@ -18,12 +18,27 @@ def test_workflow_mock_mode_returns_deterministic_report_without_gemini() -> Non
     assert result.warnings == []
     assert "overall_score" in result.report["profile_match"]
     assert "gemini_insights" not in result.report
+    assert result.report["runtime_route"]["tool_backend"] == DIRECT_BACKEND
+    assert result.report["runtime_route"]["fallback_used"] is False
 
 
 def test_workflow_uses_direct_backend_by_default() -> None:
     workflow_input = _workflow_input(analysis_mode=MOCK_MODE)
 
     assert workflow_input.tool_backend == DIRECT_BACKEND
+
+
+def test_workflow_returns_runtime_metadata_for_direct_backend() -> None:
+    result = run_career_strategy_workflow(_workflow_input(analysis_mode=MOCK_MODE))
+
+    assert result.report["runtime_route"] == {
+        "tool_backend": DIRECT_BACKEND,
+        "mcp_runtime_used": False,
+        "experimental": False,
+        "fallback_used": False,
+        "selected_tools": [],
+        "notes": ["Default deterministic backend."],
+    }
 
 
 def test_workflow_can_use_mcp_style_backend() -> None:
@@ -35,6 +50,14 @@ def test_workflow_can_use_mcp_style_backend() -> None:
     assert mcp_result.mode_used == MOCK_MODE
     assert mcp_result.warnings == []
     assert mcp_result.report["profile_match"]["overall_score"] == direct_result.report["profile_match"]["overall_score"]
+    assert mcp_result.report["runtime_route"] == {
+        "tool_backend": MCP_STYLE_BACKEND,
+        "mcp_runtime_used": False,
+        "experimental": False,
+        "fallback_used": False,
+        "selected_tools": ["local MCP-style wrappers"],
+        "notes": ["Uses local MCP-style registry without starting runtime transport."],
+    }
 
 
 def test_workflow_falls_back_if_mcp_style_backend_fails(monkeypatch) -> None:
@@ -54,6 +77,9 @@ def test_workflow_falls_back_if_mcp_style_backend_fails(monkeypatch) -> None:
 
     assert result.mode_used == MOCK_MODE
     assert "overall_score" in result.report["profile_match"]
+    assert result.report["runtime_route"]["tool_backend"] == DIRECT_BACKEND
+    assert result.report["runtime_route"]["requested_tool_backend"] == MCP_STYLE_BACKEND
+    assert result.report["runtime_route"]["fallback_used"] is True
     assert result.warnings == [
         "Local MCP-style tools could not be used. Falling back to direct deterministic services."
     ]
@@ -193,6 +219,9 @@ def test_workflow_can_use_experimental_adk_mcp_backend(monkeypatch) -> None:
     assert result.warnings == []
     assert result.report["runtime_route"]["tool_backend"] == ADK_MCP_RUNTIME_BACKEND
     assert result.report["runtime_route"]["mcp_runtime_used"] is True
+    assert result.report["runtime_route"]["experimental"] is True
+    assert result.report["runtime_route"]["fallback_used"] is False
+    assert result.report["runtime_route"]["selected_tools"] == ["analyze_job_posting", "calculate_match_score"]
     assert result.report["profile_match"]["overall_score"] == direct_report["profile_match"]["overall_score"]
 
 
@@ -214,6 +243,14 @@ def test_workflow_falls_back_if_experimental_adk_mcp_backend_fails(monkeypatch) 
     assert result.mode_used == MOCK_MODE
     assert "overall_score" in result.report["profile_match"]
     assert result.report["runtime_route"]["tool_backend"] == DIRECT_BACKEND
+    assert result.report["runtime_route"]["requested_tool_backend"] == ADK_MCP_RUNTIME_BACKEND
+    assert result.report["runtime_route"]["fallback_used"] is True
+    assert result.report["runtime_route"]["experimental"] is True
+    assert result.report["runtime_route"]["selected_tools"] == []
+    assert result.report["runtime_route"]["notes"] == [
+        "Experimental ADK-MCP runtime tools could not be used.",
+        "Fell back to direct deterministic services.",
+    ]
     assert result.warnings == [
         "Experimental ADK-MCP runtime tools could not be used. Falling back to direct deterministic services."
     ]
@@ -255,6 +292,8 @@ def test_workflow_gemini_fake_generator_works_after_experimental_adk_mcp_backend
     assert result.mode_used == GEMINI_MODE
     assert result.report["gemini_insights"]["career_summary"] == "Fake ADK-MCP-backed Gemini summary"
     assert result.report["profile_match"]["overall_score"] == direct_report["profile_match"]["overall_score"]
+    assert result.report["runtime_route"]["tool_backend"] == ADK_MCP_RUNTIME_BACKEND
+    assert result.report["runtime_route"]["fallback_used"] is False
     assert result.warnings == []
 
 
@@ -288,6 +327,8 @@ def test_workflow_gemini_fake_generator_works_after_experimental_fallback(monkey
     assert result.mode_used == GEMINI_MODE
     assert result.report["gemini_insights"]["career_summary"] == "Fake fallback Gemini summary"
     assert result.report["runtime_route"]["tool_backend"] == DIRECT_BACKEND
+    assert result.report["runtime_route"]["requested_tool_backend"] == ADK_MCP_RUNTIME_BACKEND
+    assert result.report["runtime_route"]["fallback_used"] is True
     assert result.warnings == [
         "Experimental ADK-MCP runtime tools could not be used. Falling back to direct deterministic services."
     ]

@@ -68,6 +68,18 @@ def test_export_markdown_report_writes_rich_markdown_file(tmp_path: Path) -> Non
             "recruiter_message_draft": "GOOGLE_API_KEY=abc123",
         },
         "interview_prep": {"questions": ["What is .NET?"], "practice_focus": ["ASP.NET Core"]},
+        "runtime_route": {
+            "tool_backend": "Direct Python services",
+            "requested_tool_backend": "Experimental ADK-MCP runtime tools",
+            "mcp_runtime_used": False,
+            "experimental": True,
+            "fallback_used": True,
+            "selected_tools": [],
+            "notes": [
+                "Experimental ADK-MCP runtime tools could not be used.",
+                "Fell back to direct deterministic services.",
+            ],
+        },
         "gemini_insights": {
             "career_summary": "Optional Gemini-assisted narrative summary.",
             "top_actions": ["Apply with API evidence", "Update README", "Practice interviews"],
@@ -86,6 +98,10 @@ def test_export_markdown_report_writes_rich_markdown_file(tmp_path: Path) -> Non
     assert output_path.exists()
     assert result.endswith(".md")
     assert "# DevPath Agent Career Strategy Report" in content
+    assert "## Workflow Runtime" in content
+    assert "- Requested backend: Experimental ADK-MCP runtime tools" in content
+    assert "- Backend used: Direct Python services" in content
+    assert "- Fallback used: Yes" in content
     assert "### Overall Match Score" in content
     assert "### Category Breakdown" in content
     assert "## 3. Evidence by Skill" in content
