@@ -15,7 +15,18 @@ DevPath Agent is designed around cautious handling of candidate data. The curren
 - Do not paste secrets, passwords, private tokens, or sensitive personal data into the app.
 - Do not pass secrets into MCP-style tool inputs.
 - Avoid showing private data during demos or screenshots.
-- Future GitHub import should use public repositories only unless a secure permission model is added.
+- GitHub import uses public repositories only unless a secure permission model is added later.
+- GitHub usernames are not secrets, but avoid showing private personal context in screenshots.
+
+## GitHub Safety
+
+- No GitHub token is required for Step 7A.
+- Only public repository metadata is imported.
+- Private repositories are not accessed.
+- GitHub HTML pages are not scraped.
+- Repositories are not cloned.
+- Source code is not downloaded.
+- Automated tests mock GitHub responses and do not call the real GitHub API.
 
 ## Export Safety
 

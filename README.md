@@ -31,7 +31,7 @@ The deterministic report remains the source of truth. Gemini can add concise nar
 
 ## Current Status
 
-Current status: **Step 6D - Streamlit displays workflow runtime metadata for demo-ready backend transparency.**
+Current status: **Step 7A - GitHub public repository import foundation.**
 
 Implemented today:
 
@@ -54,6 +54,7 @@ Implemented today:
 - Experimental ADK-MCP bridge wrappers for selected deterministic tools
 - Experimental ADK-MCP runtime tool backend with safe direct fallback
 - Workflow runtime metadata in the UI and exported Markdown
+- GitHub public repository metadata import as a portfolio source
 - Local Gemini, ADK, and MCP smoke-test scripts
 - Pytest suite for deterministic helpers, workflow, tools, and smoke scripts
 
@@ -61,7 +62,8 @@ Not implemented yet:
 
 - Full ADK runtime routing
 - Full MCP runtime workflow integration
-- GitHub API integration
+- GitHub source-code evidence mapping
+- GitHub private repository access
 - Source-code repository inspection
 - Production deployment
 
@@ -116,6 +118,7 @@ python scripts/check_adk_agent.py
 python scripts/check_mcp_tools.py
 python scripts/check_mcp_runtime.py
 python scripts/check_adk_mcp_tools.py
+python scripts/check_github_public_import.py octocat
 ```
 
 ## MCP Runtime Smoke Test
@@ -141,6 +144,22 @@ This validates that selected ADK-style tool wrappers can call deterministic tool
 The Streamlit workflow can also select `Experimental ADK-MCP runtime tools` as a tool backend. Direct Python services remain the default, and the experimental route falls back to direct deterministic services if the local runtime cannot be used.
 
 The UI now displays workflow runtime metadata, including selected backend, backend used, MCP runtime usage, experimental route status, fallback status, selected tools, and notes. The same safe metadata is included in exported Markdown reports.
+
+## GitHub Public Repository Import
+
+Users can import public repository metadata by GitHub username and use those repositories as portfolio projects.
+
+- No GitHub token is required.
+- Only public metadata is used: name, description, URL, language, topics, stars, forks, update timestamps, fork flag, and archived flag.
+- Private repositories are not accessed.
+- Repositories are not cloned.
+- Source code is not downloaded in this step.
+
+Manual smoke test:
+
+```powershell
+python scripts/check_github_public_import.py octocat
+```
 
 ## Optional Gemini Setup
 
@@ -177,7 +196,7 @@ Do not commit `.env`.
 - `devpath/agent_workflow.py`: single workflow facade used by Streamlit.
 - `devpath/tool_router.py`: local backend selector for direct services or MCP-style tools.
 - `devpath/core/`: deterministic scoring, privacy, config, and report helpers.
-- `devpath/services/`: file loading, export, Gemini wrapper, and future GitHub placeholder.
+- `devpath/services/`: file loading, export, Gemini wrapper, and public GitHub metadata import.
 - `devpath/agent.py`: ADK-compatible root agent skeleton.
 - `devpath/sub_agents/`: ADK-compatible sub-agent skeletons.
 - `devpath/agent_tools.py`: deterministic tools for future agent orchestration.

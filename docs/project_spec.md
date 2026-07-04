@@ -20,7 +20,7 @@ The app also includes optional Gemini-assisted structured insights, an ADK-compa
 - Job posting text
 - Optional job source URL
 - Candidate profile fields
-- Portfolio project data
+- Portfolio project data from local samples or public GitHub repository metadata
 - Optional CV context
 - Target role
 - Analysis mode
@@ -44,8 +44,9 @@ The app also includes optional Gemini-assisted structured insights, an ADK-compa
 
 - No full ADK runtime routing.
 - No MCP runtime transport.
-- No GitHub API integration.
 - No private repository access.
+- No GitHub source-code download or repository cloning.
+- No GitHub token requirement.
 - No LinkedIn scraping.
 - No LLM-based score calculation.
 - No automated tests that call real external APIs.

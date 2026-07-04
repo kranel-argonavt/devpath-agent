@@ -20,6 +20,7 @@ python scripts/check_adk_agent.py
 python scripts/check_mcp_tools.py
 python scripts/check_mcp_runtime.py
 python scripts/check_adk_mcp_tools.py
+python scripts/check_github_public_import.py octocat
 ```
 
 ## UI Points To Show
@@ -27,6 +28,10 @@ python scripts/check_adk_mcp_tools.py
 - [ ] Job posting input.
 - [ ] Candidate profile.
 - [ ] Portfolio source.
+- [ ] Test GitHub public username import.
+- [ ] Confirm no token is shown or required.
+- [ ] Confirm imported repos appear as portfolio projects.
+- [ ] Confirm report generation works with imported GitHub projects.
 - [ ] Analysis mode selector.
 - [ ] Tool backend selector.
 - [ ] Workflow Runtime section.

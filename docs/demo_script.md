@@ -65,7 +65,19 @@ Explain:
 - The `Workflow Runtime` section shows whether MCP runtime was used, which tools were selected, and whether fallback happened.
 - The deterministic score remains the source of truth.
 
-## 6. Optional Gemini Demo
+## 6. Optional GitHub Public Repository Import
+
+In `3. Portfolio Source`, select `GitHub public repositories`.
+
+Demo steps:
+
+1. Enter a public GitHub username such as `octocat`.
+2. Click `Fetch public repositories`.
+3. Show the imported public repo metadata table.
+4. Explain that no token is required, private repos are not accessed, repos are not cloned, and source code is not downloaded.
+5. Generate a career strategy using the imported repositories as portfolio projects.
+
+## 7. Optional Gemini Demo
 
 If a local API key is configured:
 
@@ -76,11 +88,11 @@ If a local API key is configured:
 
 If no key is configured, show the warning and explain that the app continues in deterministic mode.
 
-## 7. Export Markdown
+## 8. Export Markdown
 
 Open `Export`, click `Export Markdown Report`, and show the generated path. Mention that exported Markdown is privacy-masked, includes the `Workflow Runtime` section, and `outputs/*.md` is ignored by Git.
 
-## 8. Mention Smoke Tests
+## 9. Mention Smoke Tests
 
 Run or mention:
 
@@ -94,7 +106,7 @@ python scripts/check_adk_mcp_tools.py
 
 Explain that these validate optional Gemini connectivity, ADK skeleton structure, MCP-style deterministic tools, selected local MCP runtime calls, and the selected ADK-MCP bridge without requiring production runtime integration.
 
-## 9. Close With Architecture
+## 10. Close With Architecture
 
 Summarize:
 

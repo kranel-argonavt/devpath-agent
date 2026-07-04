@@ -8,7 +8,13 @@ import streamlit as st
 from devpath.agent_workflow import WorkflowInput, run_career_strategy_workflow
 from devpath.services.export_service import export_markdown_report
 from devpath.services.file_service import load_json_file, load_text_file
-from devpath.services.github_service import is_github_username_provided
+from devpath.services.github_service import (
+    convert_github_repos_to_projects,
+    fetch_public_github_repositories,
+    is_github_username_provided,
+    is_valid_github_username,
+    normalize_github_username,
+)
 from devpath.tool_router import DIRECT_BACKEND, list_tool_backends
 
 
@@ -78,6 +84,9 @@ def initialize_session_state() -> None:
         "education": "",
         "languages_text": "",
         "location_preference": "",
+        "github_username": "",
+        "github_projects": [],
+        "github_repos": [],
     }
     for key, value in defaults.items():
         st.session_state.setdefault(key, value)
@@ -101,10 +110,10 @@ def render_sidebar() -> None:
     with st.sidebar:
         st.header("DevPath MVP")
         st.markdown(
-            "**Project status:** Step 5C - local tool backend selector  \n"
+            "**Project status:** Step 7A - GitHub public repository import foundation  \n"
             "**Mode:** local deterministic mock  \n"
-            "**External API calls:** disabled by default  \n"
-            "**Data source:** sample JSON/TXT files  \n"
+            "**External API calls:** disabled by default except explicit GitHub public import  \n"
+            "**Data source:** sample files or public GitHub repo metadata  \n"
             "**ADK agent skeleton:** available  \n"
             "**ADK runtime routing:** planned"
         )
@@ -129,7 +138,7 @@ def render_sidebar() -> None:
             st.markdown(
                 "- Google ADK root agent\n"
                 "- MCP server tools\n"
-                "- GitHub public repository import"
+                "- GitHub repo evidence mapping"
             )
 
 
@@ -220,24 +229,76 @@ def render_candidate_profile_section() -> dict[str, Any]:
 
 def render_portfolio_section() -> list[dict[str, Any]]:
     st.header("3. Portfolio Source")
-    st.caption("The current MVP always analyzes local sample projects. GitHub import is a planned future step.")
+    st.caption("Use local sample projects or import public GitHub repository metadata as portfolio evidence.")
     source = st.radio("Portfolio source", ["Local sample projects", "GitHub public repositories"], horizontal=True)
 
     if source == "GitHub public repositories":
-        username = st.text_input("GitHub username", placeholder="octocat")
-        if is_github_username_provided(username):
-            st.success(f"GitHub username accepted for the placeholder flow: {username.strip()}")
-        else:
-            st.warning("Enter a GitHub username to validate the placeholder input.")
-        st.info(
-            "GitHub API integration will be implemented in a later step. "
-            "For now, the app uses local sample projects as fallback."
+        username = st.text_input("GitHub username", key="github_username", placeholder="octocat")
+        st.caption(
+            "Only public repository metadata is imported. No token, private repos, cloning, or source-code download is used."
         )
+        col_a, col_b = st.columns([1, 2])
+        with col_a:
+            fetch_clicked = st.button("Fetch public repositories", use_container_width=True)
+        with col_b:
+            max_repos = st.slider("Maximum repositories", min_value=1, max_value=30, value=10)
+
+        if fetch_clicked:
+            fetch_github_projects(username, max_repos=max_repos)
+
+        github_projects = st.session_state.get("github_projects", [])
+        if github_projects:
+            st.success(f"Imported {len(github_projects)} public GitHub repositories.")
+            render_github_repo_table(st.session_state.get("github_repos", []))
+            render_project_cards(github_projects)
+            return github_projects
+
+        st.info("No GitHub repositories imported yet. The app is using local sample projects as fallback.")
 
     projects = load_sample_projects()
     if projects:
         render_project_cards(projects)
     return projects
+
+
+def fetch_github_projects(username: str, max_repos: int) -> None:
+    normalized_username = normalize_github_username(username)
+    if not is_github_username_provided(normalized_username):
+        st.warning("Enter a GitHub username before fetching public repositories.")
+        return
+    if not is_valid_github_username(normalized_username):
+        st.error("Invalid GitHub username. Use only letters, numbers, or hyphens.")
+        return
+
+    try:
+        repos = fetch_public_github_repositories(normalized_username, max_repos=max_repos)
+        projects = convert_github_repos_to_projects(repos)
+    except (ValueError, RuntimeError) as exc:
+        st.error(f"Could not import public GitHub repositories: {exc}")
+        return
+
+    st.session_state.github_repos = repos
+    st.session_state.github_projects = projects
+    if not projects:
+        st.warning("No public non-fork, non-archived repositories were found for this username.")
+
+
+def render_github_repo_table(repos: list[dict[str, Any]]) -> None:
+    if not repos:
+        return
+
+    rows = [
+        {
+            "Repository": repo.get("name", ""),
+            "Language": repo.get("language", ""),
+            "Stars": repo.get("stars", 0),
+            "Forks": repo.get("forks", 0),
+            "Pushed": repo.get("pushed_at", ""),
+            "URL": repo.get("html_url", ""),
+        }
+        for repo in repos
+    ]
+    st.dataframe(rows, use_container_width=True, hide_index=True)
 
 
 def render_target_role_section() -> str:

@@ -7,6 +7,8 @@ DevPath Agent is deterministic-first. Scoring, evidence, gaps, and category deta
 ```text
 Streamlit UI
    |
+portfolio source: sample projects or public GitHub metadata
+   |
 WorkflowInput
    |
 run_career_strategy_workflow
@@ -24,6 +26,22 @@ UI tabs + Markdown export
 ```
 
 Direct Python services are the default backend. Local MCP-style tools run in-process through `MCP_TOOL_REGISTRY`; no MCP transport is started for that backend. The experimental ADK-MCP backend can start a local MCP stdio runtime for selected deterministic tools and falls back safely through the workflow if unavailable.
+
+## GitHub Public Repository Import
+
+```text
+GitHub username
+   |
+github_service.fetch_public_github_repositories
+   |
+public repo metadata
+   |
+convert_github_repos_to_projects
+   |
+existing scoring/report workflow
+```
+
+GitHub import feeds the portfolio source in Streamlit. It uses public repository metadata only and does not require a token, access private repositories, scrape HTML, clone repositories, or download source code. It does not replace deterministic scoring. Full agent orchestration will be implemented after GitHub evidence mapping.
 
 ## Deterministic Source Of Truth
 
@@ -164,6 +182,7 @@ python scripts/check_adk_agent.py
 python scripts/check_mcp_tools.py
 python scripts/check_mcp_runtime.py
 python scripts/check_adk_mcp_tools.py
+python scripts/check_github_public_import.py octocat
 ```
 
 These scripts validate integration readiness without changing the deterministic source of truth. Automated tests do not require real API keys.
@@ -182,4 +201,4 @@ MCP runtime tools
 deterministic services + optional Gemini narrative
 ```
 
-GitHub public repository import is planned later and should remain public-repo-only unless a secure permission model is added.
+GitHub public repository evidence mapping is planned next and should remain public-repo-only unless a secure permission model is added.
