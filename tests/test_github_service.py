@@ -98,7 +98,10 @@ def test_convert_github_repos_to_projects_returns_project_compatible_shape() -> 
             "technologies": ["C#", "dotnet", ".NET", "REST API", "SQL"],
             "url": "https://github.com/octocat/taskflow",
             "source": "github",
+            "evidence_source": "GitHub public repository metadata",
             "github": {
+                "name": "taskflow",
+                "html_url": "https://github.com/octocat/taskflow",
                 "language": "C#",
                 "topics": ["dotnet"],
                 "stars": 12,

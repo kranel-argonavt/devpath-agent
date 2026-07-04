@@ -74,8 +74,10 @@ Demo steps:
 1. Enter a public GitHub username such as `octocat`.
 2. Click `Fetch public repositories`.
 3. Show the imported public repo metadata table.
-4. Explain that no token is required, private repos are not accessed, repos are not cloned, and source code is not downloaded.
-5. Generate a career strategy using the imported repositories as portfolio projects.
+4. Show how imported GitHub repositories become portfolio evidence through language, topics, description, URL, and repository signals.
+5. Explain that no token is required, private repos are not accessed, repos are not cloned, and source code is not downloaded.
+6. Generate a career strategy using the imported repositories as portfolio projects.
+7. Open `Portfolio Evidence` and show `GitHub Repository Evidence`.
 
 ## 7. Optional Gemini Demo
 

@@ -136,3 +136,84 @@ def test_category_scores_are_present_and_numeric() -> None:
     }
     assert all(isinstance(score, int) for score in result["category_scores"].values())
     assert all("earned" in detail and "max" in detail for detail in result["category_details"].values())
+
+
+def test_github_language_can_support_required_skill() -> None:
+    result = calculate_mock_match_score(
+        job_text="Junior role requiring C#.",
+        profile={"experience_level": "Junior", "skills": []},
+        projects=[_github_project(language="C#", topics=[], description="Small portfolio project.")],
+    )
+
+    assert "C#" in result["strong_matches"]
+    assert "Project: Student API (GitHub: https://github.com/example/student-api)" in result["evidence_by_skill"]["C#"]
+
+
+def test_github_topic_can_support_required_skill() -> None:
+    result = calculate_mock_match_score(
+        job_text="Junior role requiring .NET.",
+        profile={"experience_level": "Junior", "skills": []},
+        projects=[_github_project(language="", topics=["dotnet"], description="Small portfolio project.")],
+    )
+
+    assert ".NET" in result["strong_matches"]
+    assert ".NET" in result["evidence_by_skill"]
+
+
+def test_github_description_can_support_required_skill() -> None:
+    result = calculate_mock_match_score(
+        job_text="Junior role requiring REST API.",
+        profile={"experience_level": "Junior", "skills": []},
+        projects=[_github_project(language="", topics=[], description="A REST API with SQL persistence.")],
+    )
+
+    assert "REST API" in result["strong_matches"]
+    assert "REST API" in result["evidence_by_skill"]
+
+
+def test_github_evidence_is_returned_in_scoring_result() -> None:
+    result = calculate_mock_match_score(
+        job_text="Junior role requiring C#, .NET, REST API.",
+        profile={"experience_level": "Junior", "skills": []},
+        projects=[_github_project()],
+    )
+
+    assert result["github_evidence"][0]["project_name"] == "Student API"
+    assert result["github_evidence"][0]["project_url"] == "https://github.com/example/student-api"
+    assert "Repository is public and non-archived." in result["github_evidence"][0]["evidence_notes"]
+
+
+def test_local_project_evidence_still_works() -> None:
+    evidence = collect_project_evidence(
+        [{"name": "Local API", "technologies": ["C#", "REST API"], "description": "Local project."}]
+    )
+
+    assert evidence["C#"] == ["Local API"]
+    assert evidence["REST API"] == ["Local API"]
+
+
+def _github_project(
+    *,
+    language: str = "C#",
+    topics: list[str] | None = None,
+    description: str = "REST API with SQL persistence.",
+) -> dict:
+    return {
+        "name": "Student API",
+        "description": description,
+        "technologies": [language, *(topics or [])],
+        "url": "https://github.com/example/student-api",
+        "source": "github",
+        "github": {
+            "name": "student-api",
+            "html_url": "https://github.com/example/student-api",
+            "language": language,
+            "topics": topics or ["dotnet"],
+            "stars": 5,
+            "forks": 1,
+            "updated_at": "2026-01-02T00:00:00Z",
+            "pushed_at": "2026-01-03T00:00:00Z",
+            "fork": False,
+            "archived": False,
+        },
+    }

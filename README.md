@@ -31,7 +31,7 @@ The deterministic report remains the source of truth. Gemini can add concise nar
 
 ## Current Status
 
-Current status: **Step 7A - GitHub public repository import foundation.**
+Current status: **Step 7B - GitHub public repository evidence mapping.**
 
 Implemented today:
 
@@ -55,6 +55,7 @@ Implemented today:
 - Experimental ADK-MCP runtime tool backend with safe direct fallback
 - Workflow runtime metadata in the UI and exported Markdown
 - GitHub public repository metadata import as a portfolio source
+- GitHub public repository metadata mapped into portfolio evidence
 - Local Gemini, ADK, and MCP smoke-test scripts
 - Pytest suite for deterministic helpers, workflow, tools, and smoke scripts
 
@@ -154,6 +155,8 @@ Users can import public repository metadata by GitHub username and use those rep
 - Private repositories are not accessed.
 - Repositories are not cloned.
 - Source code is not downloaded in this step.
+- GitHub public repository metadata is mapped into portfolio evidence through language, topics, description, URL, and repository signals.
+- Stars and forks are shown as public repository signals, not direct skill proof.
 
 Manual smoke test:
 

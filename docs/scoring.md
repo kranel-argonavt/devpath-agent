@@ -54,8 +54,22 @@ The scorer builds `evidence_by_skill` from:
 - Profile skills and languages
 - Portfolio project technologies
 - Project descriptions, summaries, features, stack, and highlights
+- GitHub public repository language, topics, and description when repos are imported
 
 Evidence is shown in the UI and exported Markdown so users can connect claims to concrete projects.
+
+## GitHub Evidence
+
+For imported public GitHub repositories, deterministic evidence can come from:
+
+- Primary language, such as `C#`
+- Topics, such as `dotnet`, `api`, or `docker`
+- Repository description mentions, such as `REST API` or `SQL`
+- Public URL and source metadata for traceability
+
+Stars, forks, archived status, fork status, and update timestamps are shown as repository signals. They do not create direct skill matches by themselves.
+
+No source code, README content, commit history, or private repository data is analyzed in Step 7B.
 
 ## Match Classification
 
@@ -79,6 +93,7 @@ Required missing skills become high-priority gaps. Missing nice-to-have skills b
 - ADK agent skeletons can orchestrate deterministic tools in future steps.
 - MCP-style tools wrap the same deterministic scoring and report logic.
 - The Streamlit tool backend selector can call direct services or local MCP-style tools, but both paths preserve the same deterministic scoring behavior.
+- GitHub metadata evidence feeds the same deterministic scoring path as local portfolio projects.
 
 ## Limitations
 

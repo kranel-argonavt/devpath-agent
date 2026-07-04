@@ -46,6 +46,29 @@ def test_export_markdown_report_writes_rich_markdown_file(tmp_path: Path) -> Non
             "projects_to_highlight": ["TaskFlow Desktop"],
             "suggested_evidence_points": ["TaskFlow Desktop: evidence of C#."],
             "evidence_by_skill": {"C#": ["Profile skills", "Project: TaskFlow Desktop"]},
+            "github_evidence": [
+                {
+                    "project_name": "Student API",
+                    "project_url": "https://github.com/example/student-api",
+                    "source": "github",
+                    "matched_skills": ["C#", "REST API"],
+                    "language": "C#",
+                    "topics": ["dotnet", "api"],
+                    "description_matches": ["REST API"],
+                    "signals": {
+                        "stars": 5,
+                        "forks": 1,
+                        "recently_updated": True,
+                        "archived": False,
+                        "fork": False,
+                    },
+                    "evidence_notes": [
+                        "Primary language is C#.",
+                        "Topic contains api.",
+                        "Repository is public and non-archived.",
+                    ],
+                }
+            ],
         },
         "skill_gaps": {
             "missing_skills": ["ASP.NET Core"],
@@ -113,6 +136,10 @@ def test_export_markdown_report_writes_rich_markdown_file(tmp_path: Path) -> Non
     assert "Apply with API evidence" in content
     assert "| Required Technical Skills | 28 | 35 |" in content
     assert "Project: TaskFlow Desktop" in content
+    assert "### GitHub Repository Evidence" in content
+    assert "https://github.com/example/student-api" in content
+    assert "Language: C#" in content
+    assert "Topics: dotnet, api" in content
     assert "High Priority: ASP.NET Core" in content
     assert "[EMAIL_REDACTED]" in content
     assert "GOOGLE_API_KEY=[REDACTED]" in content

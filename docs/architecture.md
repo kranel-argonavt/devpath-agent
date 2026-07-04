@@ -38,10 +38,12 @@ public repo metadata
    |
 convert_github_repos_to_projects
    |
+GitHub evidence mapper
+   |
 existing scoring/report workflow
 ```
 
-GitHub import feeds the portfolio source in Streamlit. It uses public repository metadata only and does not require a token, access private repositories, scrape HTML, clone repositories, or download source code. It does not replace deterministic scoring. Full agent orchestration will be implemented after GitHub evidence mapping.
+GitHub import feeds the portfolio source in Streamlit. GitHub public metadata is mapped into deterministic evidence through language, topics, description, URL, and repository signals, then passed into the existing scoring/report/export workflow. It uses public repository metadata only and does not require a token, access private repositories, scrape HTML, clone repositories, or download source code. It does not replace deterministic scoring. Full agent orchestration will be implemented after the GitHub portfolio block.
 
 ## Deterministic Source Of Truth
 
@@ -201,4 +203,4 @@ MCP runtime tools
 deterministic services + optional Gemini narrative
 ```
 
-GitHub public repository evidence mapping is planned next and should remain public-repo-only unless a secure permission model is added.
+Full ADK agent workflow orchestration is planned next. GitHub features should remain public-repo-only unless a secure permission model is added.

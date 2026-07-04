@@ -31,7 +31,10 @@ python scripts/check_github_public_import.py octocat
 - [ ] Test GitHub public username import.
 - [ ] Confirm no token is shown or required.
 - [ ] Confirm imported repos appear as portfolio projects.
+- [ ] Show GitHub repo language/topics.
+- [ ] Show GitHub URL in evidence.
 - [ ] Confirm report generation works with imported GitHub projects.
+- [ ] Show GitHub Repository Evidence in exported Markdown.
 - [ ] Analysis mode selector.
 - [ ] Tool backend selector.
 - [ ] Workflow Runtime section.

@@ -291,8 +291,11 @@ def render_github_repo_table(repos: list[dict[str, Any]]) -> None:
         {
             "Repository": repo.get("name", ""),
             "Language": repo.get("language", ""),
+            "Topics": ", ".join(repo.get("topics", [])),
             "Stars": repo.get("stars", 0),
             "Forks": repo.get("forks", 0),
+            "Is fork": repo.get("fork", False),
+            "Archived": repo.get("archived", False),
             "Pushed": repo.get("pushed_at", ""),
             "URL": repo.get("html_url", ""),
         }
@@ -563,6 +566,7 @@ def render_portfolio_evidence_tab(portfolio_evidence: dict[str, Any], projects: 
         render_bullets(portfolio_evidence.get("suggested_evidence_points", []), "No evidence points available.")
     st.markdown("### Portfolio Evidence Map")
     render_evidence_by_skill(portfolio_evidence.get("evidence_by_skill", {}), project_only=True)
+    render_github_evidence(portfolio_evidence.get("github_evidence", []))
     render_project_cards(projects)
 
 
@@ -706,17 +710,53 @@ def render_project_cards(projects: list[dict[str, Any]]) -> None:
         name = project.get("name", "Portfolio project")
         technologies = project.get("technologies", [])
         stack = ", ".join(technologies) or "No stack listed"
-        summary = project.get("summary", "No description available.")
+        summary = project.get("summary") or project.get("description") or "No description available."
         evidence_line = build_project_evidence_line(technologies, summary)
 
         with st.expander(name, expanded=False):
             st.markdown(f"**Stack:** {stack}")
             st.write(summary)
+            if project.get("url"):
+                st.markdown(f"**URL:** {project['url']}")
+            if project.get("source") == "github":
+                github = project.get("github", {})
+                topics = ", ".join(github.get("topics", [])) or "No topics"
+                st.markdown(
+                    f"**GitHub metadata:** language `{github.get('language') or 'Unknown'}`, "
+                    f"topics `{topics}`, stars `{github.get('stars', 0)}`, forks `{github.get('forks', 0)}`"
+                )
+                st.caption(
+                    f"Repository signals: fork={github.get('fork', False)}, "
+                    f"archived={github.get('archived', False)}, pushed={github.get('pushed_at', 'Unknown')}"
+                )
             st.caption(evidence_line)
             highlights = project.get("highlights", [])
             if highlights:
                 st.markdown("**Highlights:**")
                 render_bullets(highlights, "No highlights listed.")
+
+
+def render_github_evidence(github_evidence: list[dict[str, Any]]) -> None:
+    if not github_evidence:
+        return
+
+    st.markdown("### GitHub Repository Evidence")
+    for evidence in github_evidence:
+        title = evidence.get("project_name", "GitHub repository")
+        with st.expander(title, expanded=False):
+            if evidence.get("project_url"):
+                st.markdown(f"**URL:** {evidence['project_url']}")
+            st.markdown(f"**Language:** {evidence.get('language') or 'Unknown'}")
+            st.markdown(f"**Topics:** {', '.join(evidence.get('topics', [])) or 'No topics'}")
+            st.markdown(f"**Matched skills:** {', '.join(evidence.get('matched_skills', [])) or 'No direct skill matches'}")
+            signals = evidence.get("signals", {})
+            st.markdown(
+                "**Signals:** "
+                f"stars={signals.get('stars', 0)}, forks={signals.get('forks', 0)}, "
+                f"recently_updated={signals.get('recently_updated', False)}, "
+                f"archived={signals.get('archived', False)}, fork={signals.get('fork', False)}"
+            )
+            render_bullets(evidence.get("evidence_notes", []), "No GitHub evidence notes available.")
 
 
 def render_plan_block(title: str, items: list[str]) -> None:

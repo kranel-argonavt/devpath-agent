@@ -8,6 +8,8 @@ The current MVP is a Streamlit app backed by deterministic local logic. It loads
 
 The app also includes optional Gemini-assisted structured insights, an ADK-compatible agent skeleton, MCP-style deterministic tool contracts, and smoke-test scripts for local validation.
 
+GitHub public repositories can be imported as portfolio projects. Their public metadata is mapped into evidence through primary language, topics, description matches, URL, and repository signals.
+
 ## Target Users
 
 - Junior software developers preparing for their first or next role.
@@ -33,6 +35,7 @@ The app also includes optional Gemini-assisted structured insights, an ADK-compa
 - Category score breakdown
 - Strong matches, partial matches, and missing skills
 - Evidence by skill
+- GitHub repository evidence when public repositories are imported
 - Prioritized gaps and recommendations
 - 7-day, 14-day, and 30-day preparation plan
 - Cover letter and recruiter message drafts

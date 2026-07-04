@@ -88,7 +88,10 @@ def convert_github_repos_to_projects(repos: list[dict[str, Any]]) -> list[dict[s
                 "technologies": technologies,
                 "url": normalized.get("html_url", ""),
                 "source": "github",
+                "evidence_source": "GitHub public repository metadata",
                 "github": {
+                    "name": normalized.get("name", ""),
+                    "html_url": normalized.get("html_url", ""),
                     "language": normalized.get("language", ""),
                     "topics": normalized.get("topics", []),
                     "stars": normalized.get("stars", 0),

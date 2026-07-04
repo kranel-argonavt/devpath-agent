@@ -22,10 +22,12 @@ DevPath Agent is designed around cautious handling of candidate data. The curren
 
 - No GitHub token is required for Step 7A.
 - Only public repository metadata is imported.
+- GitHub evidence mapping uses metadata only: language, topics, description, URL, and public repository signals.
 - Private repositories are not accessed.
 - GitHub HTML pages are not scraped.
 - Repositories are not cloned.
 - Source code is not downloaded.
+- Stars and forks are public metadata signals, not private data or direct skill proof.
 - Automated tests mock GitHub responses and do not call the real GitHub API.
 
 ## Export Safety

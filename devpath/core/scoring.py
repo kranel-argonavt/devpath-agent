@@ -4,6 +4,8 @@ from collections.abc import Iterable
 import re
 from typing import Any
 
+from devpath.core.github_evidence import extract_github_evidence_for_projects, extract_github_project_evidence
+
 
 SKILL_ALIASES = {
     "C#": ["c#", "c sharp", "csharp"],
@@ -107,11 +109,18 @@ def collect_project_evidence(projects: list[dict[str, Any]]) -> dict[str, list[s
     evidence: dict[str, list[str]] = {}
     for index, project in enumerate(projects):
         name = str(project.get("name") or f"Project {index + 1}")
-        project_text = " ".join(_flatten(project))
-        for skill in detect_skills_in_text(project_text):
+        if project.get("source") == "github" or isinstance(project.get("github"), dict):
+            github_evidence = extract_github_project_evidence(project)
+            detected_skills = set(github_evidence.get("matched_skills", []))
+            label = _github_project_label(name, github_evidence.get("project_url", ""))
+        else:
+            project_text = " ".join(_flatten(project))
+            detected_skills = detect_skills_in_text(project_text)
+            label = name
+        for skill in detected_skills:
             evidence.setdefault(skill, [])
-            if name not in evidence[skill]:
-                evidence[skill].append(name)
+            if label not in evidence[skill]:
+                evidence[skill].append(label)
     return evidence
 
 
@@ -127,6 +136,7 @@ def calculate_mock_match_score(
     nice_skills = job_requirements["nice_to_have_skills"]
     profile_skills = collect_profile_skills(profile)
     project_evidence = collect_project_evidence(projects)
+    github_evidence = extract_github_evidence_for_projects(projects)
     candidate_skills = profile_skills | set(project_evidence)
 
     evidence_by_skill = _build_evidence_by_skill(profile_skills, project_evidence)
@@ -171,6 +181,7 @@ def calculate_mock_match_score(
         "partial_matches": partial_matches,
         "missing_skills": missing_skills,
         "evidence_by_skill": evidence_by_skill,
+        "github_evidence": github_evidence,
         "prioritized_gaps": prioritized_gaps,
         "explanation": (
             f"Deterministic score based on {len(full_required_matches)} of {len(required_skills)} required skills, "
@@ -231,6 +242,12 @@ def _profile_to_text(profile: dict[str, Any]) -> str:
 
 def _projects_to_text(projects: list[dict[str, Any]]) -> str:
     return " ".join(_flatten(projects))
+
+
+def _github_project_label(name: str, url: str) -> str:
+    if url:
+        return f"{name} (GitHub: {url})"
+    return f"{name} (GitHub)"
 
 
 def _flatten(value: Any) -> list[str]:

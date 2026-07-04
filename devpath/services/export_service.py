@@ -254,6 +254,35 @@ def _render_portfolio_evidence(portfolio_evidence: dict[str, Any]) -> list[str]:
     project_sources = _project_only_evidence(portfolio_evidence.get("evidence_by_skill", {}))
     if project_sources:
         lines.extend(["", "### Portfolio Evidence Map", *_render_evidence_by_skill(project_sources)])
+    github_evidence = portfolio_evidence.get("github_evidence", [])
+    if github_evidence:
+        lines.extend(["", "### GitHub Repository Evidence", *_render_github_evidence(github_evidence)])
+    return lines
+
+
+def _render_github_evidence(github_evidence: list[dict[str, Any]]) -> list[str]:
+    lines: list[str] = []
+    for evidence in github_evidence:
+        signals = evidence.get("signals", {})
+        topics = evidence.get("topics", [])
+        matched_skills = evidence.get("matched_skills", [])
+        notes = evidence.get("evidence_notes", [])
+        lines.extend(
+            [
+                f"- Project: {evidence.get('project_name', 'GitHub repository')}",
+                f"  - URL: {evidence.get('project_url', '') or 'Not provided'}",
+                f"  - Language: {evidence.get('language', '') or 'Unknown'}",
+                f"  - Topics: {', '.join(str(topic) for topic in topics) if topics else 'None'}",
+                f"  - Matched skills: {', '.join(str(skill) for skill in matched_skills) if matched_skills else 'None'}",
+                (
+                    "  - Signals: "
+                    f"stars={signals.get('stars', 0)}, forks={signals.get('forks', 0)}, "
+                    f"recently_updated={signals.get('recently_updated', False)}, "
+                    f"archived={signals.get('archived', False)}, fork={signals.get('fork', False)}"
+                ),
+                f"  - Notes: {'; '.join(str(note) for note in notes) if notes else 'No GitHub evidence notes available.'}",
+            ]
+        )
     return lines
 
 

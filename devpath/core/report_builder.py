@@ -52,6 +52,7 @@ def create_mock_report(
             "projects_to_highlight": project_names[:3],
             "suggested_evidence_points": _portfolio_points(projects),
             "evidence_by_skill": score.get("evidence_by_skill", {}),
+            "github_evidence": score.get("github_evidence", []),
         },
         "skill_gaps": {
             "missing_skills": missing_skills,
