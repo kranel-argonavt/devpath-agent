@@ -27,14 +27,14 @@
 - Step 7A - GitHub public repository import foundation
 - Step 7B - GitHub repo evidence mapping
 - Step 7C - Full ADK agent workflow orchestration
+- Step 7D - Streamlit full agent mode + trace
 
 ## Current
 
-- Step 7C - Full ADK agent workflow orchestration
+- Step 7D - Streamlit full agent mode + trace
 
 ## Next
 
-- Step 7D - Streamlit full agent mode + trace
 - Step 8A - Final capstone demo polish
 - Step 8B - Kaggle writeup and video script
 

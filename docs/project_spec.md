@@ -6,7 +6,7 @@ DevPath Agent is a Kaggle capstone project for junior software developers who wa
 
 The current MVP is a Streamlit app backed by deterministic local logic. It loads or accepts a job posting, candidate profile, portfolio projects, and optional CV context. It then generates a structured report with match scoring, evidence, gaps, recommendations, application drafts, interview prep, and Markdown export.
 
-The app also includes optional Gemini-assisted structured insights, an ADK-compatible agent skeleton, a full ADK-style deterministic workflow facade, MCP-style deterministic tool contracts, and smoke-test scripts for local validation.
+The app also includes optional Gemini-assisted structured insights, an ADK-compatible agent skeleton, a full ADK-style deterministic workflow facade exposed through Streamlit, MCP-style deterministic tool contracts, and smoke-test scripts for local validation.
 
 GitHub public repositories can be imported as portfolio projects. Their public metadata is mapped into evidence through primary language, topics, description matches, URL, and repository signals.
 
@@ -26,6 +26,7 @@ GitHub public repositories can be imported as portfolio projects. Their public m
 - Optional CV context
 - Target role
 - Analysis mode
+- Analysis workflow mode: standard workflow or full agent workflow
 - Tool backend selection
 - Optional full agent workflow execution in local smoke tests
 
@@ -43,6 +44,7 @@ GitHub public repositories can be imported as portfolio projects. Their public m
 - Interview questions and practice focus
 - Optional Gemini-assisted narrative sections
 - Full agent workflow metadata and serialized agent trace when the opt-in full workflow is used
+- Agent Workflow Trace display in Streamlit and exported Markdown
 - Privacy-masked Markdown report
 
 ## Current Non-Goals
@@ -58,4 +60,4 @@ GitHub public repositories can be imported as portfolio projects. Their public m
 
 ## Planned Final System
 
-The planned final system will combine the Streamlit UI, Google ADK root agent, specialized sub-agents, MCP runtime tools, optional Gemini narrative assistance, and public GitHub repository evidence mapping. Step 7C adds deterministic ADK-style orchestration through `privacy_guard`, `job_analyzer`, `portfolio_evidence`, `profile_matcher`, `gap_planner`, `application_writer`, and `interview_coach`. Deterministic scoring should remain the transparent source of truth.
+The planned final system will combine the Streamlit UI, Google ADK root agent, specialized sub-agents, MCP runtime tools, optional Gemini narrative assistance, and public GitHub repository evidence mapping. The current full agent workflow adds deterministic ADK-style orchestration through `privacy_guard`, `job_analyzer`, `portfolio_evidence`, `profile_matcher`, `gap_planner`, `application_writer`, and `interview_coach`, with trace visibility in Streamlit. Deterministic scoring should remain the transparent source of truth.

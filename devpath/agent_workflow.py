@@ -154,23 +154,73 @@ def run_career_strategy_workflow(
 
 def run_career_strategy_agent_workflow(
     workflow_input: WorkflowInput,
+    *,
+    config: AppConfig | None = None,
+    gemini_generator: Callable[[dict[str, Any], str, str], dict[str, Any]] | None = None,
 ) -> WorkflowResult:
     """Run the deterministic full ADK-style agent workflow as an opt-in path."""
 
     from devpath.full_agent_workflow import FullAgentWorkflowInput, run_full_agent_workflow
 
-    result = run_full_agent_workflow(
-        FullAgentWorkflowInput(
-            job_text=workflow_input.job_text,
-            profile=workflow_input.profile,
-            projects=workflow_input.projects,
-            target_role=workflow_input.target_role,
-            cv_text=workflow_input.cv_text,
-            tool_backend=workflow_input.tool_backend,
-            analysis_mode=workflow_input.analysis_mode,
+    try:
+        full_result = run_full_agent_workflow(
+            FullAgentWorkflowInput(
+                job_text=workflow_input.job_text,
+                profile=workflow_input.profile,
+                projects=workflow_input.projects,
+                target_role=workflow_input.target_role,
+                cv_text=workflow_input.cv_text,
+                output_style=workflow_input.output_style,
+                tool_backend=workflow_input.tool_backend,
+                analysis_mode=workflow_input.analysis_mode,
+            )
         )
-    )
-    return WorkflowResult(report=result.report, mode_used=MOCK_MODE, warnings=result.warnings)
+    except Exception:
+        fallback = run_career_strategy_workflow(
+            workflow_input,
+            config=config,
+            gemini_generator=gemini_generator,
+        )
+        return WorkflowResult(
+            report=fallback.report,
+            mode_used=fallback.mode_used,
+            warnings=[
+                "Full agent workflow could not be used. Falling back to standard deterministic workflow.",
+                *fallback.warnings,
+            ],
+        )
+
+    report = deepcopy(full_result.report)
+    warnings = list(full_result.warnings)
+    deterministic_fields = _deterministic_profile_match_snapshot(report)
+
+    if workflow_input.analysis_mode == MOCK_MODE:
+        return WorkflowResult(report=report, mode_used=MOCK_MODE, warnings=warnings)
+
+    if workflow_input.analysis_mode != GEMINI_MODE:
+        warnings.append("Unknown analysis mode. The app continued in deterministic mode.")
+        return WorkflowResult(report=report, mode_used=MOCK_MODE, warnings=warnings)
+
+    app_config = config or get_app_config()
+    if not app_config.gemini_enabled or not app_config.google_api_key:
+        warnings.append("Gemini API key is not configured. The app continued in deterministic mode.")
+        return WorkflowResult(report=report, mode_used=MOCK_MODE, warnings=warnings)
+
+    generator = gemini_generator or generate_gemini_career_insights
+    try:
+        insights = generator(
+            deepcopy(report),
+            app_config.google_api_key,
+            app_config.gemini_model,
+        )
+    except Exception:
+        warnings.append("Gemini-assisted insights could not be generated. Continuing with deterministic report.")
+        return WorkflowResult(report=report, mode_used=MOCK_MODE, warnings=warnings)
+
+    report["gemini_insights"] = insights
+    report["gemini_summary"] = str(insights.get("career_summary", "")) if isinstance(insights, dict) else ""
+    _restore_deterministic_profile_match_fields(report, deterministic_fields)
+    return WorkflowResult(report=report, mode_used=GEMINI_MODE, warnings=warnings)
 
 
 def _profile_with_target_role(profile: dict[str, Any], target_role: str) -> dict[str, Any]:

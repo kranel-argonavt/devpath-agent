@@ -5,7 +5,7 @@ from typing import Any
 
 import streamlit as st
 
-from devpath.agent_workflow import WorkflowInput, run_career_strategy_workflow
+from devpath.agent_workflow import WorkflowInput, run_career_strategy_agent_workflow, run_career_strategy_workflow
 from devpath.services.export_service import export_markdown_report
 from devpath.services.file_service import load_json_file, load_text_file
 from devpath.services.github_service import (
@@ -29,6 +29,9 @@ TARGET_ROLES = [
     "Junior C# Developer",
     "Backend Developer Intern",
 ]
+
+STANDARD_WORKFLOW = "Standard workflow"
+FULL_AGENT_WORKFLOW = "Full agent workflow"
 
 
 def main() -> None:
@@ -110,13 +113,12 @@ def render_sidebar() -> None:
     with st.sidebar:
         st.header("DevPath MVP")
         st.markdown(
-            "**Project status:** Step 7A - GitHub public repository import foundation  \n"
+            "**Project status:** Step 7D - Streamlit full agent mode + trace  \n"
             "**Mode:** local deterministic mock  \n"
             "**External API calls:** disabled by default except explicit GitHub public import  \n"
             "**Data source:** sample files or public GitHub repo metadata  \n"
             "**ADK agent skeleton:** available  \n"
-            "**Full agent workflow:** available via smoke test  \n"
-            "**Streamlit full agent mode:** planned"
+            "**Full agent workflow:** available in Streamlit"
         )
 
         st.divider()
@@ -137,9 +139,9 @@ def render_sidebar() -> None:
 
         with st.expander("Planned later"):
             st.markdown(
-                "- Google ADK root agent\n"
-                "- MCP server tools\n"
-                "- GitHub repo evidence mapping"
+                "- Streamlit trace polish for final demo\n"
+                "- Live ADK runtime exploration\n"
+                "- Kaggle writeup and video script"
             )
 
 
@@ -342,12 +344,23 @@ def render_analysis_settings_section() -> dict[str, Any]:
         "Local MCP-style tools: uses MCP-style local wrappers without runtime transport. "
         "Experimental ADK-MCP runtime tools: starts local MCP stdio runtime for selected tools and falls back safely if unavailable."
     )
+    analysis_workflow = st.selectbox(
+        "Analysis workflow",
+        [STANDARD_WORKFLOW, FULL_AGENT_WORKFLOW],
+        index=0,
+        help=(
+            "Standard workflow runs the stable deterministic report pipeline. Full agent workflow runs the staged "
+            "ADK-style orchestration with privacy_guard, job_analyzer, portfolio_evidence, profile_matcher, "
+            "gap_planner, application_writer, and interview_coach."
+        ),
+    )
     output_style = st.selectbox("Output style", ["Concise", "Detailed"])
     include_cover_letter = st.checkbox("Include cover letter draft", value=True)
     include_interview_prep = st.checkbox("Include interview prep", value=True)
     return {
         "analysis_mode": analysis_mode,
         "tool_backend": tool_backend,
+        "analysis_workflow": analysis_workflow,
         "output_style": output_style,
         "include_cover_letter": include_cover_letter,
         "include_interview_prep": include_interview_prep,
@@ -382,12 +395,21 @@ def handle_generate_report(
         analysis_mode=settings.get("analysis_mode", "Mock deterministic mode"),
         tool_backend=settings.get("tool_backend", DIRECT_BACKEND),
     )
-    result = run_career_strategy_workflow(workflow_input)
+    warnings: list[str] = []
+    if settings.get("analysis_workflow") == FULL_AGENT_WORKFLOW:
+        try:
+            result = run_career_strategy_agent_workflow(workflow_input)
+        except Exception:
+            warnings.append("Full agent workflow could not be used. Falling back to standard deterministic workflow.")
+            result = run_career_strategy_workflow(workflow_input)
+    else:
+        result = run_career_strategy_workflow(workflow_input)
+
     report = result.report
     if job_source_url.strip():
         report["job_analysis"]["job_source_url"] = job_source_url.strip()
 
-    for warning in result.warnings:
+    for warning in [*warnings, *result.warnings]:
         st.warning(warning)
     if result.mode_used == "Gemini-assisted summary":
         st.success("Gemini-assisted career insights generated. Deterministic score fields were unchanged.")
@@ -403,6 +425,7 @@ def render_results_tabs(report: dict[str, Any], projects: list[dict[str, Any]], 
     st.header("7. Results")
     st.caption("Review the mock analysis, then export a Markdown report when the result looks useful.")
     render_workflow_runtime(report.get("runtime_route", {}))
+    render_agent_workflow_trace(report)
 
     tabs = st.tabs(
         [
@@ -473,6 +496,50 @@ def render_workflow_runtime(runtime_route: dict[str, Any]) -> None:
         render_bullets(selected_tools, "No runtime tools were selected for this backend.")
         st.markdown("**Notes:**")
         render_bullets(notes, "No runtime notes available.")
+
+
+def render_agent_workflow_trace(report: dict[str, Any]) -> None:
+    agent_workflow = report.get("agent_workflow", {})
+    agent_trace = report.get("agent_trace", [])
+    if not agent_workflow and not agent_trace:
+        return
+
+    st.info("Agent Workflow Trace: full ADK-style deterministic orchestration was used.")
+    with st.expander("Agent Workflow Trace", expanded=True):
+        col_a, col_b, col_c = st.columns(3)
+        col_a.metric("Scoring source", str(agent_workflow.get("scoring_source", "deterministic")))
+        llm_modification = bool(agent_workflow.get("llm_score_modification", False))
+        col_b.metric("LLM score modification", "Enabled" if llm_modification else "Disabled")
+        col_c.metric("Agent stages", str(len(agent_trace) or len(agent_workflow.get("agents", []))))
+
+        st.markdown(f"**Agent orchestration:** {agent_workflow.get('orchestration', 'Full agent workflow')}")
+        st.caption("Trace entries show metadata only. Raw private inputs and secrets are not displayed.")
+
+        if not agent_trace:
+            render_bullets(agent_workflow.get("agents", []), "No serialized agent trace available.")
+            return
+
+        for step in agent_trace:
+            status = str(step.get("status", "completed"))
+            icon = agent_status_icon(status, step.get("warnings", []))
+            with st.expander(f"{icon} {step.get('agent_name', 'agent')}", expanded=False):
+                st.write(step.get("summary", "No summary available."))
+                tools_used = step.get("tools_used", [])
+                st.markdown("**Tools used:**")
+                render_bullets(tools_used, "No tools recorded for this stage.")
+                warnings = step.get("warnings", [])
+                if warnings:
+                    st.markdown("**Warnings:**")
+                    render_bullets(warnings, "No warnings.")
+
+
+def agent_status_icon(status: str, warnings: list[str]) -> str:
+    normalized = status.lower()
+    if normalized == "failed":
+        return "✗"
+    if warnings or normalized in {"warning", "fallback"}:
+        return "!"
+    return "✓"
 
 
 def render_job_analysis_tab(

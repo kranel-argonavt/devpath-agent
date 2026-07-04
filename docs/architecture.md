@@ -7,6 +7,10 @@ DevPath Agent is deterministic-first. Scoring, evidence, gaps, and category deta
 ```text
 Streamlit UI
    |
+Analysis workflow selector
+   |-- Standard workflow
+   |-- Full agent workflow
+   |
 portfolio source: sample projects or public GitHub metadata
    |
 WorkflowInput
@@ -116,6 +120,28 @@ final report
 ```
 
 `run_full_agent_workflow` coordinates the named stages, calls deterministic services, and adds `agent_workflow` plus serialized `agent_trace` metadata to the report. Automated tests do not require live ADK runtime execution. MCP runtime can still be used by selected backends, but the full workflow defaults to deterministic direct behavior unless configured otherwise.
+
+## Step 7D Streamlit Full Agent Mode
+
+```text
+Streamlit
+   |
+Analysis workflow selector
+   |-- Standard workflow
+   |-- Full agent workflow
+       |
+       privacy_guard
+       job_analyzer
+       portfolio_evidence
+       profile_matcher
+       gap_planner
+       application_writer
+       interview_coach
+   |
+report + agent trace + export
+```
+
+Step 7D exposes the full deterministic agent workflow in Streamlit without making it the default. The `Agent Workflow Trace` section shows stage names, summaries, tools used, warnings, deterministic scoring source, and disabled LLM score modification. Exported Markdown includes the same trace metadata when the full workflow is used.
 
 ## MCP Layer
 
@@ -232,4 +258,4 @@ MCP runtime tools
 deterministic services + optional Gemini narrative
 ```
 
-Streamlit full agent mode and trace polish are planned next. GitHub features should remain public-repo-only unless a secure permission model is added.
+Final demo polish and the Kaggle writeup are planned next. GitHub features should remain public-repo-only unless a secure permission model is added.

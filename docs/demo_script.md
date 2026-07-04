@@ -30,6 +30,7 @@ Show the header and explain that the default mode is deterministic and local.
 Keep:
 
 - Analysis mode: `Mock deterministic mode`
+- Analysis workflow: `Standard workflow`
 - Tool backend: `Direct Python services`
 
 Click `Generate Career Strategy`.
@@ -44,7 +45,32 @@ Show:
 
 Explain that scoring, gaps, and evidence are deterministic.
 
-## 5. Show MCP-Style Backend
+## 5. Show Full Agent Workflow Mode
+
+Switch:
+
+```text
+Analysis workflow -> Full agent workflow
+```
+
+Click `Generate Career Strategy`.
+
+Show:
+
+- `Agent Workflow Trace`
+- `privacy_guard`
+- `job_analyzer`
+- `portfolio_evidence`
+- `profile_matcher`
+- `gap_planner`
+- `application_writer`
+- `interview_coach`
+- Scoring source: deterministic
+- LLM score modification: disabled
+
+Explain that agents orchestrate the workflow and produce trace metadata, but deterministic scoring remains the source of truth.
+
+## 6. Show MCP-Style Backend
 
 Switch `Tool backend` to `Local MCP-style tools` and generate again.
 
@@ -65,7 +91,7 @@ Explain:
 - The `Workflow Runtime` section shows whether MCP runtime was used, which tools were selected, and whether fallback happened.
 - The deterministic score remains the source of truth.
 
-## 6. Optional Full Agent Workflow Smoke Test
+## 7. Optional Full Agent Workflow Smoke Test
 
 Run:
 
@@ -85,7 +111,7 @@ Show that the full ADK-style workflow executes each named stage:
 
 Explain that this is deterministic orchestration and trace generation. It does not require a live ADK runtime, and `profile_matcher` still uses deterministic scoring as the source of truth.
 
-## 7. Optional GitHub Public Repository Import
+## 8. Optional GitHub Public Repository Import
 
 In `3. Portfolio Source`, select `GitHub public repositories`.
 
@@ -99,7 +125,7 @@ Demo steps:
 6. Generate a career strategy using the imported repositories as portfolio projects.
 7. Open `Portfolio Evidence` and show `GitHub Repository Evidence`.
 
-## 8. Optional Gemini Demo
+## 9. Optional Gemini Demo
 
 If a local API key is configured:
 
@@ -110,11 +136,11 @@ If a local API key is configured:
 
 If no key is configured, show the warning and explain that the app continues in deterministic mode.
 
-## 9. Export Markdown
+## 10. Export Markdown
 
-Open `Export`, click `Export Markdown Report`, and show the generated path. Mention that exported Markdown is privacy-masked, includes the `Workflow Runtime` section, and `outputs/*.md` is ignored by Git.
+Open `Export`, click `Export Markdown Report`, and show the generated path. Mention that exported Markdown is privacy-masked, includes the `Workflow Runtime` section, includes `Agent Workflow Trace` when full agent mode was used, and `outputs/*.md` is ignored by Git.
 
-## 10. Mention Smoke Tests
+## 11. Mention Smoke Tests
 
 Run or mention:
 
@@ -129,7 +155,7 @@ python scripts/check_full_agent_workflow.py
 
 Explain that these validate optional Gemini connectivity, ADK skeleton structure, MCP-style deterministic tools, selected local MCP runtime calls, the selected ADK-MCP bridge, and the full ADK-style deterministic workflow without requiring production runtime integration.
 
-## 11. Close With Architecture
+## 12. Close With Architecture
 
 Summarize:
 
@@ -137,7 +163,7 @@ Summarize:
 - The workflow uses a tool router.
 - The tool router can use direct Python services or local MCP-style tools.
 - Full ADK-style deterministic orchestration now exists with trace metadata.
-- Streamlit full agent mode and trace polish are planned next.
+- Streamlit can show standard workflow or full agent workflow mode.
 - Deterministic scoring remains the source of truth.
 
 ## Optional Step 6A.1 Runtime Proof

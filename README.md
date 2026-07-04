@@ -13,6 +13,10 @@ DevPath Agent turns that comparison into a structured, explainable workflow that
 ```text
 Streamlit UI
    |
+Analysis workflow selector
+   |-- Standard workflow
+   |-- Full agent workflow
+   |
 agent_workflow.run_career_strategy_workflow
    |
 tool_router
@@ -31,7 +35,7 @@ The deterministic report remains the source of truth. Gemini can add concise nar
 
 ## Current Status
 
-Current status: **Step 7C - Full ADK-style deterministic agent workflow orchestration.**
+Current status: **Step 7D - Streamlit full agent mode + trace.**
 
 Implemented today:
 
@@ -57,6 +61,8 @@ Implemented today:
 - GitHub public repository metadata import as a portfolio source
 - GitHub public repository metadata mapped into portfolio evidence
 - Full ADK-style deterministic agent workflow with named stages and trace metadata
+- Streamlit `Analysis workflow` selector for standard or full agent workflow mode
+- Agent Workflow Trace display in Streamlit and exported Markdown
 - Local Gemini, ADK, and MCP smoke-test scripts
 - Pytest suite for deterministic helpers, workflow, tools, and smoke scripts
 
@@ -82,7 +88,7 @@ Streamlit does **not** yet run a full ADK runtime. The experimental ADK-MCP back
 
 ## Full Agent Workflow Orchestration
 
-The project now includes a full ADK-style deterministic workflow facade in `devpath/full_agent_workflow.py`. It runs the career strategy process through named stages:
+The project includes a full ADK-style deterministic workflow facade in `devpath/full_agent_workflow.py`. Streamlit can now run either the standard deterministic workflow or the full agent workflow through the `Analysis workflow` selector. The full workflow runs the career strategy process through named stages:
 
 - `privacy_guard`
 - `job_analyzer`
@@ -92,7 +98,7 @@ The project now includes a full ADK-style deterministic workflow facade in `devp
 - `application_writer`
 - `interview_coach`
 
-These stages orchestrate existing deterministic tools and services, produce an agent trace, and attach workflow metadata to the report. Deterministic scoring remains the source of truth; agents must not invent or modify numeric match scores.
+These stages orchestrate existing deterministic tools and services, produce an agent trace, and attach workflow metadata to the report. The UI displays `Agent Workflow Trace`, and Markdown export includes the same trace when present. Deterministic scoring remains the source of truth; agents must not invent or modify numeric match scores.
 
 ## Setup
 

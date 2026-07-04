@@ -50,7 +50,10 @@ DevPath Agent is designed around cautious handling of candidate data. The curren
 - The full ADK-style workflow does not require API keys.
 - The full workflow is deterministic orchestration around local tools and services.
 - Agents record trace metadata but must not expose raw secrets or private tokens.
+- Agent trace is safe metadata: stage names, summaries, selected tool names, status, and warnings.
+- Agent trace must not include raw job text, full CV text, API keys, private tokens, or other secret-bearing inputs.
 - `profile_matcher` uses deterministic scoring and must not invent or modify numeric scores.
+- Agents do not modify numeric scores; scoring remains deterministic and auditable.
 - Automated tests for the full workflow do not call external APIs or live ADK runtime services.
 
 ## Runtime Boundaries

@@ -39,6 +39,8 @@ def _report_to_markdown(report: dict[str, Any]) -> str:
         "## Workflow Runtime",
         *_render_workflow_runtime(report.get("runtime_route", {})),
         "",
+        *_render_agent_workflow_trace(report),
+        "",
         "## 1. Job Analysis",
         *_render_job_analysis(report.get("job_analysis", {})),
         "",
@@ -96,6 +98,46 @@ def _render_workflow_runtime(runtime_route: dict[str, Any]) -> list[str]:
         lines.extend(f"  - {note}" for note in notes)
     else:
         lines.append("  - No runtime notes available.")
+    return lines
+
+
+def _render_agent_workflow_trace(report: dict[str, Any]) -> list[str]:
+    agent_workflow = report.get("agent_workflow", {})
+    agent_trace = report.get("agent_trace", [])
+    if not agent_workflow and not agent_trace:
+        return []
+
+    lines = ["## Agent Workflow Trace"]
+    if agent_trace:
+        for step in agent_trace:
+            lines.extend(
+                [
+                    f"- Agent: {step.get('agent_name', 'agent')}",
+                    f"  - Status: {step.get('status', 'completed')}",
+                    f"  - Summary: {step.get('summary', 'No summary available.')}",
+                    (
+                        "  - Tools used: "
+                        f"{', '.join(str(tool) for tool in step.get('tools_used', [])) or 'None'}"
+                    ),
+                ]
+            )
+            warnings = step.get("warnings", [])
+            if warnings:
+                lines.append(f"  - Warnings: {'; '.join(str(warning) for warning in warnings)}")
+            else:
+                lines.append("  - Warnings: None")
+    else:
+        lines.extend(_render_bullets(agent_workflow.get("agents", []), "No serialized agent trace available."))
+
+    lines.extend(
+        [
+            "",
+            "## Agent Workflow Metadata",
+            f"- Orchestration: {agent_workflow.get('orchestration', 'Full agent workflow')}",
+            f"- Scoring source: {agent_workflow.get('scoring_source', 'deterministic')}",
+            f"- LLM score modification: {_enabled_disabled(agent_workflow.get('llm_score_modification', False))}",
+        ]
+    )
     return lines
 
 
@@ -358,6 +400,10 @@ def _titleize(key: str) -> str:
 
 def _yes_no(value: Any) -> str:
     return "Yes" if bool(value) else "No"
+
+
+def _enabled_disabled(value: Any) -> str:
+    return "Enabled" if bool(value) else "Disabled"
 
 
 def _strip_trailing_blank(lines: list[str]) -> list[str]:

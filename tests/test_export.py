@@ -103,6 +103,29 @@ def test_export_markdown_report_writes_rich_markdown_file(tmp_path: Path) -> Non
                 "Fell back to direct deterministic services.",
             ],
         },
+        "agent_workflow": {
+            "enabled": True,
+            "orchestration": "Full ADK-style deterministic agent workflow",
+            "agents": ["privacy_guard", "job_analyzer", "profile_matcher"],
+            "scoring_source": "deterministic",
+            "llm_score_modification": False,
+        },
+        "agent_trace": [
+            {
+                "agent_name": "privacy_guard",
+                "status": "completed",
+                "summary": "Masked sensitive context before analysis.",
+                "tools_used": ["mask_personal_data"],
+                "warnings": [],
+            },
+            {
+                "agent_name": "profile_matcher",
+                "status": "completed",
+                "summary": "Calculated deterministic match score.",
+                "tools_used": ["calculate_match_score", "create_mock_report"],
+                "warnings": [],
+            },
+        ],
         "gemini_insights": {
             "career_summary": "Optional Gemini-assisted narrative summary.",
             "top_actions": ["Apply with API evidence", "Update README", "Practice interviews"],
@@ -125,6 +148,12 @@ def test_export_markdown_report_writes_rich_markdown_file(tmp_path: Path) -> Non
     assert "- Requested backend: Experimental ADK-MCP runtime tools" in content
     assert "- Backend used: Direct Python services" in content
     assert "- Fallback used: Yes" in content
+    assert "## Agent Workflow Trace" in content
+    assert "- Agent: privacy_guard" in content
+    assert "- Agent: profile_matcher" in content
+    assert "## Agent Workflow Metadata" in content
+    assert "- Scoring source: deterministic" in content
+    assert "- LLM score modification: Disabled" in content
     assert "### Overall Match Score" in content
     assert "### Category Breakdown" in content
     assert "## 3. Evidence by Skill" in content

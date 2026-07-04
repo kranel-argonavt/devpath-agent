@@ -41,6 +41,10 @@ python scripts/check_github_public_import.py octocat
 - [ ] Confirm deterministic scoring source.
 - [ ] Confirm LLM score modification is disabled.
 - [ ] Analysis mode selector.
+- [ ] Analysis workflow selector.
+- [ ] Full agent workflow mode.
+- [ ] Agent Workflow Trace section.
+- [ ] Deterministic scoring source.
 - [ ] Tool backend selector.
 - [ ] Workflow Runtime section.
 - [ ] Selected backend.
@@ -52,6 +56,7 @@ python scripts/check_github_public_import.py octocat
 - [ ] Gemini-assisted Career Strategy if API key is configured.
 - [ ] Markdown export.
 - [ ] Export Markdown and verify Workflow Runtime section.
+- [ ] Export Markdown and verify Agent Workflow Trace section.
 
 ## Safety Checks
 

@@ -5,6 +5,7 @@ from devpath.agent_workflow import (
     MOCK_MODE,
     DETERMINISTIC_PROFILE_MATCH_FIELDS,
     WorkflowInput,
+    run_career_strategy_agent_workflow,
     run_career_strategy_workflow,
 )
 from devpath.core.config import AppConfig
@@ -332,6 +333,71 @@ def test_workflow_gemini_fake_generator_works_after_experimental_fallback(monkey
     assert result.warnings == [
         "Experimental ADK-MCP runtime tools could not be used. Falling back to direct deterministic services."
     ]
+
+
+def test_full_agent_workflow_wrapper_returns_report_with_trace() -> None:
+    result = run_career_strategy_agent_workflow(_workflow_input(analysis_mode=MOCK_MODE))
+
+    assert result.mode_used == MOCK_MODE
+    assert "overall_score" in result.report["profile_match"]
+    assert result.report["agent_workflow"]["enabled"] is True
+    assert result.report["agent_workflow"]["scoring_source"] == "deterministic"
+    assert result.report["agent_workflow"]["llm_score_modification"] is False
+    assert [step["agent_name"] for step in result.report["agent_trace"]] == [
+        "privacy_guard",
+        "job_analyzer",
+        "portfolio_evidence",
+        "profile_matcher",
+        "gap_planner",
+        "application_writer",
+        "interview_coach",
+    ]
+
+
+def test_full_agent_workflow_keeps_deterministic_score() -> None:
+    standard_result = run_career_strategy_workflow(_workflow_input(analysis_mode=MOCK_MODE))
+    full_result = run_career_strategy_agent_workflow(_workflow_input(analysis_mode=MOCK_MODE))
+
+    assert full_result.report["profile_match"]["overall_score"] == standard_result.report["profile_match"]["overall_score"]
+    assert full_result.report["profile_match"]["missing_skills"] == standard_result.report["profile_match"]["missing_skills"]
+
+
+def test_full_agent_workflow_falls_back_if_underlying_full_workflow_raises(monkeypatch) -> None:
+    def failing_full_workflow(*args, **kwargs):
+        raise RuntimeError("full workflow failed")
+
+    monkeypatch.setattr("devpath.full_agent_workflow.run_full_agent_workflow", failing_full_workflow)
+
+    result = run_career_strategy_agent_workflow(_workflow_input(analysis_mode=MOCK_MODE))
+
+    assert "overall_score" in result.report["profile_match"]
+    assert "agent_workflow" not in result.report
+    assert result.warnings == [
+        "Full agent workflow could not be used. Falling back to standard deterministic workflow."
+    ]
+
+
+def test_full_agent_workflow_gemini_fake_generator_attaches_insights() -> None:
+    def fake_generator(report, api_key, model):
+        return {
+            "career_summary": "Fake full-agent Gemini summary",
+            "top_actions": [],
+            "portfolio_positioning": [],
+            "skill_gap_strategy": [],
+            "interview_focus": [],
+            "raw_response": "{}",
+        }
+
+    result = run_career_strategy_agent_workflow(
+        _workflow_input(analysis_mode=GEMINI_MODE),
+        config=AppConfig(google_api_key="fake-key", gemini_model="gemini-2.5-flash", gemini_enabled=True),
+        gemini_generator=fake_generator,
+    )
+
+    assert result.mode_used == GEMINI_MODE
+    assert result.report["gemini_insights"]["career_summary"] == "Fake full-agent Gemini summary"
+    assert result.report["agent_workflow"]["scoring_source"] == "deterministic"
+    assert "fake-key" not in str(result.report)
 
 
 def _workflow_input(analysis_mode: str, tool_backend: str = DIRECT_BACKEND) -> WorkflowInput:

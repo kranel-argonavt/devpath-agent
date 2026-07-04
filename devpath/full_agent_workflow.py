@@ -45,6 +45,7 @@ class FullAgentWorkflowInput:
     projects: list[dict[str, Any]]
     target_role: str = "Junior Software Developer"
     cv_text: str = ""
+    output_style: str = "Concise"
     tool_backend: str = DIRECT_BACKEND
     analysis_mode: str = "Mock deterministic mode"
 
@@ -72,6 +73,7 @@ def run_full_agent_workflow(
         "projects": deepcopy(workflow_input.projects),
         "tool_backend": workflow_input.tool_backend,
         "analysis_mode": workflow_input.analysis_mode,
+        "output_style": workflow_input.output_style,
         "warnings": [],
     }
     trace = [
@@ -166,6 +168,7 @@ def run_profile_matcher_stage(state: dict[str, Any]) -> AgentTraceStep:
             profile=state["profile"],
             projects=state["projects"],
             cv_text=state["masked_cv_text"],
+            output_style=state["output_style"],
             tool_backend=state["tool_backend"],
         )
     except RuntimeError:
@@ -175,6 +178,7 @@ def run_profile_matcher_stage(state: dict[str, Any]) -> AgentTraceStep:
             profile=state["profile"],
             projects=state["projects"],
             cv_text=state["masked_cv_text"],
+            output_style=state["output_style"],
             tool_backend=DIRECT_BACKEND,
         )
     state["report"] = report
