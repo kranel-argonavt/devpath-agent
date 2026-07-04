@@ -8,7 +8,7 @@ from devpath.agent_workflow import (
     run_career_strategy_workflow,
 )
 from devpath.core.config import AppConfig
-from devpath.tool_router import DIRECT_BACKEND, MCP_STYLE_BACKEND, build_report_with_backend
+from devpath.tool_router import ADK_MCP_RUNTIME_BACKEND, DIRECT_BACKEND, MCP_STYLE_BACKEND, build_report_with_backend
 
 
 def test_workflow_mock_mode_returns_deterministic_report_without_gemini() -> None:
@@ -166,6 +166,131 @@ def test_workflow_gemini_fake_generator_works_with_mcp_style_backend() -> None:
     assert result.mode_used == GEMINI_MODE
     assert result.report["gemini_insights"]["career_summary"] == "Fake MCP-backed Gemini summary"
     assert result.warnings == []
+
+
+def test_workflow_can_use_experimental_adk_mcp_backend(monkeypatch) -> None:
+    direct_report = build_report_with_backend(
+        _workflow_input(analysis_mode=MOCK_MODE).job_text,
+        _workflow_input(analysis_mode=MOCK_MODE).profile,
+        _workflow_input(analysis_mode=MOCK_MODE).projects,
+        tool_backend=DIRECT_BACKEND,
+    )
+
+    def fake_analyze(job_text):
+        return {"required_skills": ["C#", ".NET"]}
+
+    def fake_score(job_text, profile, projects):
+        return direct_report["profile_match"]
+
+    monkeypatch.setattr("devpath.adk_mcp_tools.analyze_job_posting_via_mcp_tool", fake_analyze)
+    monkeypatch.setattr("devpath.adk_mcp_tools.calculate_match_score_via_mcp_tool", fake_score)
+
+    result = run_career_strategy_workflow(
+        _workflow_input(analysis_mode=MOCK_MODE, tool_backend=ADK_MCP_RUNTIME_BACKEND)
+    )
+
+    assert result.mode_used == MOCK_MODE
+    assert result.warnings == []
+    assert result.report["runtime_route"]["tool_backend"] == ADK_MCP_RUNTIME_BACKEND
+    assert result.report["runtime_route"]["mcp_runtime_used"] is True
+    assert result.report["profile_match"]["overall_score"] == direct_report["profile_match"]["overall_score"]
+
+
+def test_workflow_falls_back_if_experimental_adk_mcp_backend_fails(monkeypatch) -> None:
+    def fake_build_report_with_backend(**kwargs):
+        if kwargs["tool_backend"] == ADK_MCP_RUNTIME_BACKEND:
+            raise RuntimeError("ADK-MCP backend failed")
+        return build_report_with_backend(**kwargs)
+
+    monkeypatch.setattr(
+        "devpath.agent_workflow.build_report_with_backend",
+        fake_build_report_with_backend,
+    )
+
+    result = run_career_strategy_workflow(
+        _workflow_input(analysis_mode=MOCK_MODE, tool_backend=ADK_MCP_RUNTIME_BACKEND)
+    )
+
+    assert result.mode_used == MOCK_MODE
+    assert "overall_score" in result.report["profile_match"]
+    assert result.report["runtime_route"]["tool_backend"] == DIRECT_BACKEND
+    assert result.warnings == [
+        "Experimental ADK-MCP runtime tools could not be used. Falling back to direct deterministic services."
+    ]
+
+
+def test_workflow_gemini_fake_generator_works_after_experimental_adk_mcp_backend(monkeypatch) -> None:
+    direct_report = build_report_with_backend(
+        _workflow_input(analysis_mode=MOCK_MODE).job_text,
+        _workflow_input(analysis_mode=MOCK_MODE).profile,
+        _workflow_input(analysis_mode=MOCK_MODE).projects,
+        tool_backend=DIRECT_BACKEND,
+    )
+
+    def fake_analyze(job_text):
+        return {"required_skills": ["C#", ".NET"]}
+
+    def fake_score(job_text, profile, projects):
+        return direct_report["profile_match"]
+
+    def fake_generator(report, api_key, model):
+        return {
+            "career_summary": "Fake ADK-MCP-backed Gemini summary",
+            "top_actions": [],
+            "portfolio_positioning": [],
+            "skill_gap_strategy": [],
+            "interview_focus": [],
+            "raw_response": "{}",
+        }
+
+    monkeypatch.setattr("devpath.adk_mcp_tools.analyze_job_posting_via_mcp_tool", fake_analyze)
+    monkeypatch.setattr("devpath.adk_mcp_tools.calculate_match_score_via_mcp_tool", fake_score)
+
+    result = run_career_strategy_workflow(
+        _workflow_input(analysis_mode=GEMINI_MODE, tool_backend=ADK_MCP_RUNTIME_BACKEND),
+        config=AppConfig(google_api_key="fake-key", gemini_model="gemini-2.5-flash", gemini_enabled=True),
+        gemini_generator=fake_generator,
+    )
+
+    assert result.mode_used == GEMINI_MODE
+    assert result.report["gemini_insights"]["career_summary"] == "Fake ADK-MCP-backed Gemini summary"
+    assert result.report["profile_match"]["overall_score"] == direct_report["profile_match"]["overall_score"]
+    assert result.warnings == []
+
+
+def test_workflow_gemini_fake_generator_works_after_experimental_fallback(monkeypatch) -> None:
+    def fake_build_report_with_backend(**kwargs):
+        if kwargs["tool_backend"] == ADK_MCP_RUNTIME_BACKEND:
+            raise RuntimeError("ADK-MCP backend failed")
+        return build_report_with_backend(**kwargs)
+
+    def fake_generator(report, api_key, model):
+        return {
+            "career_summary": "Fake fallback Gemini summary",
+            "top_actions": [],
+            "portfolio_positioning": [],
+            "skill_gap_strategy": [],
+            "interview_focus": [],
+            "raw_response": "{}",
+        }
+
+    monkeypatch.setattr(
+        "devpath.agent_workflow.build_report_with_backend",
+        fake_build_report_with_backend,
+    )
+
+    result = run_career_strategy_workflow(
+        _workflow_input(analysis_mode=GEMINI_MODE, tool_backend=ADK_MCP_RUNTIME_BACKEND),
+        config=AppConfig(google_api_key="fake-key", gemini_model="gemini-2.5-flash", gemini_enabled=True),
+        gemini_generator=fake_generator,
+    )
+
+    assert result.mode_used == GEMINI_MODE
+    assert result.report["gemini_insights"]["career_summary"] == "Fake fallback Gemini summary"
+    assert result.report["runtime_route"]["tool_backend"] == DIRECT_BACKEND
+    assert result.warnings == [
+        "Experimental ADK-MCP runtime tools could not be used. Falling back to direct deterministic services."
+    ]
 
 
 def _workflow_input(analysis_mode: str, tool_backend: str = DIRECT_BACKEND) -> WorkflowInput:

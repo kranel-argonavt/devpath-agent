@@ -12,7 +12,12 @@ from typing import Any
 
 from devpath.core.config import AppConfig, get_app_config
 from devpath.services.gemini_service import generate_gemini_career_insights
-from devpath.tool_router import DIRECT_BACKEND, MCP_STYLE_BACKEND, build_report_with_backend
+from devpath.tool_router import (
+    ADK_MCP_RUNTIME_BACKEND,
+    DIRECT_BACKEND,
+    MCP_STYLE_BACKEND,
+    build_report_with_backend,
+)
 
 
 MOCK_MODE = "Mock deterministic mode"
@@ -75,6 +80,18 @@ def run_career_strategy_workflow(
     except RuntimeError:
         if workflow_input.tool_backend == MCP_STYLE_BACKEND:
             warnings.append("Local MCP-style tools could not be used. Falling back to direct deterministic services.")
+            deterministic_report = build_report_with_backend(
+                job_text=workflow_input.job_text,
+                profile=profile,
+                projects=workflow_input.projects,
+                cv_text=workflow_input.cv_text,
+                output_style=workflow_input.output_style,
+                tool_backend=DIRECT_BACKEND,
+            )
+        elif workflow_input.tool_backend == ADK_MCP_RUNTIME_BACKEND:
+            warnings.append(
+                "Experimental ADK-MCP runtime tools could not be used. Falling back to direct deterministic services."
+            )
             deterministic_report = build_report_with_backend(
                 job_text=workflow_input.job_text,
                 profile=profile,

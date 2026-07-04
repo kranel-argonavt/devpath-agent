@@ -267,7 +267,10 @@ def render_analysis_settings_section() -> dict[str, Any]:
         "Tool backend",
         list_tool_backends(),
         index=0,
-        help="Local MCP-style tools use the MCP tool registry in-process. No MCP transport is started yet.",
+        help=(
+            "Local MCP-style tools use the MCP registry in-process. Experimental ADK-MCP runtime tools "
+            "start a local MCP stdio runtime for selected tools and fall back safely if unavailable."
+        ),
     )
     output_style = st.selectbox("Output style", ["Concise", "Detailed"])
     include_cover_letter = st.checkbox("Include cover letter draft", value=True)

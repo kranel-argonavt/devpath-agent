@@ -53,6 +53,15 @@ Explain:
 - No MCP transport is started.
 - The deterministic score remains the source of truth.
 
+Optionally switch `Tool backend` to `Experimental ADK-MCP runtime tools` and generate again.
+
+Explain:
+
+- This path routes selected job-analysis and match-score calls through ADK-style wrappers and local MCP stdio runtime.
+- Direct Python services remain the default.
+- If the runtime path fails, the workflow falls back to direct deterministic services with a warning.
+- The deterministic score remains the source of truth.
+
 ## 6. Optional Gemini Demo
 
 If a local API key is configured:
@@ -89,7 +98,7 @@ Summarize:
 - Streamlit calls a workflow facade.
 - The workflow uses a tool router.
 - The tool router can use direct Python services or local MCP-style tools.
-- ADK runtime routing through MCP is planned next.
+- Full ADK runtime orchestration is planned next.
 - Deterministic scoring remains the source of truth.
 
 ## Optional Step 6A.1 Runtime Proof
@@ -111,3 +120,13 @@ python scripts/check_adk_mcp_tools.py
 ```
 
 Explain that selected ADK-style tool wrappers now call local MCP runtime tools. This proves the bridge path without routing the full Streamlit workflow through ADK or MCP runtime yet.
+
+## Optional Step 6C Workflow Backend Demo
+
+In the app, select:
+
+```text
+Tool backend -> Experimental ADK-MCP runtime tools
+```
+
+Generate the report and explain that the workflow can now use the selected ADK-MCP runtime route while still preserving deterministic scoring and safe fallback behavior.

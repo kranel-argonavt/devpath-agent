@@ -14,6 +14,7 @@ run_career_strategy_workflow
 tool_router
    |-- Direct Python services
    |-- Local MCP-style tool registry
+   |-- Experimental ADK-MCP runtime tools
    |
 deterministic report
    |
@@ -22,7 +23,7 @@ optional Gemini insights
 UI tabs + Markdown export
 ```
 
-Direct Python services are the default backend. Local MCP-style tools run in-process through `MCP_TOOL_REGISTRY`; no MCP transport is started.
+Direct Python services are the default backend. Local MCP-style tools run in-process through `MCP_TOOL_REGISTRY`; no MCP transport is started for that backend. The experimental ADK-MCP backend can start a local MCP stdio runtime for selected deterministic tools and falls back safely through the workflow if unavailable.
 
 ## Deterministic Source Of Truth
 
@@ -107,7 +108,29 @@ MCP deterministic tools
 core scoring/privacy logic
 ```
 
-`scripts/check_adk_mcp_tools.py` validates that selected ADK-style wrappers can call local MCP runtime tools. This is selected-tool bridging only: Streamlit is not routed through ADK+MCP runtime yet, and deterministic scoring remains the source of truth.
+`scripts/check_adk_mcp_tools.py` validates that selected ADK-style wrappers can call local MCP runtime tools. This is selected-tool bridging only: Streamlit is not routed through full ADK runtime orchestration yet, and deterministic scoring remains the source of truth.
+
+## Step 6C Experimental Workflow Backend
+
+```text
+Streamlit UI
+   |
+agent_workflow
+   |
+tool_router
+   |
+Experimental ADK-MCP runtime tools
+   |
+ADK-style wrappers
+   |
+MCP runtime adapter
+   |
+local MCP stdio server
+   |
+deterministic tools
+```
+
+The Step 6C backend is opt-in. It builds the report shape through deterministic report logic, validates selected job-analysis and match-score calls through ADK-MCP wrappers, records runtime route metadata, and falls back to direct deterministic services if runtime startup or tool calls fail.
 
 ## Gemini Layer
 

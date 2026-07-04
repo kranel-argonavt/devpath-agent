@@ -7,12 +7,13 @@ from devpath.agent_tools import build_mock_report_tool
 
 DIRECT_BACKEND = "Direct Python services"
 MCP_STYLE_BACKEND = "Local MCP-style tools"
+ADK_MCP_RUNTIME_BACKEND = "Experimental ADK-MCP runtime tools"
 
 
 def list_tool_backends() -> list[str]:
     """Return supported local tool backend names."""
 
-    return [DIRECT_BACKEND, MCP_STYLE_BACKEND]
+    return [DIRECT_BACKEND, MCP_STYLE_BACKEND, ADK_MCP_RUNTIME_BACKEND]
 
 
 def normalize_tool_backend(value: str | None) -> str:
@@ -35,7 +36,17 @@ def build_report_with_backend(
 
     backend = normalize_tool_backend(tool_backend)
     if backend == MCP_STYLE_BACKEND:
-        return _build_report_with_mcp_style_tools(
+        report = _build_report_with_mcp_style_tools(
+            job_text=job_text,
+            profile=profile,
+            projects=projects,
+            cv_text=cv_text,
+            output_style=output_style,
+        )
+        return _attach_runtime_route(report, tool_backend=backend, mcp_runtime_used=False)
+
+    if backend == ADK_MCP_RUNTIME_BACKEND:
+        return _build_report_with_adk_mcp_runtime_tools(
             job_text=job_text,
             profile=profile,
             projects=projects,
@@ -43,13 +54,14 @@ def build_report_with_backend(
             output_style=output_style,
         )
 
-    return build_mock_report_tool(
+    report = build_mock_report_tool(
         job_text=job_text,
         profile=profile,
         projects=projects,
         cv_text=cv_text,
         output_style=output_style,
     )
+    return _attach_runtime_route(report, tool_backend=backend, mcp_runtime_used=False)
 
 
 def _build_report_with_mcp_style_tools(
@@ -72,3 +84,73 @@ def _build_report_with_mcp_style_tools(
         )
     except Exception as exc:
         raise RuntimeError("Local MCP-style tools could not build the deterministic report.") from exc
+
+
+def _build_report_with_adk_mcp_runtime_tools(
+    job_text: str,
+    profile: dict[str, Any],
+    projects: list[dict[str, Any]],
+    cv_text: str,
+    output_style: str,
+) -> dict[str, Any]:
+    """Build a report while validating selected tools through MCP runtime."""
+
+    report = build_mock_report_tool(
+        job_text=job_text,
+        profile=profile,
+        projects=projects,
+        cv_text=cv_text,
+        output_style=output_style,
+    )
+
+    try:
+        from devpath.adk_mcp_tools import (
+            analyze_job_posting_via_mcp_tool,
+            calculate_match_score_via_mcp_tool,
+        )
+
+        job_analysis = analyze_job_posting_via_mcp_tool(job_text)
+        runtime_score = calculate_match_score_via_mcp_tool(job_text, profile, projects)
+    except Exception as exc:
+        raise RuntimeError("Experimental ADK-MCP runtime tools could not build the deterministic report.") from exc
+
+    base_score = report.get("profile_match", {}).get("overall_score")
+    runtime_score_value = runtime_score.get("overall_score")
+    score_consistent = runtime_score_value == base_score
+    if _has_expected_score_fields(runtime_score):
+        report["profile_match"] = runtime_score
+
+    runtime_route = {
+        "tool_backend": ADK_MCP_RUNTIME_BACKEND,
+        "mcp_runtime_used": True,
+        "selected_tools": ["analyze_job_posting", "calculate_match_score"],
+        "score_consistent": score_consistent,
+    }
+    if isinstance(job_analysis, dict):
+        runtime_route["job_analysis_detected_skills"] = job_analysis.get("required_skills", [])
+
+    report["runtime_route"] = runtime_route
+    return report
+
+
+def _has_expected_score_fields(score: dict[str, Any]) -> bool:
+    return all(
+        key in score
+        for key in (
+            "overall_score",
+            "category_scores",
+            "strong_matches",
+            "partial_matches",
+            "missing_skills",
+            "evidence_by_skill",
+            "prioritized_gaps",
+        )
+    )
+
+
+def _attach_runtime_route(report: dict[str, Any], *, tool_backend: str, mcp_runtime_used: bool) -> dict[str, Any]:
+    report["runtime_route"] = {
+        "tool_backend": tool_backend,
+        "mcp_runtime_used": mcp_runtime_used,
+    }
+    return report

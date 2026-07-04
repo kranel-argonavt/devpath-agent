@@ -22,14 +22,14 @@
 - Step 6A - MCP runtime adapter and selected tool smoke test
 - Step 6A.1 - MCP runtime smoke test verified with installed SDK
 - Step 6B - Route selected ADK tools through MCP runtime
+- Step 6C - Experimental ADK+MCP workflow route
 
 ## Current
 
-- Ready for Step 6C planning
+- Ready for Step 6D planning
 
 ## Next
 
-- Step 6C - Experimental ADK+MCP workflow route
 - Step 6D - Streamlit experimental ADK+MCP mode
 - Step 7A - GitHub public repository import foundation
 - Step 7B - GitHub repo evidence mapping

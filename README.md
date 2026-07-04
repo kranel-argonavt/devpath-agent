@@ -18,6 +18,7 @@ agent_workflow.run_career_strategy_workflow
 tool_router
    |-- Direct Python services
    |-- Local MCP-style tool registry
+   |-- Experimental ADK-MCP runtime tools
    |
 deterministic report
    |
@@ -30,7 +31,7 @@ The deterministic report remains the source of truth. Gemini can add concise nar
 
 ## Current Status
 
-Current status: **Step 6B - selected ADK-style tools can route through MCP runtime.**
+Current status: **Step 6C - experimental ADK-MCP runtime backend available through the workflow.**
 
 Implemented today:
 
@@ -47,17 +48,18 @@ Implemented today:
 - Google ADK-compatible `root_agent` skeleton and sub-agent definitions
 - Deterministic agent tools
 - MCP-compatible server skeleton and MCP-style tool registry
-- Tool backend selector: direct Python services or local MCP-style tools
+- Tool backend selector: direct Python services, local MCP-style tools, or experimental ADK-MCP runtime tools
 - Experimental MCP stdio runtime adapter for selected manual tool calls
 - Local MCP runtime smoke test succeeds with selected deterministic tools
 - Experimental ADK-MCP bridge wrappers for selected deterministic tools
+- Experimental ADK-MCP runtime tool backend with safe direct fallback
 - Local Gemini, ADK, and MCP smoke-test scripts
 - Pytest suite for deterministic helpers, workflow, tools, and smoke scripts
 
 Not implemented yet:
 
 - Full ADK runtime routing
-- MCP runtime transport integration
+- Full MCP runtime workflow integration
 - GitHub API integration
 - Source-code repository inspection
 - Production deployment
@@ -69,9 +71,9 @@ Not implemented yet:
 - `devpath/agent_tools.py` exposes deterministic tool wrappers for future agent orchestration.
 - `mcp_server/server.py` exposes an import-safe MCP server skeleton or fallback metadata.
 - `mcp_server/tools/` contains MCP-style wrappers around deterministic project logic.
-- `devpath/tool_router.py` lets the workflow use either direct deterministic services or the local MCP-style registry in-process.
+- `devpath/tool_router.py` lets the workflow use direct deterministic services, the local MCP-style registry in-process, or experimental ADK-MCP runtime wrappers.
 
-Streamlit does **not** yet run a full ADK or MCP runtime. That routing is planned for later.
+Streamlit does **not** yet run a full ADK runtime. The experimental ADK-MCP backend is selected manually and only routes selected deterministic tools through local MCP stdio with safe fallback.
 
 ## Setup
 
@@ -134,6 +136,8 @@ python scripts/check_adk_mcp_tools.py
 ```
 
 This validates that selected ADK-style tool wrappers can call deterministic tools through the local MCP stdio runtime. The default Streamlit workflow does not use this runtime path yet.
+
+The Streamlit workflow can also select `Experimental ADK-MCP runtime tools` as a tool backend. Direct Python services remain the default, and the experimental route falls back to direct deterministic services if the local runtime cannot be used.
 
 ## Optional Gemini Setup
 
