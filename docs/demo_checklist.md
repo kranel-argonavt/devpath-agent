@@ -33,7 +33,7 @@ streamlit run app.py
 
 - [ ] Click `Load sample React frontend scenario`.
 - [ ] Confirm Gemini/ADK tool-calling agent is selected by default.
-- [ ] Confirm Gemini-assisted summary is selected by default.
+- [ ] Confirm `Runtime details for judges` shows structured Gemini behavior and MCP-first tool route.
 - [ ] Confirm deterministic score source is visible.
 - [ ] Confirm Local sample projects is selected by default.
 - [ ] Generate Career Strategy.
@@ -49,6 +49,7 @@ streamlit run app.py
 - [ ] Show LLM score modification disabled.
 - [ ] Show Workflow Runtime section.
 - [ ] Show MCP runtime preferred route and fallback status.
+- [ ] Capture the recommended screenshots under `assets/screenshots/`.
 - [ ] Export Markdown and verify Workflow Runtime section.
 - [ ] Export Markdown and verify Agent Workflow Trace section.
 - [ ] Export Markdown and verify AI Tool-Calling Trace section.

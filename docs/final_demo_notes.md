@@ -4,8 +4,8 @@
 
 Use this path for the main recording because it works offline and does not require secrets:
 
-- Analysis workflow: Gemini/ADK tool-calling agent
-- Analysis mode: Gemini-assisted summary
+- Demo workflow: Capstone agent mode: Gemini/ADK tool-calling + MCP trace
+- Gemini behavior: Structured extraction + narrative writers
 - Tool route: MCP runtime first, local MCP-style registry fallback, direct deterministic fallback
 - Portfolio source: Local sample projects
 
@@ -37,9 +37,9 @@ Do not claim source-code analysis. Step 7B uses public metadata only.
 
 Use only if a local `.env` API key is configured and hidden:
 
-1. Select `Gemini-assisted summary`.
+1. Use the default capstone workflow.
 2. Generate the report.
-3. Show structured Gemini sections.
+3. Show structured Gemini sections in Gaps, Action Plan, Application, and Interview.
 4. Explain that Gemini improves narrative only and does not modify deterministic scores.
 
 ## What To Show
@@ -54,6 +54,8 @@ Use only if a local `.env` API key is configured and hidden:
 - AI Tool-Calling Trace.
 - Workflow Runtime.
 - Markdown export.
+- Recommended screenshots in `assets/screenshots/`.
+- Architecture diagram from `assets/architecture/devpath-agent-architecture.mmd`.
 - Optional GitHub public metadata import.
 - AI-assisted vibe coding as part of the build story.
 

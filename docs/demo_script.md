@@ -19,7 +19,7 @@ streamlit run app.py
 Show the header and capability line:
 
 ```text
-Deterministic scoring | GitHub evidence | ADK-style agent workflow | MCP tools | Optional Gemini insights | Markdown export
+Deterministic scoring · GitHub evidence · ADK-style agent workflow · MCP tools · Gemini-assisted insights · Markdown export
 ```
 
 ## 3. Load Demo Scenario
@@ -34,9 +34,9 @@ Explain that the core demo works offline and without API keys.
 
 Default settings:
 
-- Analysis workflow: Gemini/ADK tool-calling agent
-- Analysis mode: Gemini-assisted summary
-- Tool route: MCP runtime first, local MCP-style registry fallback, direct deterministic fallback
+- Demo workflow: Capstone agent mode: Gemini/ADK tool-calling + MCP trace
+- Gemini behavior: Structured extraction + narrative writers
+- Tool route: MCP runtime first -> local MCP registry -> direct deterministic fallback
 - Portfolio source: Local sample projects
 
 ## 4. Show Inputs
@@ -48,7 +48,7 @@ Briefly show:
 - Portfolio
 - AI Agent Demo Settings
 
-Keep Runtime details collapsed unless you want to point out the defaults.
+Open `Runtime details for judges` briefly to show that the capstone mode locks the MCP-first tool route and keeps deterministic scoring as the source of truth.
 
 ## 5. Generate Career Strategy
 
@@ -74,8 +74,10 @@ Open:
 
 - Overview: score breakdown and missing skills
 - Evidence: portfolio evidence and evidence by skill
-- Gaps: prioritized gaps and recommendations
-- Action Plan: 7-day, 14-day, and 30-day plan
+- Gaps: Gemini-enhanced gap narrative plus deterministic gap details
+- Action Plan: Gemini-enhanced 7-day, 14-day, 30-day plan, portfolio tasks, study tasks, interview drills, and done criteria
+- Application: tailored drafts, CV bullets, project positioning, application checklist
+- Interview: technical questions with answer focus, behavioral questions, project story prompts, weak-area drills
 
 Explain that the app connects job requirements to candidate evidence instead of just generating generic advice.
 
@@ -147,9 +149,9 @@ Explain that only public metadata is used: language, topics, description, URL, s
 
 If a local key is configured and hidden:
 
-1. Ensure `Gemini-assisted summary` is selected.
+1. Use the default capstone workflow with `Gemini behavior: Structured extraction + narrative writers`.
 2. Generate the report with local `GOOGLE_API_KEY`.
-3. Show structured Gemini sections.
+3. Show structured Gemini sections in Gaps, Action Plan, Application, and Interview.
 
 Explain that Gemini can enhance Gaps, Action Plan, Application, and Interview narrative. It does not calculate or modify the match score.
 
@@ -179,3 +181,23 @@ Summarize:
 - Optional Gemini provides structured extraction and narrative assistance.
 - Deterministic scoring remains the source of truth.
 - The project was built through AI-assisted vibe coding / Antigravity-style iteration for the capstone.
+
+## Screenshot Checklist
+
+Capture these after the final smoke test and save them under `assets/screenshots/`:
+
+1. `01a-input-job-posting.png` - sample React job posting.
+2. `01b-input-candidate-profile.png` - candidate profile and optional CV context.
+3. `01c-input-portfolio.png` - local sample portfolio projects.
+4. `01d-input-agent-settings.png` - AI Agent Demo Settings with Runtime details open.
+5. `02a-results-overview-AI-Summary.png` - Results Dashboard and Gemini-assisted summary.
+6. `02b-results-overview-ProfileMatch.png` - deterministic match score and category breakdown.
+7. `03-gemini-action-plan.png` - Gemini-enhanced Action Plan.
+8. `03-gemini-action-SkillGaps.png` - Gemini-enhanced gap narrative.
+9. `04a-runtime-tool-AgentWorkflowTrace.png` - Agent Workflow Trace.
+10. `04b-runtime-tool-AI-Tool-Calling-Trace.png` - AI Tool-Calling Trace.
+11. `04c-runtime-tool-Workflow-Runtime.png` - Workflow Runtime metadata.
+
+Optional:
+
+- `05-export-preview.png` - Export tab with Markdown preview, if there is time to capture it after the main capstone evidence screenshots.

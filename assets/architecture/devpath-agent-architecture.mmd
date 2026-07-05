@@ -1,0 +1,93 @@
+flowchart TD
+    User["User / Judge"]
+    Streamlit["Streamlit UI"]
+    Inputs["Job posting + candidate profile + portfolio + optional CV"]
+    Settings["AI Agent Demo Settings"]
+    Workflow["devpath.agent_workflow"]
+
+    subgraph Modes["Workflow Modes"]
+        ToolCalling["Capstone agent mode: Gemini/ADK tool-calling + MCP trace"]
+        FullAgent["ADK-style deterministic multi-agent workflow"]
+        Standard["Baseline deterministic workflow"]
+    end
+
+    subgraph TraceAgents["Visible Agent Stages / Trace Labels"]
+        Privacy["privacy_guard"]
+        Job["job_analyzer"]
+        Portfolio["portfolio_evidence"]
+        Matcher["profile_matcher"]
+        CareerBuilder["career_report_builder"]
+        Gap["gap_planner"]
+        Writer["application_writer"]
+        Interview["interview_coach"]
+        GeminiNarrative["gemini_narrative"]
+    end
+
+    subgraph ToolRoute["MCP-First Route For Deterministic Tools"]
+        DeterministicCalls["mask/analyze/portfolio/score/report tool calls"]
+        MCPRuntime["MCP runtime"]
+        MCPRegistry["Local MCP-style registry"]
+        Direct["Direct deterministic services"]
+        ToolOutputs["validated deterministic tool outputs"]
+    end
+
+    subgraph Gemini["Optional Gemini API Steps"]
+        ExtractJob["extract_job_requirements_with_gemini"]
+        ExtractCandidate["extract_candidate_context_with_gemini"]
+        NarrativeWriters["gap/action/application/interview writers"]
+    end
+
+    subgraph Validation["Deterministic Validation Boundary"]
+        JobValidator["validate_job_requirements"]
+        CandidateValidator["validate_candidate_context"]
+        ExtractedContext["validated extracted context"]
+    end
+
+    subgraph SourceOfTruth["Deterministic Source Of Truth"]
+        Score["weighted match score"]
+        Evidence["evidence by skill"]
+        Gaps["canonical gaps"]
+        ReportBuilder["build_career_report"]
+    end
+
+    Enhanced["LLM narrative enhancements only"]
+    Report["Career strategy report"]
+    Runtime["Agent Workflow Trace + AI Tool-Calling Trace + Workflow Runtime"]
+    Export["Privacy-masked Markdown export"]
+
+    User --> Streamlit --> Inputs --> Settings --> Workflow
+    Workflow --> ToolCalling
+    Workflow --> FullAgent
+    Workflow --> Standard
+
+    ToolCalling --> Privacy --> Job --> Portfolio --> Matcher --> CareerBuilder --> Gap --> Writer --> Interview --> GeminiNarrative
+    ToolCalling --> DeterministicCalls
+    DeterministicCalls --> MCPRuntime
+    MCPRuntime -->|success| ToolOutputs
+    MCPRuntime -->|fallback| MCPRegistry
+    MCPRegistry -->|success| ToolOutputs
+    MCPRegistry -->|fallback| Direct
+    Direct --> ToolOutputs
+    ToolOutputs --> Score
+    ToolOutputs --> Evidence
+    ToolOutputs --> Gaps
+    ToolOutputs --> ReportBuilder
+
+    ToolCalling --> ExtractJob --> JobValidator --> ExtractedContext
+    ToolCalling --> ExtractCandidate --> CandidateValidator --> ExtractedContext
+    ExtractedContext --> NarrativeWriters
+    ReportBuilder --> NarrativeWriters
+    NarrativeWriters --> Enhanced
+
+    FullAgent --> ReportBuilder
+    Standard --> ReportBuilder
+    Score --> ReportBuilder
+    Evidence --> ReportBuilder
+    Gaps --> ReportBuilder
+    ReportBuilder --> Report
+    Enhanced --> Report
+    ToolCalling --> Runtime
+    FullAgent --> Runtime
+    Runtime --> Report
+    Report --> Streamlit
+    Report --> Export

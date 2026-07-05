@@ -12,40 +12,46 @@ DevPath Agent turns that comparison into a structured, explainable workflow that
 
 ## Current Architecture
 
-```text
-Streamlit UI
-   |
-Analysis workflow selector
-   |-- Gemini/ADK tool-calling agent
-   |-- Standard workflow
-   |-- Full agent workflow
-   |
-agent_workflow.run_career_strategy_workflow
-   |
-Gemini/ADK tool-calling agent mode
-   |-- MCP runtime preferred
-   |-- Local MCP-style registry fallback
-   |-- Direct deterministic fallback
-   |
-tool_router
-   |-- Direct Python services
-   |-- Local MCP-style tool registry
-   |-- Experimental ADK-MCP runtime tools
-   |
-deterministic report
-   |
-optional Gemini structured insights
-   |
-Markdown export
+```mermaid
+flowchart TD
+    UI["Streamlit UI"]
+    Inputs["Job posting + profile + portfolio + optional CV"]
+    Workflow["devpath.agent_workflow"]
+    ToolCalling["Capstone agent mode: Gemini/ADK tool-calling"]
+    FullAgent["ADK-style deterministic multi-agent workflow"]
+    Standard["Baseline deterministic workflow"]
+    MCPRuntime["MCP runtime preferred"]
+    MCPRegistry["Local MCP-style registry fallback"]
+    Direct["Direct deterministic services fallback"]
+    Gemini["Gemini structured extraction + narrative writers"]
+    Validators["Deterministic validators"]
+    Score["Deterministic score/evidence/gaps"]
+    Report["Career report"]
+    Runtime["Agent trace + AI Tool-Calling Trace"]
+    Export["Privacy-masked Markdown export"]
+
+    UI --> Inputs --> Workflow
+    Workflow --> ToolCalling
+    Workflow --> FullAgent
+    Workflow --> Standard
+    ToolCalling --> MCPRuntime --> MCPRegistry --> Direct
+    ToolCalling --> Gemini --> Validators
+    Validators --> Score
+    Direct --> Score
+    FullAgent --> Score
+    Standard --> Score
+    Score --> Report
+    Report --> Runtime
+    Report --> Export
 ```
 
-The deterministic report remains the source of truth. Gemini can add concise narrative insight only when explicitly selected and configured with a local API key.
+The deterministic report remains the source of truth. Gemini can extract structured context and enrich narrative sections when configured with a local API key, but deterministic validators and scoring tools preserve canonical score, evidence, and gap fields.
 
 ## Current Status
 
 Current status: **Agent Runtime Upgrade - capstone-grade tool-calling demo mode.**
 
-Implemented today:
+Implemented:
 
 - Streamlit mock workflow UI
 - Editable job posting, candidate profile, portfolio source, CV context, and analysis settings
@@ -56,12 +62,13 @@ Implemented today:
 - Prioritized skill gaps with recommendations
 - Preparation plan, application drafts, and interview prep
 - Rich privacy-masked Markdown export
-- Optional Gemini-assisted structured insights
+- Optional Gemini-assisted structured extraction and richer narrative writers
 - Google ADK-compatible `root_agent` skeleton and sub-agent definitions
 - Deterministic agent tools
 - MCP-compatible server skeleton and MCP-style tool registry
 - MCP tools for local profile/project loading, portfolio summary, privacy detection/masking, export, scoring, public GitHub repository metadata, and public README fetch
-- Tool backend selector: direct Python services, local MCP-style tools, or experimental ADK-MCP runtime tools
+- Demo workflow selector for capstone tool-calling, ADK-style deterministic workflow, or baseline deterministic workflow
+- Backend comparison selector for non-capstone deterministic routes
 - Experimental MCP stdio runtime adapter for selected manual tool calls
 - Local MCP runtime smoke test succeeds with selected deterministic tools
 - Experimental ADK-MCP bridge wrappers for selected deterministic tools
@@ -71,7 +78,7 @@ Implemented today:
 - GitHub public repository metadata mapped into portfolio evidence
 - Controlled public GitHub README fetch helper for explicit MCP/API use
 - Full ADK-style deterministic agent workflow with named stages and trace metadata
-- Streamlit `Analysis workflow` selector for Gemini/ADK tool-calling, full agent workflow, or standard workflow mode
+- Streamlit `Demo workflow` selector for Gemini/ADK tool-calling, full agent workflow, or standard workflow mode
 - Agent Workflow Trace display in Streamlit and exported Markdown
 - AI Tool-Calling Trace display in Streamlit and exported Markdown
 - Capstone-ready demo defaults: Gemini/ADK tool-calling, Gemini-assisted summary with safe fallback, deterministic scoring, local sample projects
@@ -123,7 +130,7 @@ Gemini is enabled by default for bounded structured extraction and narrative wri
 
 ## Full Agent Workflow Orchestration
 
-The project includes a full ADK-style deterministic workflow facade in `devpath/full_agent_workflow.py`. Streamlit can now run either the standard deterministic workflow or the full agent workflow through the `Analysis workflow` selector. The full workflow runs the career strategy process through named stages:
+The project includes a full ADK-style deterministic workflow facade in `devpath/full_agent_workflow.py`. Streamlit can run the standard deterministic workflow or the full agent workflow through the `Demo workflow` selector. The full workflow runs the career strategy process through named stages:
 
 - `privacy_guard`
 - `job_analyzer`
@@ -154,7 +161,7 @@ Course concepts demonstrated:
 Default offline path:
 
 1. Click `Load sample React frontend scenario`.
-2. Keep `Gemini/ADK tool-calling agent`, `Gemini-assisted summary`, and `Local sample projects`.
+2. Keep the default `Capstone agent mode: Gemini/ADK tool-calling + MCP trace` and `Local sample projects`.
 3. Click `Generate Career Strategy`.
 4. Show Match Score, Evidence, Gaps, Agent Workflow Trace, AI Tool-Calling Trace, Workflow Runtime, and Markdown export.
 
@@ -261,7 +268,7 @@ Then edit `.env` locally:
 
 ```text
 GOOGLE_API_KEY=your_key_here
-GEMINI_MODEL=gemini-2.5-flash
+GEMINI_MODEL=gemini-3.1-flash-lite
 ```
 
 Do not commit `.env`.

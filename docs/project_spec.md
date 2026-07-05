@@ -10,7 +10,7 @@ The current MVP is a Streamlit app backed by deterministic local logic. It loads
 
 The app also includes optional Gemini-assisted structured insights, an ADK-compatible agent skeleton, a full ADK-style deterministic workflow facade, and a capstone-grade Gemini/ADK tool-calling workflow exposed through Streamlit. MCP-style deterministic tool contracts and smoke-test scripts are included for local validation.
 
-The current demo defaults are presentation-ready and offline-safe: Gemini/ADK tool-calling agent, Gemini-assisted summary with safe skip/fallback, deterministic scoring, and Local sample projects.
+The current demo defaults are presentation-ready and offline-safe: capstone Gemini/ADK tool-calling mode, structured Gemini behavior with safe skip/fallback, deterministic scoring, an MCP-first route with local fallbacks, and Local sample projects.
 
 GitHub public repositories can be imported as portfolio projects. Their public metadata is mapped into evidence through primary language, topics, description matches, URL, and repository signals.
 
@@ -29,9 +29,9 @@ GitHub public repositories can be imported as portfolio projects. Their public m
 - Portfolio project data from local samples or public GitHub repository metadata
 - Optional CV context
 - Target role
-- Analysis mode
-- Analysis workflow mode: Gemini/ADK tool-calling agent, full agent workflow, or standard workflow
-- Tool backend selection
+- Demo workflow mode: Gemini/ADK tool-calling agent, full agent workflow, or standard workflow
+- Structured Gemini behavior when an API key is configured
+- MCP-first tool route in capstone mode, with backend selection available for baseline workflow comparison
 - Optional full agent workflow and MCP runtime execution in local smoke tests
 
 ## Outputs
@@ -46,7 +46,7 @@ GitHub public repositories can be imported as portfolio projects. Their public m
 - 7-day, 14-day, and 30-day preparation plan
 - Cover letter and recruiter message drafts
 - Interview questions and practice focus
-- Optional Gemini-assisted narrative sections
+- Optional Gemini-assisted extraction and narrative sections
 - Full agent workflow metadata and serialized agent trace when the opt-in full workflow is used
 - Agent Workflow Trace display in Streamlit and exported Markdown
 - AI Tool-Calling Trace display in Streamlit and exported Markdown

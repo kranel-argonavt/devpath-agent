@@ -189,32 +189,46 @@ def load_demo_scenario() -> None:
 
 def render_sidebar() -> None:
     with st.sidebar:
-        st.header("Capstone Demo")
+        st.header("DevPath Agent")
         st.markdown(
-            "**Status:** Capstone demo ready  \n"
-            "**Track fit:** Concierge Agents  \n"
-            "**Default:** Gemini/ADK tool-calling, React sample data, safe fallback"
+            "**Capstone track:** Concierge Agents  \n"
+            "**Default demo:** Gemini/ADK tool-calling  \n"
+            "**Scoring:** deterministic source of truth"
         )
 
         st.divider()
-        st.subheader("Workflow")
+        st.subheader("Demo Guide")
         st.markdown(
-            "1. Load demo scenario\n"
-            "2. Generate career strategy\n"
-            "3. Show score, evidence, gaps\n"
-            "4. Show agent trace and runtime\n"
-            "5. Export Markdown"
+            "1. Load the React sample scenario\n"
+            "2. Generate the career strategy\n"
+            "3. Show score, evidence, and gaps\n"
+            "4. Show Gemini-enhanced plan, application, and interview prep\n"
+            "5. Open Runtime and show tool traces\n"
+            "6. Export the Markdown report"
         )
 
         st.divider()
-        st.subheader("Security")
-        st.warning("Do not paste secrets, passwords, private tokens, or sensitive personal data.")
+        st.subheader("Capstone Concepts")
+        st.markdown(
+            "- ADK-style agent workflow\n"
+            "- MCP-first tool route with fallback\n"
+            "- Gemini structured extraction and narrative writers\n"
+            "- Privacy masking and safe trace metadata\n"
+            "- Markdown export and reproducible tests"
+        )
 
-        with st.expander("Planned later"):
+        st.divider()
+        st.subheader("Runtime Promise")
+        st.info(
+            "Gemini may enrich narrative sections, but numeric score, evidence, and canonical gaps remain deterministic."
+        )
+
+        with st.expander("Submission reminders"):
             st.markdown(
-                "- Live ADK runtime exploration\n"
-                "- GitHub source-code evidence mapping\n"
-                "- Kaggle writeup and video script"
+                "- Do not show `.env` or API keys\n"
+                "- Use local sample or manual portfolio JSON for reliable judging\n"
+                "- Capture Runtime tab and Export tab screenshots\n"
+                "- Keep the demo video under 5 minutes"
             )
 
 
@@ -776,7 +790,6 @@ def render_results_dashboard(report: dict[str, Any]) -> None:
     strong_matches = profile_match.get("strong_matches", [])
     prioritized_gaps = skill_gaps.get("prioritized_gaps", [])
     evidence_by_skill = profile_match.get("evidence_by_skill", {})
-    next_action = _recommended_next_action(prioritized_gaps, report.get("preparation_plan", {}))
 
     col_a, col_b, col_c, col_d = st.columns(4)
     col_a.metric("Match Score", f"{profile_match.get('overall_score', 0)}/100")
@@ -784,20 +797,10 @@ def render_results_dashboard(report: dict[str, Any]) -> None:
     col_c.metric("Priority Gaps", str(len(prioritized_gaps)))
     col_d.metric("Evidence Items", str(sum(len(items) for items in evidence_by_skill.values())))
 
-    st.info(f"Recommended next action: {next_action}")
     if portfolio_evidence.get("github_evidence"):
         st.caption("GitHub Repository Evidence is available in the Evidence tab.")
     if st.session_state.get("latest_exported_path"):
         st.success(f"Latest Markdown export: {st.session_state.latest_exported_path}")
-
-
-def _recommended_next_action(prioritized_gaps: list[dict[str, Any]], preparation_plan: dict[str, Any]) -> str:
-    if prioritized_gaps:
-        return str(prioritized_gaps[0].get("recommendation", "Address the highest-priority skill gap."))
-    seven_day_plan = preparation_plan.get("7_day_plan", [])
-    if seven_day_plan:
-        return str(seven_day_plan[0])
-    return "Polish portfolio evidence and prepare concise project stories."
 
 
 def render_workflow_runtime(runtime_route: dict[str, Any]) -> None:
