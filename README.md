@@ -240,7 +240,7 @@ Optional GitHub path: switch Portfolio to `GitHub public repositories`, enter a 
 Open your terminal (Command Prompt or Git Bash) and run the following commands to clone the project and navigate into its folder:
 ```bash
 # Clone the repository
-git clone <https://github.com/kranel-argonavt/devpath-agent>
+git clone https://github.com/kranel-argonavt/VocabTrainer.git
 
 # Move into the project directory
 cd devpath-agent
