@@ -4,6 +4,8 @@ DevPath Agent is an AI Career Copilot for junior software developers. It analyze
 
 Built for Kaggle's **AI Agents: Intensive Vibe Coding Capstone Project with Google**, the project fits the **Concierge Agents** track: it gives one developer a practical, personalized career strategy while keeping scoring explainable and personal data handling cautious.
 
+Public repository: https://github.com/kranel-argonavt/devpath-agent
+
 ## Problem
 
 Junior developers often struggle to translate broad job postings into a concrete preparation plan. Requirements are mixed with nice-to-have skills, seniority signals, language expectations, and vague responsibilities. Candidate evidence is also scattered across profile notes, CV text, and portfolio projects.
@@ -14,34 +16,97 @@ DevPath Agent turns that comparison into a structured, explainable workflow that
 
 ```mermaid
 flowchart TD
-    UI["Streamlit UI"]
-    Inputs["Job posting + profile + portfolio + optional CV"]
+    User["User / Judge"]
+    Streamlit["Streamlit UI"]
+    Inputs["Job posting + candidate profile + portfolio + optional CV"]
+    Settings["AI Agent Demo Settings"]
     Workflow["devpath.agent_workflow"]
-    ToolCalling["Capstone agent mode: Gemini/ADK tool-calling"]
-    FullAgent["ADK-style deterministic multi-agent workflow"]
-    Standard["Baseline deterministic workflow"]
-    MCPRuntime["MCP runtime preferred"]
-    MCPRegistry["Local MCP-style registry fallback"]
-    Direct["Direct deterministic services fallback"]
-    Gemini["Gemini structured extraction + narrative writers"]
-    Validators["Deterministic validators"]
-    Score["Deterministic score/evidence/gaps"]
-    Report["Career report"]
-    Runtime["Agent trace + AI Tool-Calling Trace"]
+
+    subgraph Modes["Workflow Modes"]
+        ToolCalling["Capstone agent mode: Gemini/ADK tool-calling + MCP trace"]
+        FullAgent["ADK-style deterministic multi-agent workflow"]
+        Standard["Baseline deterministic workflow"]
+    end
+
+    subgraph TraceAgents["Visible Agent Stages / Trace Labels"]
+        Privacy["privacy_guard"]
+        Job["job_analyzer"]
+        Portfolio["portfolio_evidence"]
+        Matcher["profile_matcher"]
+        CareerBuilder["career_report_builder"]
+        Gap["gap_planner"]
+        Writer["application_writer"]
+        Interview["interview_coach"]
+        GeminiNarrative["gemini_narrative"]
+    end
+
+    subgraph ToolRoute["MCP-First Route For Deterministic Tools"]
+        DeterministicCalls["mask/analyze/portfolio/score/report tool calls"]
+        MCPRuntime["MCP runtime"]
+        MCPRegistry["Local MCP-style registry"]
+        Direct["Direct deterministic services"]
+        ToolOutputs["validated deterministic tool outputs"]
+    end
+
+    subgraph Gemini["Optional Gemini API Steps"]
+        ExtractJob["extract_job_requirements_with_gemini"]
+        ExtractCandidate["extract_candidate_context_with_gemini"]
+        NarrativeWriters["gap/action/application/interview writers"]
+    end
+
+    subgraph Validation["Deterministic Validation Boundary"]
+        JobValidator["validate_job_requirements"]
+        CandidateValidator["validate_candidate_context"]
+        ExtractedContext["validated extracted context"]
+    end
+
+    subgraph SourceOfTruth["Deterministic Source Of Truth"]
+        Score["weighted match score"]
+        Evidence["evidence by skill"]
+        Gaps["canonical gaps"]
+        ReportBuilder["build_career_report"]
+    end
+
+    Enhanced["LLM narrative enhancements only"]
+    Report["Career strategy report"]
+    Runtime["Agent Workflow Trace + AI Tool-Calling Trace + Workflow Runtime"]
     Export["Privacy-masked Markdown export"]
 
-    UI --> Inputs --> Workflow
+    User --> Streamlit --> Inputs --> Settings --> Workflow
     Workflow --> ToolCalling
     Workflow --> FullAgent
     Workflow --> Standard
-    ToolCalling --> MCPRuntime --> MCPRegistry --> Direct
-    ToolCalling --> Gemini --> Validators
-    Validators --> Score
-    Direct --> Score
-    FullAgent --> Score
-    Standard --> Score
-    Score --> Report
-    Report --> Runtime
+
+    ToolCalling --> Privacy --> Job --> Portfolio --> Matcher --> CareerBuilder --> Gap --> Writer --> Interview --> GeminiNarrative
+    ToolCalling --> DeterministicCalls
+    DeterministicCalls --> MCPRuntime
+    MCPRuntime -->|success| ToolOutputs
+    MCPRuntime -->|fallback| MCPRegistry
+    MCPRegistry -->|success| ToolOutputs
+    MCPRegistry -->|fallback| Direct
+    Direct --> ToolOutputs
+    ToolOutputs --> Score
+    ToolOutputs --> Evidence
+    ToolOutputs --> Gaps
+    ToolOutputs --> ReportBuilder
+
+    ToolCalling --> ExtractJob --> JobValidator --> ExtractedContext
+    ToolCalling --> ExtractCandidate --> CandidateValidator --> ExtractedContext
+    ExtractedContext --> NarrativeWriters
+    ReportBuilder --> NarrativeWriters
+    NarrativeWriters --> Enhanced
+
+    FullAgent --> ReportBuilder
+    Standard --> ReportBuilder
+    Score --> ReportBuilder
+    Evidence --> ReportBuilder
+    Gaps --> ReportBuilder
+    ReportBuilder --> Report
+    Enhanced --> Report
+    ToolCalling --> Runtime
+    FullAgent --> Runtime
+    Runtime --> Report
+    Report --> Streamlit
     Report --> Export
 ```
 
@@ -171,15 +236,55 @@ Optional GitHub path: switch Portfolio to `GitHub public repositories`, enter a 
 
 ## Setup
 
-Windows PowerShell:
+### 1. Clone the Repository
+Open your terminal (Command Prompt or Git Bash) and run the following commands to clone the project and navigate into its folder:
+```bash
+# Clone the repository
+git clone <https://github.com/kranel-argonavt/devpath-agent>
 
+# Move into the project directory
+cd devpath-agent
+```
+
+### 2. Open PowerShell and Run Setup
+Now, open **PowerShell** inside the project folder and execute the following steps to set up the application:
+
+#### A. Create and Activate Virtual Environment
 ```powershell
+# 1. Create a virtual environment named .venv
 python -m venv .venv
+
+# 2. Temporarily bypass Execution Policy to allow script execution in this session
 Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass
+
+# 3. Activate the virtual environment
 .\.venv\Scripts\Activate.ps1
+```
+
+#### B. Install Dependencies
+```powershell
+# Upgrade pip to ensure smooth package installation
+python -m pip install --upgrade pip
+
+# Install all required packages
 pip install -r requirements.txt
+```
+
+### 3. Environment Configuration
+Before launching the app, configure your API keys:
+1. Duplicate the template file: copy `.env.example` and rename it to `.env`.
+2. Open `.env` in your text editor and insert your Gemini API key:
+   ```env
+   GOOGLE_API_KEY=your_actual_api_key_here
+   GEMINI_MODEL=your_actual_model_here(gemini-3.1-flash-lite)
+   ```
+
+### 4. Run the Application
+Make sure your virtual environment is still active (you should see `(.venv)` at the beginning of your PowerShell line), then run:
+```powershell
 streamlit run app.py
 ```
+*The app will automatically open in your default browser at `http://localhost:8501`.*
 
 ## Commands
 

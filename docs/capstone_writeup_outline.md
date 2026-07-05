@@ -48,10 +48,6 @@ Outline the Streamlit demo from sample job posting to Markdown export, including
 
 List the current MVP features and smoke tests.
 
-## What Is Planned Next
-
-List Kaggle writeup, video recording, public repository polish, and optional deployment notes.
-
 ## Links
 
 Add Kaggle notebook, repository, demo video, and exported sample report links when available.

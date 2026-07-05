@@ -64,7 +64,6 @@ Show the Results Dashboard:
 - Top Strengths
 - Priority Gaps
 - Evidence Items
-- Recommended next action
 
 Explain that the numeric score is deterministic and auditable.
 
