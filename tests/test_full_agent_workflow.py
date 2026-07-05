@@ -63,6 +63,24 @@ def test_optional_fake_summary_generator_attaches_narrative_without_score_change
     assert result.report["profile_match"]["overall_score"] == mock_result.report["profile_match"]["overall_score"]
 
 
+def test_cv_context_is_masked_and_marked_as_report_context() -> None:
+    result = run_full_agent_workflow(
+        FullAgentWorkflowInput(
+            job_text=_job_text(),
+            profile=_profile(),
+            projects=_projects(),
+            cv_text="CV contact test@example.com and GOOGLE_API_KEY=abc123",
+            target_role="Junior .NET Developer",
+        )
+    )
+
+    privacy_guard = next(step for step in result.agent_trace if step.agent_name == "privacy_guard")
+
+    assert result.report["job_analysis"]["cv_context_provided"] is True
+    assert privacy_guard.warnings == ["Potential personal data or secret-like text was masked before analysis."]
+    assert "overall_score" in result.report["profile_match"]
+
+
 def test_existing_direct_workflow_still_works() -> None:
     result = run_career_strategy_workflow(
         WorkflowInput(

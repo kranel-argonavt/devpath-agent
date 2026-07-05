@@ -1,6 +1,6 @@
 """Tests for deterministic privacy masking helpers."""
 
-from devpath.core.privacy import mask_api_keys, mask_email, mask_personal_data, mask_phone
+from devpath.core.privacy import detect_sensitive_data, mask_api_keys, mask_email, mask_personal_data, mask_phone
 
 
 def test_mask_email_redacts_email_addresses() -> None:
@@ -22,3 +22,12 @@ def test_mask_personal_data_redacts_github_token() -> None:
     assert "[EMAIL_REDACTED]" in masked
     assert "[PHONE_REDACTED]" in masked
     assert "GITHUB_TOKEN=[REDACTED]" in masked
+
+
+def test_detect_sensitive_data_reports_types_without_raw_values() -> None:
+    result = detect_sensitive_data("Email test@example.com and GOOGLE_API_KEY=abc123")
+
+    assert result["has_sensitive_data"] is True
+    assert result["detected_types"] == ["email", "api_key"]
+    assert "test@example.com" not in str(result)
+    assert "abc123" not in str(result)

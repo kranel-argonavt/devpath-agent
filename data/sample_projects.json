@@ -1,35 +1,20 @@
 [
   {
-    "name": "TaskFlow Desktop",
-    "summary": "A desktop task manager for personal productivity built with C#, WPF, and MVVM.",
-    "technologies": ["C#", ".NET", "WPF", "MVVM", "SQLite"],
-    "highlights": [
-      "Implemented task creation, filtering, and due-date reminders",
-      "Persisted user data locally with SQLite",
-      "Structured the UI around the MVVM pattern"
-    ],
-    "repository_url": "https://github.com/example/taskflow-desktop"
+    "name": "TaskBoard React Dashboard",
+    "summary": "A React and TypeScript task management dashboard with reusable components, filters, modal dialogs, responsive layout, and REST API integration mock.",
+    "technologies": ["React", "TypeScript", "JavaScript", "HTML", "CSS", "REST API", "Git", "Tailwind CSS"],
+    "url": "https://github.com/example/taskboard-react"
   },
   {
-    "name": "Galaxy Courier",
-    "summary": "A 2D Unity prototype game focused on movement, UI feedback, and save state handling.",
-    "technologies": ["C#", "Unity", "Git"],
-    "highlights": [
-      "Built player movement and level progression systems",
-      "Added a lightweight settings and progress save feature",
-      "Used Git for version control across project milestones"
-    ],
-    "repository_url": "https://github.com/example/galaxy-courier"
+    "name": "Weather UI App",
+    "summary": "A responsive weather application built with JavaScript, HTML, CSS, and API fetching. Includes loading states, error handling, and mobile-friendly layout.",
+    "technologies": ["JavaScript", "HTML", "CSS", "REST API", "Git"],
+    "url": "https://github.com/example/weather-ui"
   },
   {
-    "name": "Student API Demo",
-    "summary": "A beginner-friendly backend demo showing CRUD operations with ASP.NET Core and EF Core.",
-    "technologies": ["C#", ".NET", "ASP.NET Core", "EF Core", "REST API", "SQL", "Git"],
-    "highlights": [
-      "Created CRUD endpoints for student records",
-      "Connected application data to a relational database",
-      "Tested endpoints locally with HTTP client tools"
-    ],
-    "repository_url": "https://github.com/example/student-api-demo"
+    "name": "Portfolio Website",
+    "summary": "Personal portfolio website with project case studies, responsive design, accessibility improvements, and Figma-based visual planning.",
+    "technologies": ["HTML", "CSS", "JavaScript", "Responsive Design", "Figma", "Git"],
+    "url": "https://github.com/example/frontend-portfolio"
   }
 ]

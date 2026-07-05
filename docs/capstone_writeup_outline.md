@@ -14,11 +14,11 @@ Junior developers, career changers, and portfolio-driven candidates applying for
 
 ## Solution Overview
 
-Explain the Streamlit workflow, deterministic score, gap analysis, preparation plan, application drafts, interview prep, optional Gemini insights, ADK skeleton, and MCP-style tool layer.
+Explain the Streamlit workflow, deterministic score, gap analysis, preparation plan, application drafts, interview prep, optional Gemini insights, ADK-style tool-calling workflow, and MCP tool layer.
 
 ## Agent Architecture
 
-Describe the workflow facade, tool router, ADK root agent skeleton, sub-agent responsibilities, and future runtime path.
+Describe the workflow facade, tool router, ADK root agent skeleton, sub-agent responsibilities, and visible Gemini/ADK tool-calling path.
 
 ## Gemini Usage
 
@@ -26,11 +26,11 @@ Explain optional structured narrative insights and the rule that Gemini does not
 
 ## ADK Usage
 
-Explain `root_agent`, sub-agent modules, deterministic agent tools, and local ADK smoke testing.
+Explain `root_agent`, sub-agent modules, deterministic agent tools, local ADK smoke testing, and the Streamlit `Agent Workflow Trace`.
 
 ## MCP/Tool Usage
 
-Explain MCP server skeleton, MCP-style deterministic tools, `MCP_TOOL_REGISTRY`, local MCP smoke testing, and future runtime transport plans.
+Explain MCP server skeleton, MCP-style deterministic tools, `MCP_TOOL_REGISTRY`, local MCP smoke testing, and the MCP-first tool-calling route with local registry/direct fallback.
 
 ## Deterministic Scoring
 
@@ -42,7 +42,7 @@ Describe `.env`, ignored generated reports, privacy masking, no external calls i
 
 ## Demo Flow
 
-Outline the Streamlit demo from sample job posting to Markdown export.
+Outline the Streamlit demo from sample job posting to Markdown export, including `AI Tool-Calling Trace` in the Runtime tab.
 
 ## What Is Implemented
 
@@ -50,7 +50,7 @@ List the current MVP features and smoke tests.
 
 ## What Is Planned Next
 
-List MCP runtime adapter, ADK+MCP workflow route, GitHub public repository import, and final Kaggle demo polish.
+List Kaggle writeup, video recording, public repository polish, and optional deployment notes.
 
 ## Links
 

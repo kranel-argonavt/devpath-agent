@@ -40,6 +40,83 @@ def test_extract_job_requirements_detects_required_skills() -> None:
     assert requirements["detected_languages"] == ["English"]
 
 
+def test_extract_job_requirements_detects_python_backend_skills() -> None:
+    requirements = extract_job_requirements(
+        "Junior Python Backend Developer requirements: Python, FastAPI, SQL, Git, REST API, English."
+    )
+
+    assert requirements["required_skills"] == ["Python", "FastAPI", "SQL", "Git", "REST API", "English"]
+
+
+def test_extract_job_requirements_detects_frontend_react_skills() -> None:
+    requirements = extract_job_requirements(
+        "Junior Frontend Developer requiring React, TypeScript, JavaScript, HTML, CSS, Git, REST API, and English. "
+        "Nice to have: Next.js, Figma, Docker, Unit Testing with Jest."
+    )
+
+    assert requirements["required_skills"] == [
+        "React",
+        "JavaScript",
+        "TypeScript",
+        "HTML",
+        "CSS",
+        "Git",
+        "REST API",
+        "English",
+    ]
+    assert requirements["nice_to_have_skills"] == ["Docker", "Unit Testing", "Next.js", "Figma"]
+
+
+def test_frontend_project_evidence_detects_react_stack() -> None:
+    evidence = collect_project_evidence(
+        [
+            {
+                "name": "TaskBoard React Dashboard",
+                "summary": "React TypeScript dashboard with responsive layout and REST API integration.",
+                "technologies": ["React", "TypeScript", "JavaScript", "HTML", "CSS", "REST API", "Git"],
+            }
+        ]
+    )
+
+    assert "TaskBoard React Dashboard" in evidence["React"]
+    assert "TaskBoard React Dashboard" in evidence["TypeScript"]
+    assert "TaskBoard React Dashboard" in evidence["HTML"]
+    assert "TaskBoard React Dashboard" in evidence["CSS"]
+
+
+def test_portfolio_evidence_does_not_require_language_project_evidence() -> None:
+    result = calculate_mock_match_score(
+        job_text="Junior role requiring Python, SQL, Git, REST API, English.",
+        profile={
+            "experience_level": "Junior",
+            "skills": ["Python", "SQL", "Git", "REST API"],
+            "languages": ["English B2"],
+        },
+        projects=[
+            {
+                "name": "Backend API",
+                "summary": "Python REST API with SQL persistence and Git workflow.",
+                "technologies": ["Python", "SQL", "Git", "REST API"],
+            }
+        ],
+    )
+
+    portfolio_reason = result["category_details"]["portfolio_evidence"]["reason"]
+    assert "English" not in portfolio_reason
+    assert portfolio_reason == (
+        "Matched portfolio evidence: Python, SQL, Git, REST API. "
+        "Required skills without project evidence: none."
+    )
+
+
+def test_internal_does_not_count_as_intern_seniority() -> None:
+    requirements = extract_job_requirements(
+        "Junior .NET Developer building internal web services with C#, .NET, SQL, Git, and English."
+    )
+
+    assert requirements["detected_seniority"] == "Junior"
+
+
 def test_dotnet_does_not_automatically_count_as_aspnet_core() -> None:
     result = calculate_mock_match_score(
         job_text="Junior backend role requiring ASP.NET Core.",

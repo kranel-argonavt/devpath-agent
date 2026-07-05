@@ -5,9 +5,15 @@ import mcp_server.server as server_module
 
 EXPECTED_TOOL_NAMES = {
     "analyze_job_posting",
+    "read_profile",
+    "read_local_projects",
+    "fetch_github_repositories",
+    "fetch_repository_readme",
     "summarize_portfolio",
+    "build_portfolio_summary",
     "calculate_match_score",
     "build_career_report",
+    "detect_sensitive_data",
     "mask_personal_data",
     "export_markdown_report",
 }

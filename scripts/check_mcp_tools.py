@@ -17,9 +17,15 @@ if str(PROJECT_ROOT) not in sys.path:
 
 EXPECTED_TOOL_NAMES = {
     "analyze_job_posting",
+    "read_profile",
+    "read_local_projects",
+    "fetch_github_repositories",
+    "fetch_repository_readme",
     "summarize_portfolio",
+    "build_portfolio_summary",
     "calculate_match_score",
     "build_career_report",
+    "detect_sensitive_data",
     "mask_personal_data",
     "export_markdown_report",
 }
@@ -76,9 +82,25 @@ def _run_tool_smoke_checks(registry: dict[str, Any]) -> None:
     if portfolio.get("project_count") != len(projects):
         raise RuntimeError("summarize_portfolio did not return the expected project count.")
 
+    portfolio_alias = registry["build_portfolio_summary"](projects)
+    if portfolio_alias.get("project_count") != len(projects):
+        raise RuntimeError("build_portfolio_summary did not return the expected project count.")
+
+    sample_profile = registry["read_profile"]()
+    if not isinstance(sample_profile, dict) or "skills" not in sample_profile:
+        raise RuntimeError("read_profile did not return sample profile data.")
+
+    sample_projects = registry["read_local_projects"]()
+    if not isinstance(sample_projects, list) or not sample_projects:
+        raise RuntimeError("read_local_projects did not return sample project data.")
+
     report = registry["build_career_report"](job_text, profile, projects)
     if "profile_match" not in report or "overall_score" not in report["profile_match"]:
         raise RuntimeError("build_career_report did not return profile match score data.")
+
+    detected = registry["detect_sensitive_data"]("Email test@example.com and GOOGLE_API_KEY=abc123")
+    if not detected.get("has_sensitive_data"):
+        raise RuntimeError("detect_sensitive_data did not detect sensitive values.")
 
     masked = registry["mask_personal_data"]("Email test@example.com and GOOGLE_API_KEY=abc123")
     if "test@example.com" in masked or "abc123" in masked:

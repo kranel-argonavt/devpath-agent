@@ -72,6 +72,16 @@ def test_export_markdown_report_writes_rich_markdown_file(tmp_path: Path) -> Non
         },
         "skill_gaps": {
             "missing_skills": ["ASP.NET Core"],
+            "llm_gap_narrative": {
+                "summary": "Gemini says ASP.NET Core is the highest leverage gap.",
+                "gap_explanations": [
+                    {
+                        "skill": "ASP.NET Core",
+                        "explanation": "It connects directly to the backend role.",
+                        "next_step": "Build one endpoint and document it.",
+                    }
+                ],
+            },
             "prioritized_gaps": [
                 {
                     "skill": "ASP.NET Core",
@@ -82,15 +92,57 @@ def test_export_markdown_report_writes_rich_markdown_file(tmp_path: Path) -> Non
             ],
         },
         "preparation_plan": {
+            "llm_enhanced_plan": {
+                "summary": "Gemini-enhanced plan summary.",
+                "7_day_plan": ["Document one API endpoint."],
+                "14_day_plan": ["Add a test case."],
+                "30_day_roadmap": ["Publish a backend case study."],
+                "portfolio_tasks": ["Add endpoint screenshots and setup notes to the README."],
+                "study_tasks": ["Review REST API validation and error handling."],
+                "interview_drills": ["Practice a two-minute API walkthrough."],
+                "done_criteria": ["Repository includes setup, endpoint examples, and one test."],
+            },
             "7_day_plan": ["Review requirements."],
             "14_day_plan": ["Build a small API."],
             "30_day_roadmap": ["Polish the portfolio."],
         },
         "application_drafts": {
+            "llm_enhanced_drafts": {
+                "cover_letter_draft": "Enhanced cover letter.",
+                "recruiter_message_draft": "Enhanced recruiter message.",
+                "cv_bullets": ["Built a documented API endpoint."],
+                "project_positioning": ["Lead with the API project as direct backend evidence."],
+                "what_to_emphasize": ["Mention documented endpoint behavior and testing."],
+                "what_to_avoid": ["Avoid claiming production experience that is not in the portfolio."],
+                "application_checklist": ["Verify GitHub links and README sections before applying."],
+            },
             "cover_letter_draft": "Contact me at test@example.com.",
             "recruiter_message_draft": "GOOGLE_API_KEY=abc123",
         },
-        "interview_prep": {"questions": ["What is .NET?"], "practice_focus": ["ASP.NET Core"]},
+        "interview_prep": {
+            "llm_enhanced_prep": {
+                "focus_summary": "Practice API project stories.",
+                "questions": ["How did you design the endpoint?"],
+                "practice_focus": ["Endpoint design"],
+                "technical_questions": [
+                    {
+                        "question": "How would you validate API input?",
+                        "answer_focus": "Mention validation rules, status codes, and test cases.",
+                    }
+                ],
+                "behavioral_questions": [
+                    {
+                        "question": "Tell me about improving a project after feedback.",
+                        "answer_focus": "Use the API README/test improvement story.",
+                    }
+                ],
+                "project_story_prompts": ["Explain the API project from problem to implementation."],
+                "weak_area_drills": ["Practice explaining Docker as a next improvement."],
+                "answer_guidance": ["Start with project evidence, then describe the tradeoff."],
+            },
+            "questions": ["What is .NET?"],
+            "practice_focus": ["ASP.NET Core"],
+        },
         "runtime_route": {
             "tool_backend": "Direct Python services",
             "requested_tool_backend": "Experimental ADK-MCP runtime tools",
@@ -126,6 +178,28 @@ def test_export_markdown_report_writes_rich_markdown_file(tmp_path: Path) -> Non
                 "warnings": [],
             },
         ],
+        "tool_call_trace": [
+            {
+                "tool_name": "extract_job_requirements_with_gemini",
+                "agent_name": "job_analyzer",
+                "backend_used": "Gemini API",
+                "status": "completed",
+                "input_summary": "masked_job_text + target_role",
+                "output_summary": "Gemini structured job extraction returned candidate requirements.",
+                "fallback_used": False,
+                "warnings": [],
+            },
+            {
+                "tool_name": "generate_gap_narrative",
+                "agent_name": "gap_planner",
+                "backend_used": "Gemini API",
+                "status": "completed",
+                "input_summary": "canonical deterministic report + validated extracted context",
+                "output_summary": "Gemini gap narrative generated from canonical gaps.",
+                "fallback_used": False,
+                "warnings": [],
+            },
+        ],
         "gemini_insights": {
             "career_summary": "Optional Gemini-assisted narrative summary.",
             "top_actions": ["Apply with API evidence", "Update README", "Practice interviews"],
@@ -149,6 +223,9 @@ def test_export_markdown_report_writes_rich_markdown_file(tmp_path: Path) -> Non
     assert "- Backend used: Direct Python services" in content
     assert "- Fallback used: Yes" in content
     assert "## Agent Workflow Trace" in content
+    assert "## AI Tool-Calling Trace" in content
+    assert "extract_job_requirements_with_gemini" in content
+    assert "generate_gap_narrative" in content
     assert "- Agent: privacy_guard" in content
     assert "- Agent: profile_matcher" in content
     assert "## Agent Workflow Metadata" in content
@@ -170,6 +247,17 @@ def test_export_markdown_report_writes_rich_markdown_file(tmp_path: Path) -> Non
     assert "Language: C#" in content
     assert "Topics: dotnet, api" in content
     assert "High Priority: ASP.NET Core" in content
+    assert "### Gemini-Enhanced Gap Narrative" in content
+    assert "Gemini says ASP.NET Core is the highest leverage gap." in content
+    assert "### Gemini-Enhanced Action Plan" in content
+    assert "#### Portfolio Tasks" in content
+    assert "Repository includes setup, endpoint examples, and one test." in content
+    assert "### Gemini-Enhanced Application Drafts" in content
+    assert "#### Project Positioning" in content
+    assert "Avoid claiming production experience" in content
+    assert "### Gemini-Enhanced Interview Prep" in content
+    assert "#### Technical Questions With Answer Focus" in content
+    assert "Answer focus: Mention validation rules, status codes, and test cases." in content
     assert "[EMAIL_REDACTED]" in content
     assert "GOOGLE_API_KEY=[REDACTED]" in content
     assert "test@example.com" not in content

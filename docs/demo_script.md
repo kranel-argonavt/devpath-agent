@@ -2,11 +2,13 @@
 
 This script is designed for a 2-4 minute capstone video.
 
-## 1. Introduce The Problem
+## 1. Problem
 
-Junior developers often see job postings with many requirements and do not know what they match, what they lack, or what to prepare first. DevPath Agent turns a job posting, profile, and portfolio into a focused career preparation plan.
+Junior developers often struggle to understand whether a job posting is realistic for them, which portfolio evidence to highlight, and what to prepare before applying.
 
-## 2. Open The App
+DevPath Agent turns a job posting, profile, and portfolio into an evidence-based career strategy.
+
+## 2. Open DevPath Agent
 
 Run:
 
@@ -14,195 +16,166 @@ Run:
 streamlit run app.py
 ```
 
-Show the header and explain that the default mode is deterministic and local.
-
-## 3. Load Sample Inputs
-
-1. In `1. Job Posting`, select `Load sample job posting`.
-2. In `2. Candidate Profile`, select `Load sample profile`.
-3. In `3. Portfolio Source`, keep `Local sample projects`.
-4. Briefly expand one project card.
-5. Keep a junior target role.
-6. Leave CV context empty or use short non-sensitive sample text.
-
-## 4. Generate Deterministic Report
-
-Keep:
-
-- Analysis mode: `Mock deterministic mode`
-- Analysis workflow: `Standard workflow`
-- Tool backend: `Direct Python services`
-
-Click `Generate Career Strategy`.
-
-Show:
-
-- `Workflow Runtime` section with backend used and fallback status
-- `Profile Match` overall score and category breakdown
-- `Evidence by Skill`
-- `Skill Gaps` and prioritized recommendations
-- `Preparation Plan`
-
-Explain that scoring, gaps, and evidence are deterministic.
-
-## 5. Show Full Agent Workflow Mode
-
-Switch:
+Show the header and capability line:
 
 ```text
-Analysis workflow -> Full agent workflow
+Deterministic scoring | GitHub evidence | ADK-style agent workflow | MCP tools | Optional Gemini insights | Markdown export
 ```
 
-Click `Generate Career Strategy`.
+## 3. Load Demo Scenario
 
-Show:
+Click:
+
+```text
+Load sample React frontend scenario
+```
+
+Explain that the core demo works offline and without API keys.
+
+Default settings:
+
+- Analysis workflow: Gemini/ADK tool-calling agent
+- Analysis mode: Gemini-assisted summary
+- Tool route: MCP runtime first, local MCP-style registry fallback, direct deterministic fallback
+- Portfolio source: Local sample projects
+
+## 4. Show Inputs
+
+Briefly show:
+
+- Job Posting
+- Candidate Profile
+- Portfolio
+- AI Agent Demo Settings
+
+Keep Runtime details collapsed unless you want to point out the defaults.
+
+## 5. Generate Career Strategy
+
+Click:
+
+```text
+Generate Career Strategy
+```
+
+Show the Results Dashboard:
+
+- Match Score
+- Top Strengths
+- Priority Gaps
+- Evidence Items
+- Recommended next action
+
+Explain that the numeric score is deterministic and auditable.
+
+## 6. Show Evidence And Gaps
+
+Open:
+
+- Overview: score breakdown and missing skills
+- Evidence: portfolio evidence and evidence by skill
+- Gaps: prioritized gaps and recommendations
+- Action Plan: 7-day, 14-day, and 30-day plan
+
+Explain that the app connects job requirements to candidate evidence instead of just generating generic advice.
+
+## 7. Show Agent And Tool-Calling Trace
+
+Open the Runtime tab and show:
 
 - `Agent Workflow Trace`
-- `privacy_guard`
-- `job_analyzer`
-- `portfolio_evidence`
-- `profile_matcher`
-- `gap_planner`
-- `application_writer`
-- `interview_coach`
+- `AI Tool-Calling Trace`
+- `Workflow Runtime`
+
+Point out:
+
 - Scoring source: deterministic
 - LLM score modification: disabled
+- Agents orchestrate the workflow, but do not invent numeric scores.
+- Tool calls show backend used, status, fallback status, input summary, output summary, and warnings.
 
-Explain that agents orchestrate the workflow and produce trace metadata, but deterministic scoring remains the source of truth.
+In `AI Tool-Calling Trace`, show the career workflow tools:
 
-## 6. Show MCP-Style Backend
+- `mask_personal_data`
+- `extract_job_requirements_with_gemini`
+- `validate_job_requirements`
+- `analyze_job_posting`
+- `build_portfolio_summary`
+- `extract_candidate_context_with_gemini`
+- `validate_candidate_context`
+- `calculate_match_score`
+- `build_career_report`
+- `generate_gap_narrative`
+- `generate_action_plan_narrative`
+- `generate_application_drafts`
+- `generate_interview_prep`
+- `generate_gemini_career_insights`
 
-Switch `Tool backend` to `Local MCP-style tools` and generate again.
+Explain that MCP runtime is preferred. If unavailable, the trace clearly shows fallback to the local MCP-style registry or direct deterministic services.
 
-Explain:
+## 8. Show Workflow Runtime
 
-- This path uses the local MCP-style registry in-process.
-- No MCP transport is started.
-- The `Workflow Runtime` section shows backend metadata.
-- The deterministic score remains the source of truth.
+In the Runtime tab, show:
 
-Optionally switch `Tool backend` to `Experimental ADK-MCP runtime tools` and generate again.
+- Workflow backend
+- MCP runtime status
+- Fallback status
+- Selected tools
 
-Explain:
+Explain that Gemini extracts and explains in bounded JSON steps. Deterministic validators and scoring tools still own canonical score, evidence, and gaps. If no key is configured, Gemini steps are shown as skipped and the deterministic report still works.
 
-- This path routes selected job-analysis and match-score calls through ADK-style wrappers and local MCP stdio runtime.
-- Direct Python services remain the default.
-- If the runtime path fails, the workflow falls back to direct deterministic services with a warning.
-- The `Workflow Runtime` section shows whether MCP runtime was used, which tools were selected, and whether fallback happened.
-- The deterministic score remains the source of truth.
+## 9. Optional GitHub Evidence
 
-## 7. Optional Full Agent Workflow Smoke Test
+For custom judge-style testing without network access:
 
-Run:
+1. Select `Manual JSON input`.
+2. Paste a JSON array of projects or use the React frontend sample button.
+3. Generate the report again.
+4. Show that evidence is built from the pasted project technologies and summaries.
 
-```powershell
-python scripts/check_full_agent_workflow.py
+If internet access is available:
+
+1. Select `GitHub public repositories`.
+2. Enter a public username such as `octocat`.
+3. Fetch public repositories.
+4. Generate the report again.
+5. Show GitHub Repository Evidence.
+
+Explain that only public metadata is used: language, topics, description, URL, stars, forks, and timestamps. No token, private repo access, cloning, or source-code download is used.
+
+## 10. Optional Gemini Narrative
+
+If a local key is configured and hidden:
+
+1. Ensure `Gemini-assisted summary` is selected.
+2. Generate the report with local `GOOGLE_API_KEY`.
+3. Show structured Gemini sections.
+
+Explain that Gemini can enhance Gaps, Action Plan, Application, and Interview narrative. It does not calculate or modify the match score.
+
+## 11. Export Markdown
+
+Open Export, click:
+
+```text
+Export Markdown Report
 ```
 
-Show that the full ADK-style workflow executes each named stage:
+Mention that exported Markdown is privacy-masked and includes:
 
-- `privacy_guard`
-- `job_analyzer`
-- `portfolio_evidence`
-- `profile_matcher`
-- `gap_planner`
-- `application_writer`
-- `interview_coach`
-
-Explain that this is deterministic orchestration and trace generation. It does not require a live ADK runtime, and `profile_matcher` still uses deterministic scoring as the source of truth.
-
-## 8. Optional GitHub Public Repository Import
-
-In `3. Portfolio Source`, select `GitHub public repositories`.
-
-Demo steps:
-
-1. Enter a public GitHub username such as `octocat`.
-2. Click `Fetch public repositories`.
-3. Show the imported public repo metadata table.
-4. Show how imported GitHub repositories become portfolio evidence through language, topics, description, URL, and repository signals.
-5. Explain that no token is required, private repos are not accessed, repos are not cloned, and source code is not downloaded.
-6. Generate a career strategy using the imported repositories as portfolio projects.
-7. Open `Portfolio Evidence` and show `GitHub Repository Evidence`.
-
-## 9. Optional Gemini Demo
-
-If a local API key is configured:
-
-1. Select `Gemini-assisted summary`.
-2. Generate the report.
-3. Show `Gemini-assisted Career Strategy`.
-4. Point out AI career summary, top actions, portfolio positioning, skill gap strategy, and interview focus areas.
-
-If no key is configured, show the warning and explain that the app continues in deterministic mode.
-
-## 10. Export Markdown
-
-Open `Export`, click `Export Markdown Report`, and show the generated path. Mention that exported Markdown is privacy-masked, includes the `Workflow Runtime` section, includes `Agent Workflow Trace` when full agent mode was used, and `outputs/*.md` is ignored by Git.
-
-## 11. Mention Smoke Tests
-
-Run or mention:
-
-```powershell
-python scripts/check_gemini_connection.py
-python scripts/check_adk_agent.py
-python scripts/check_mcp_tools.py
-python scripts/check_mcp_runtime.py
-python scripts/check_adk_mcp_tools.py
-python scripts/check_full_agent_workflow.py
-```
-
-Explain that these validate optional Gemini connectivity, ADK skeleton structure, MCP-style deterministic tools, selected local MCP runtime calls, the selected ADK-MCP bridge, and the full ADK-style deterministic workflow without requiring production runtime integration.
+- Workflow Runtime
+- Agent Workflow Trace
+- AI Tool-Calling Trace
+- GitHub Repository Evidence when available
 
 ## 12. Close With Architecture
 
 Summarize:
 
-- Streamlit calls a workflow facade.
-- The workflow uses a tool router.
-- The tool router can use direct Python services or local MCP-style tools.
-- Full ADK-style deterministic orchestration now exists with trace metadata.
-- Streamlit can show standard workflow or full agent workflow mode.
+- Track fit: Concierge Agents
+- ADK-style multi-agent workflow coordinates the career strategy stages.
+- MCP tools are used through a visible MCP-first tool-calling route with safe fallback.
+- Security features protect secrets and privacy.
+- Optional Gemini provides structured extraction and narrative assistance.
 - Deterministic scoring remains the source of truth.
-
-## Optional Step 6A.1 Runtime Proof
-
-Run:
-
-```powershell
-python scripts/check_mcp_runtime.py
-```
-
-Explain that selected tools are called through a local MCP stdio runtime using the installed MCP SDK while deterministic scoring remains the source of truth. If the local SDK/runtime is unavailable, show the clean diagnostic message and explain that the default Streamlit workflow is unaffected.
-
-## Optional Step 6B ADK-MCP Bridge Proof
-
-Run:
-
-```powershell
-python scripts/check_adk_mcp_tools.py
-```
-
-Explain that selected ADK-style tool wrappers now call local MCP runtime tools. This proves the bridge path without routing the full Streamlit workflow through ADK or MCP runtime yet.
-
-## Optional Step 6C Workflow Backend Demo
-
-In the app, select:
-
-```text
-Tool backend -> Experimental ADK-MCP runtime tools
-```
-
-Generate the report and explain that the workflow can now use the selected ADK-MCP runtime route while still preserving deterministic scoring and safe fallback behavior.
-
-## Optional Step 6D Runtime Metadata Demo
-
-Show:
-
-- Tool backend selector.
-- A generated report with `Direct Python services`.
-- The `Workflow Runtime` section.
-- A generated report with `Experimental ADK-MCP runtime tools`.
-- Whether MCP runtime was used or fallback happened.
-- Exported Markdown with the `Workflow Runtime` section.
+- The project was built through AI-assisted vibe coding / Antigravity-style iteration for the capstone.

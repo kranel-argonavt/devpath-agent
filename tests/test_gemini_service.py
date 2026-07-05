@@ -4,6 +4,7 @@ from devpath.core.config import AppConfig
 from devpath.services.gemini_service import (
     build_structured_career_strategy_prompt,
     is_gemini_available,
+    parse_gemini_json_object,
     parse_gemini_structured_response,
 )
 from scripts.check_gemini_connection import main as gemini_smoke_main
@@ -78,6 +79,16 @@ def test_parse_gemini_structured_response_returns_safe_fallback_for_invalid_json
     assert parsed["portfolio_positioning"] == []
     assert parsed["skill_gap_strategy"] == []
     assert parsed["interview_focus"] == []
+    assert parsed["raw_response"] == response
+
+
+def test_parse_gemini_json_object_repairs_wrapped_json_and_trailing_commas() -> None:
+    response = 'Here is JSON:\n{"required_skills": ["Python",], "confidence": 0.9,}\nThanks.'
+
+    parsed = parse_gemini_json_object(response)
+
+    assert parsed["required_skills"] == ["Python"]
+    assert parsed["confidence"] == 0.9
     assert parsed["raw_response"] == response
 
 

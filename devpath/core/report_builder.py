@@ -22,6 +22,11 @@ def create_mock_report(
     prioritized_gaps = score.get("prioritized_gaps", [])
     gap_recommendations = [gap["recommendation"] for gap in prioritized_gaps[:3]]
     job_requirements = score.get("job_requirements", {})
+    required_skills = job_requirements.get("required_skills", [])
+    focus_skills = _focus_skills(required_skills, projects)
+    focus_text = ", ".join(focus_skills) if focus_skills else "the target technologies"
+    project_text = ", ".join(project_names[:2]) if project_names[:2] else "your portfolio projects"
+    project_type = _project_type(primary_role, required_skills)
 
     return {
         "job_analysis": {
@@ -48,7 +53,7 @@ def create_mock_report(
             "explanation": score["explanation"],
         },
         "portfolio_evidence": {
-            "summary": "Portfolio evidence is strongest where projects show C#, .NET, database work, version control, or API concepts.",
+            "summary": f"Portfolio evidence is strongest where projects show {focus_text}.",
             "projects_to_highlight": project_names[:3],
             "suggested_evidence_points": _portfolio_points(projects),
             "evidence_by_skill": score.get("evidence_by_skill", {}),
@@ -64,43 +69,37 @@ def create_mock_report(
         "preparation_plan": {
             "7_day_plan": [
                 "Review the job posting and map each requirement to profile or project evidence.",
-                "Refresh C#, .NET, Git, SQL, and REST API basics with short notes.",
+                f"Refresh {focus_text} basics with short notes.",
                 "Prepare one portfolio story for each strong match.",
             ],
             "14_day_plan": [
-                "Build or polish a small ASP.NET Core endpoint if backend evidence is weak.",
+                f"Build or polish a small {project_type} project area if evidence is weak.",
                 "Add concise README sections that explain technologies, responsibilities, and outcomes.",
                 "Practice explaining project tradeoffs in English.",
             ],
             "30_day_roadmap": [
-                "Create a focused backend portfolio improvement project.",
+                f"Create a focused {project_type} portfolio improvement project.",
                 "Add tests or validation logic to one existing project.",
-                "Prepare a reusable interview answer bank for junior .NET roles.",
+                f"Prepare a reusable interview answer bank for {primary_role} roles.",
             ],
             "gap_recommendations": gap_recommendations,
         },
         "application_drafts": {
             "cover_letter_draft": (
                 f"Dear Hiring Team,\n\nI am applying for the {primary_role} opportunity because my background "
-                "in C#, .NET, Git, and software engineering projects aligns with the junior developer profile. "
-                "My portfolio shows hands-on practice with desktop, backend, and database concepts, and I am "
+                f"in {focus_text} and software engineering projects aligns with the junior developer profile. "
+                f"My portfolio shows hands-on practice through {project_text}, and I am "
                 "motivated to grow in a collaborative engineering team.\n\nKind regards"
             ),
             "recruiter_message_draft": (
-                f"Hello, I am interested in the junior .NET role. I have practical C#/.NET experience, "
-                f"portfolio projects such as {', '.join(project_names[:2])}, and I am looking for a junior "
+                f"Hello, I am interested in the {primary_role} role. I have practical experience with {focus_text}, "
+                f"portfolio projects such as {project_text}, and I am looking for a junior "
                 "developer opportunity in Germany or remote within the EU."
             ),
         },
         "interview_prep": {
-            "questions": [
-                "How would you explain the difference between C# and .NET?",
-                "How have you used Git in your projects?",
-                "What is a REST API, and how would you design a simple endpoint?",
-                "How would you model and query data in SQL?",
-                "Which portfolio project best proves you are ready for this role?",
-            ],
-            "practice_focus": missing_skills[:3] or ["C# fundamentals", ".NET project explanation", "Git workflow"],
+            "questions": _interview_questions(primary_role, required_skills),
+            "practice_focus": missing_skills[:3] or _practice_focus(required_skills),
             "prioritized_gaps": prioritized_gaps,
         },
         "privacy_notice": (
@@ -124,6 +123,78 @@ def _portfolio_points(projects: list[dict[str, Any]]) -> list[str]:
         else:
             points.append(f"{name}: add clearer technology and outcome evidence.")
     return points
+
+
+def _focus_skills(required_skills: list[str], projects: list[dict[str, Any]]) -> list[str]:
+    project_skills: list[str] = []
+    for project in projects:
+        project_skills.extend(str(skill) for skill in project.get("technologies", []) if str(skill).strip())
+    source = required_skills or project_skills
+    preferred = [
+        "React",
+        "TypeScript",
+        "JavaScript",
+        "HTML",
+        "CSS",
+        "Python",
+        "FastAPI",
+        "Django",
+        "C#",
+        ".NET",
+        "ASP.NET Core",
+        "SQL",
+        "Git",
+        "REST API",
+    ]
+    result: list[str] = []
+    for skill in preferred:
+        if skill in source and skill not in result:
+            result.append(skill)
+    for skill in source:
+        if skill not in result:
+            result.append(skill)
+    return result[:6]
+
+
+def _project_type(primary_role: str, required_skills: list[str]) -> str:
+    role_text = f"{primary_role} {' '.join(required_skills)}".lower()
+    if any(term in role_text for term in ["frontend", "react", "javascript", "typescript", "html", "css"]):
+        return "frontend"
+    if any(term in role_text for term in ["python", "fastapi", "django"]):
+        return "backend"
+    if any(term in role_text for term in ["c#", ".net", "asp.net", "sql", "api"]):
+        return "backend"
+    return "software"
+
+
+def _interview_questions(primary_role: str, required_skills: list[str]) -> list[str]:
+    if _project_type(primary_role, required_skills) == "frontend":
+        return [
+            "How do you structure reusable React components?",
+            "How have you used Git in your projects?",
+            "How do you connect a frontend screen to a REST API?",
+            "How do you approach responsive HTML/CSS layouts?",
+            "Which portfolio project best proves you are ready for this role?",
+        ]
+    if "Python" in required_skills:
+        return [
+            "How would you structure a small Python backend project?",
+            "How have you used Git in your projects?",
+            "What is a REST API, and how would you design a simple endpoint?",
+            "How would you model and query data in SQL?",
+            "Which portfolio project best proves you are ready for this role?",
+        ]
+    return [
+        "How would you explain the main technologies required for this role?",
+        "How have you used Git in your projects?",
+        "What is a REST API, and how would you design a simple endpoint?",
+        "How would you debug or improve one portfolio project?",
+        "Which portfolio project best proves you are ready for this role?",
+    ]
+
+
+def _practice_focus(required_skills: list[str]) -> list[str]:
+    return required_skills[:3] or ["Project explanation", "Git workflow", "Technical communication"]
 
 
 def _gap_message(missing_skills: list[str]) -> str:

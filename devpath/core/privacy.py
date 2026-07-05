@@ -9,6 +9,11 @@ API_KEY_PATTERN = re.compile(
     r"\b(?P<name>GOOGLE_API_KEY|GITHUB_TOKEN)\s*=\s*(?P<value>[^\s#]+)",
     re.IGNORECASE,
 )
+SENSITIVE_PATTERNS = {
+    "email": EMAIL_PATTERN,
+    "phone": PHONE_PATTERN,
+    "api_key": API_KEY_PATTERN,
+}
 
 
 def mask_email(text: str) -> str:
@@ -35,3 +40,17 @@ def mask_personal_data(text: str) -> str:
     masked = mask_email(text)
     masked = mask_phone(masked)
     return mask_api_keys(masked)
+
+
+def detect_sensitive_data(text: str) -> dict[str, object]:
+    """Detect whether text contains supported sensitive data patterns."""
+
+    detected_types = [
+        name
+        for name, pattern in SENSITIVE_PATTERNS.items()
+        if pattern.search(text or "")
+    ]
+    return {
+        "has_sensitive_data": bool(detected_types),
+        "detected_types": detected_types,
+    }

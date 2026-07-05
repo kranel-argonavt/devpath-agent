@@ -257,3 +257,49 @@ def _mark_backend_fallback(
         "selected_tools": [],
         "notes": notes,
     }
+
+
+def run_career_strategy_tool_calling_workflow(
+    workflow_input: WorkflowInput,
+    *,
+    config: AppConfig | None = None,
+    gemini_generator: Callable[[dict[str, Any], str, str], dict[str, Any]] | None = None,
+) -> WorkflowResult:
+    """Run the capstone Gemini/ADK tool-calling workflow with MCP fallbacks."""
+
+    from devpath.adk_tool_calling_workflow import ToolCallingWorkflowInput, run_adk_tool_calling_workflow
+
+    try:
+        tool_result = run_adk_tool_calling_workflow(
+            ToolCallingWorkflowInput(
+                job_text=workflow_input.job_text,
+                profile=workflow_input.profile,
+                projects=workflow_input.projects,
+                target_role=workflow_input.target_role,
+                cv_text=workflow_input.cv_text,
+                output_style=workflow_input.output_style,
+                analysis_mode=workflow_input.analysis_mode,
+            ),
+            config=config,
+            gemini_generator=gemini_generator,
+        )
+    except Exception:
+        fallback = run_career_strategy_agent_workflow(
+            workflow_input,
+            config=config,
+            gemini_generator=gemini_generator,
+        )
+        return WorkflowResult(
+            report=fallback.report,
+            mode_used=fallback.mode_used,
+            warnings=[
+                "Gemini/ADK tool-calling workflow could not be used. Falling back to full deterministic agent workflow.",
+                *fallback.warnings,
+            ],
+        )
+
+    return WorkflowResult(
+        report=tool_result.report,
+        mode_used=tool_result.mode_used,
+        warnings=tool_result.warnings,
+    )

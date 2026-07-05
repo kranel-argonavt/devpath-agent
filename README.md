@@ -2,6 +2,8 @@
 
 DevPath Agent is an AI Career Copilot for junior software developers. It analyzes a job posting, candidate profile, project portfolio, and optional CV context, then produces a deterministic match score, evidence-based gaps, a preparation plan, application drafts, interview prep, and optional Gemini-assisted narrative insights.
 
+Built for Kaggle's **AI Agents: Intensive Vibe Coding Capstone Project with Google**, the project fits the **Concierge Agents** track: it gives one developer a practical, personalized career strategy while keeping scoring explainable and personal data handling cautious.
+
 ## Problem
 
 Junior developers often struggle to translate broad job postings into a concrete preparation plan. Requirements are mixed with nice-to-have skills, seniority signals, language expectations, and vague responsibilities. Candidate evidence is also scattered across profile notes, CV text, and portfolio projects.
@@ -14,10 +16,16 @@ DevPath Agent turns that comparison into a structured, explainable workflow that
 Streamlit UI
    |
 Analysis workflow selector
+   |-- Gemini/ADK tool-calling agent
    |-- Standard workflow
    |-- Full agent workflow
    |
 agent_workflow.run_career_strategy_workflow
+   |
+Gemini/ADK tool-calling agent mode
+   |-- MCP runtime preferred
+   |-- Local MCP-style registry fallback
+   |-- Direct deterministic fallback
    |
 tool_router
    |-- Direct Python services
@@ -35,7 +43,7 @@ The deterministic report remains the source of truth. Gemini can add concise nar
 
 ## Current Status
 
-Current status: **Step 7D - Streamlit full agent mode + trace.**
+Current status: **Agent Runtime Upgrade - capstone-grade tool-calling demo mode.**
 
 Implemented today:
 
@@ -52,6 +60,7 @@ Implemented today:
 - Google ADK-compatible `root_agent` skeleton and sub-agent definitions
 - Deterministic agent tools
 - MCP-compatible server skeleton and MCP-style tool registry
+- MCP tools for local profile/project loading, portfolio summary, privacy detection/masking, export, scoring, public GitHub repository metadata, and public README fetch
 - Tool backend selector: direct Python services, local MCP-style tools, or experimental ADK-MCP runtime tools
 - Experimental MCP stdio runtime adapter for selected manual tool calls
 - Local MCP runtime smoke test succeeds with selected deterministic tools
@@ -60,19 +69,22 @@ Implemented today:
 - Workflow runtime metadata in the UI and exported Markdown
 - GitHub public repository metadata import as a portfolio source
 - GitHub public repository metadata mapped into portfolio evidence
+- Controlled public GitHub README fetch helper for explicit MCP/API use
 - Full ADK-style deterministic agent workflow with named stages and trace metadata
-- Streamlit `Analysis workflow` selector for standard or full agent workflow mode
+- Streamlit `Analysis workflow` selector for Gemini/ADK tool-calling, full agent workflow, or standard workflow mode
 - Agent Workflow Trace display in Streamlit and exported Markdown
+- AI Tool-Calling Trace display in Streamlit and exported Markdown
+- Capstone-ready demo defaults: Gemini/ADK tool-calling, Gemini-assisted summary with safe fallback, deterministic scoring, local sample projects
 - Local Gemini, ADK, and MCP smoke-test scripts
 - Pytest suite for deterministic helpers, workflow, tools, and smoke scripts
 
 Not implemented yet:
 
 - Live ADK runtime routing in Streamlit
-- Full MCP runtime workflow integration
+- Production ADK Agent Engine deployment
 - GitHub source-code evidence mapping
 - GitHub private repository access
-- Source-code repository inspection
+- Source-code repository inspection beyond controlled public metadata and explicit README fetch
 - Production deployment
 
 ## Agent And Tool Layers
@@ -81,10 +93,33 @@ Not implemented yet:
 - `devpath/sub_agents/` contains planned specialized agents for job analysis, portfolio evidence, matching, gap planning, application writing, interview coaching, and privacy review.
 - `devpath/agent_tools.py` exposes deterministic tool wrappers for future agent orchestration.
 - `mcp_server/server.py` exposes an import-safe MCP server skeleton or fallback metadata.
-- `mcp_server/tools/` contains MCP-style wrappers around deterministic project logic.
+- `mcp_server/tools/` contains MCP-style wrappers around deterministic project logic, local sample readers, privacy tools, export, and controlled public GitHub lookups.
 - `devpath/tool_router.py` lets the workflow use direct deterministic services, the local MCP-style registry in-process, or experimental ADK-MCP runtime wrappers.
 
-Streamlit does **not** yet run a full ADK runtime. The experimental ADK-MCP backend is selected manually and only routes selected deterministic tools through local MCP stdio with safe fallback.
+Streamlit now includes a capstone demo mode named `Gemini/ADK tool-calling agent`. It runs the career workflow through visible tool calls, requests MCP runtime first, falls back to the local MCP-style registry, and finally falls back to direct deterministic services. Streamlit still does **not** depend on a deployed ADK runtime; the route is intentionally local, testable, and safe for judging.
+
+## Gemini/ADK Tool-Calling Mode
+
+The default demo workflow is `Gemini/ADK tool-calling agent`. It records an `AI Tool-Calling Trace` for:
+
+- `mask_personal_data`
+- `extract_job_requirements_with_gemini`
+- `validate_job_requirements`
+- `analyze_job_posting`
+- `build_portfolio_summary`
+- `extract_candidate_context_with_gemini`
+- `validate_candidate_context`
+- `calculate_match_score`
+- `build_career_report`
+- `generate_gap_narrative`
+- `generate_action_plan_narrative`
+- `generate_application_drafts`
+- `generate_interview_prep`
+- `generate_gemini_career_insights`
+
+Each trace entry shows the tool name, agent name, backend used, status, input summary, output summary, fallback status, and warnings. The preferred backend is MCP runtime. If MCP runtime is unavailable, the workflow falls back to the in-process MCP-style registry, then to direct deterministic Python services.
+
+Gemini is enabled by default for bounded structured extraction and narrative writing, but it is optional at runtime. Gemini may extract job/profile/CV facts and may enhance narrative sections for Gaps, Action Plan, Application, and Interview. Deterministic validators normalize or reject Gemini output, deterministic tools still calculate the canonical score/evidence/gaps, and Gemini cannot overwrite numeric score fields. If `GOOGLE_API_KEY` is missing or Gemini fails, the report is still generated and Gemini tool-calls are marked as skipped or fallback.
 
 ## Full Agent Workflow Orchestration
 
@@ -99,6 +134,33 @@ The project includes a full ADK-style deterministic workflow facade in `devpath/
 - `interview_coach`
 
 These stages orchestrate existing deterministic tools and services, produce an agent trace, and attach workflow metadata to the report. The UI displays `Agent Workflow Trace`, and Markdown export includes the same trace when present. Deterministic scoring remains the source of truth; agents must not invent or modify numeric match scores.
+
+## Capstone Fit
+
+Recommended track: **Concierge Agents**.
+
+Course concepts demonstrated:
+
+- ADK-style multi-agent workflow with root agent, staged sub-agent responsibilities, and visible tool-calling mode
+- MCP server skeleton, MCP-style tools, local registry, MCP runtime adapter, and MCP-first tool-calling route with fallback
+- Security and privacy features, including masking and no-secret export rules
+- Agent tools and deterministic tool contracts for scoring, privacy, report, GitHub evidence, and export
+- Deployability and reproducible setup through requirements, Dockerfile, smoke scripts, and tests
+- Optional Gemini structured extraction and narrative writers that never modify deterministic scores
+- Antigravity / AI-assisted vibe coding can be shown in the final video build story
+
+## Demo Flow
+
+Default offline path:
+
+1. Click `Load sample React frontend scenario`.
+2. Keep `Gemini/ADK tool-calling agent`, `Gemini-assisted summary`, and `Local sample projects`.
+3. Click `Generate Career Strategy`.
+4. Show Match Score, Evidence, Gaps, Agent Workflow Trace, AI Tool-Calling Trace, Workflow Runtime, and Markdown export.
+
+Optional custom-input path: switch Portfolio to `Manual JSON input`, paste a project array, and generate a report without relying on GitHub.
+
+Optional GitHub path: switch Portfolio to `GitHub public repositories`, enter a public username, fetch repositories, and show GitHub Repository Evidence.
 
 ## Setup
 
@@ -162,11 +224,11 @@ Run the selected-tool ADK-to-MCP bridge smoke test:
 python scripts/check_adk_mcp_tools.py
 ```
 
-This validates that selected ADK-style tool wrappers can call deterministic tools through the local MCP stdio runtime. The default Streamlit workflow does not use this runtime path yet.
+This validates that selected ADK-style tool wrappers can call deterministic tools through the local MCP stdio runtime.
 
-The Streamlit workflow can also select `Experimental ADK-MCP runtime tools` as a tool backend. Direct Python services remain the default, and the experimental route falls back to direct deterministic services if the local runtime cannot be used.
+The default Streamlit workflow can now run `Gemini/ADK tool-calling agent` mode. That mode requests MCP runtime first, then falls back to local MCP-style tools and direct deterministic services if the local runtime cannot be used.
 
-The UI now displays workflow runtime metadata, including selected backend, backend used, MCP runtime usage, experimental route status, fallback status, selected tools, and notes. The same safe metadata is included in exported Markdown reports.
+The UI displays workflow runtime metadata and the AI Tool-Calling Trace, including selected backend, backend used, MCP runtime usage, fallback status, selected tools, and notes. The same safe metadata is included in exported Markdown reports.
 
 ## GitHub Public Repository Import
 
@@ -177,6 +239,7 @@ Users can import public repository metadata by GitHub username and use those rep
 - Private repositories are not accessed.
 - Repositories are not cloned.
 - Source code is not downloaded in this step.
+- README text can be fetched explicitly through the controlled public GitHub README helper, but it is not private repository access or source-code inspection.
 - GitHub public repository metadata is mapped into portfolio evidence through language, topics, description, URL, and repository signals.
 - Stars and forks are shown as public repository signals, not direct skill proof.
 
@@ -207,9 +270,9 @@ Do not commit `.env`.
 
 - `.env` is ignored by Git and must not be committed.
 - `.env.example` is safe because it contains empty placeholders.
-- Gemini is optional and only runs when explicitly selected.
+- Gemini is optional at runtime. It is selected by default for the demo, but safely skips itself when no local key is configured.
 - The deterministic score, evidence, gaps, and category details are the source of truth.
-- Gemini, ADK, and MCP layers may explain or orchestrate, but must not overwrite deterministic score fields.
+- Gemini may extract and explain; deterministic validators and tools validate, score, and preserve canonical score/evidence/gap fields.
 - Exported Markdown is privacy-masked.
 - Generated reports in `outputs/*.md` are ignored by Git.
 - Do not paste secrets, passwords, private tokens, or sensitive personal data into the app, prompts, screenshots, or exported reports.
@@ -219,6 +282,7 @@ Do not commit `.env`.
 - `app.py`: Streamlit mock workflow.
 - `data/`: sample job posting, profile, and portfolio projects.
 - `devpath/agent_workflow.py`: single workflow facade used by Streamlit.
+- `devpath/adk_tool_calling_workflow.py`: MCP-first Gemini/ADK tool-calling workflow with safe fallbacks and visible trace.
 - `devpath/full_agent_workflow.py`: opt-in full ADK-style deterministic workflow with agent trace.
 - `devpath/tool_router.py`: local backend selector for direct services or MCP-style tools.
 - `devpath/core/`: deterministic scoring, privacy, config, and report helpers.

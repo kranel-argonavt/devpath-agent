@@ -1,25 +1,28 @@
 {
   "target_roles": [
-    "Junior .NET Developer",
-    "Junior Unity Developer",
-    "Junior C# Developer"
+    "Junior Frontend React Developer",
+    "Junior Frontend Developer",
+    "React Developer",
+    "Web Developer"
   ],
   "experience_level": "Junior",
   "skills": [
-    "C#",
-    ".NET",
-    "WPF",
-    "Unity",
-    "SQLite",
-    "EF Core",
+    "React",
+    "JavaScript",
+    "TypeScript",
+    "HTML",
+    "CSS",
     "Git",
-    "MVVM"
+    "REST API",
+    "Responsive Design",
+    "Tailwind CSS",
+    "Figma basics"
   ],
   "languages": [
-    "English B1-B2",
-    "German A1",
-    "Ukrainian Native"
+    "English B2",
+    "Ukrainian native"
   ],
-  "education": "Software Engineering",
-  "location_preference": "Germany / Remote EU"
+  "education": "Self-taught web developer with completed frontend courses",
+  "location_preference": "Remote EU",
+  "summary": "Junior frontend developer focused on building clean React interfaces, responsive layouts, and API-connected dashboard screens. Comfortable using Git and explaining portfolio projects in English."
 }

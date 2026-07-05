@@ -69,7 +69,7 @@ For imported public GitHub repositories, deterministic evidence can come from:
 
 Stars, forks, archived status, fork status, and update timestamps are shown as repository signals. They do not create direct skill matches by themselves.
 
-No source code, README content, commit history, or private repository data is analyzed in Step 7B.
+No source code, commit history, or private repository data is analyzed in Step 7B. Public README text can be fetched explicitly through the GitHub README helper, but default portfolio scoring still relies on public metadata and local project fields unless README content is intentionally passed into project evidence.
 
 ## Match Classification
 
@@ -90,9 +90,12 @@ Required missing skills become high-priority gaps. Missing nice-to-have skills b
 ## Gemini, ADK, And MCP
 
 - Gemini does not modify scores.
-- ADK agent skeletons can orchestrate deterministic tools in future steps.
+- Gemini may extract structured job/candidate context, but deterministic validators normalize or reject that context.
+- Gemini may enhance narrative-only report sections for gaps, action plan, application drafts, and interview prep.
+- ADK-style workflows orchestrate deterministic tools and expose trace metadata.
 - MCP-style tools wrap the same deterministic scoring and report logic.
-- The Streamlit tool backend selector can call direct services or local MCP-style tools, but both paths preserve the same deterministic scoring behavior.
+- The default Gemini/ADK tool-calling workflow requests MCP runtime first, then falls back to the local MCP-style registry and direct deterministic services.
+- The Streamlit tool backend selector can still call direct services or local MCP-style tools in legacy workflow modes, but all paths preserve the same deterministic scoring behavior.
 - GitHub metadata evidence feeds the same deterministic scoring path as local portfolio projects.
 
 ## Limitations

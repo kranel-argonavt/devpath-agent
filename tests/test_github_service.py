@@ -2,15 +2,21 @@
 
 from __future__ import annotations
 
+import base64
+
 import pytest
 
 from devpath.services.github_service import (
     GitHubService,
+    build_github_readme_api_url,
     build_github_repos_api_url,
     convert_github_repos_to_projects,
     fetch_public_github_repositories,
+    fetch_public_repository_readme,
     is_github_username_provided,
+    is_valid_github_repo_name,
     is_valid_github_username,
+    normalize_github_repo_name,
     normalize_github_username,
     parse_github_repo,
     parse_github_repositories,
@@ -61,6 +67,17 @@ def test_build_github_repos_api_url() -> None:
 def test_build_github_repos_api_url_rejects_invalid_username() -> None:
     with pytest.raises(ValueError, match="Invalid GitHub username"):
         build_github_repos_api_url("bad_name")
+
+
+def test_normalize_and_validate_github_repo_name() -> None:
+    assert normalize_github_repo_name(" taskflow.api/ ") == "taskflow.api"
+    assert is_valid_github_repo_name("taskflow.api") is True
+    assert is_valid_github_repo_name("bad/name") is False
+    assert is_valid_github_repo_name("bad..name") is False
+
+
+def test_build_github_readme_api_url() -> None:
+    assert build_github_readme_api_url("@octocat", "taskflow") == "https://api.github.com/repos/octocat/taskflow/readme"
 
 
 def test_parse_github_repo_handles_public_metadata() -> None:
@@ -170,6 +187,52 @@ def test_fetch_public_github_repositories_rejects_non_list_payload() -> None:
         fetch_public_github_repositories("octocat", http_get=fake_get)
 
 
+def test_fetch_public_repository_readme_uses_injected_http_get() -> None:
+    calls = []
+    encoded = base64.b64encode("# TaskFlow\nREST API demo.".encode("utf-8")).decode("ascii")
+
+    def fake_get(url, headers, timeout):
+        calls.append((url, headers["User-Agent"], timeout))
+        return FakeResponse(
+            200,
+            {
+                "name": "README.md",
+                "html_url": "https://github.com/octocat/taskflow/blob/main/README.md",
+                "download_url": "https://raw.githubusercontent.com/octocat/taskflow/main/README.md",
+                "encoding": "base64",
+                "content": encoded,
+            },
+        )
+
+    readme = fetch_public_repository_readme("octocat", "taskflow", http_get=fake_get)
+
+    assert readme["owner"] == "octocat"
+    assert readme["repo"] == "taskflow"
+    assert readme["content"] == "# TaskFlow\nREST API demo."
+    assert readme["truncated"] is False
+    assert calls == [("https://api.github.com/repos/octocat/taskflow/readme", "DevPath-Agent-Capstone", 10)]
+
+
+def test_fetch_public_repository_readme_truncates_long_content() -> None:
+    encoded = base64.b64encode("abcdef".encode("utf-8")).decode("ascii")
+
+    def fake_get(url, headers, timeout):
+        return FakeResponse(200, {"encoding": "base64", "content": encoded})
+
+    readme = fetch_public_repository_readme("octocat", "taskflow", max_chars=3, http_get=fake_get)
+
+    assert readme["content"] == "abc"
+    assert readme["truncated"] is True
+
+
+def test_fetch_public_repository_readme_rejects_missing_readme() -> None:
+    def fake_get(url, headers, timeout):
+        return FakeResponse(404, {"message": "Not Found"})
+
+    with pytest.raises(RuntimeError, match="was not found"):
+        fetch_public_repository_readme("octocat", "missing", http_get=fake_get)
+
+
 def test_github_service_wrapper_fetches_public_repositories(monkeypatch) -> None:
     def fake_fetch(username, max_repos=10):
         return [{"name": username, "stars": max_repos}]
@@ -177,6 +240,19 @@ def test_github_service_wrapper_fetches_public_repositories(monkeypatch) -> None
     monkeypatch.setattr("devpath.services.github_service.fetch_public_github_repositories", fake_fetch)
 
     assert GitHubService().fetch_public_repositories("octocat", max_repos=5) == [{"name": "octocat", "stars": 5}]
+
+
+def test_github_service_wrapper_fetches_repository_readme(monkeypatch) -> None:
+    def fake_fetch(owner, repo, max_chars=12000):
+        return {"owner": owner, "repo": repo, "max_chars": max_chars}
+
+    monkeypatch.setattr("devpath.services.github_service.fetch_public_repository_readme", fake_fetch)
+
+    assert GitHubService().fetch_repository_readme("octocat", "taskflow", max_chars=50) == {
+        "owner": "octocat",
+        "repo": "taskflow",
+        "max_chars": 50,
+    }
 
 
 def test_github_public_import_smoke_script_with_fake_fetcher(capsys) -> None:

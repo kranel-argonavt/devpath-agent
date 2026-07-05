@@ -7,6 +7,7 @@ download source code.
 
 from __future__ import annotations
 
+import base64
 import re
 from typing import Any, Callable
 
@@ -14,7 +15,9 @@ import requests
 
 
 GITHUB_REPOS_API_BASE = "https://api.github.com/users"
+GITHUB_REPO_API_BASE = "https://api.github.com/repos"
 _USERNAME_PATTERN = re.compile(r"^[A-Za-z0-9](?:[A-Za-z0-9-]{0,37}[A-Za-z0-9])?$")
+_REPO_NAME_PATTERN = re.compile(r"^[A-Za-z0-9_.-]+$")
 
 
 def is_github_username_provided(username: str | None) -> bool:
@@ -50,6 +53,18 @@ def build_github_repos_api_url(username: str, *, per_page: int = 30) -> str:
     return f"{GITHUB_REPOS_API_BASE}/{normalized}/repos?type=public&sort=pushed&direction=desc&per_page={page_size}"
 
 
+def build_github_readme_api_url(owner: str, repo: str) -> str:
+    """Build the public GitHub README API URL."""
+
+    normalized_owner = normalize_github_username(owner)
+    normalized_repo = normalize_github_repo_name(repo)
+    if not is_valid_github_username(normalized_owner):
+        raise ValueError("Invalid GitHub owner. Use a valid public GitHub username or organization.")
+    if not is_valid_github_repo_name(normalized_repo):
+        raise ValueError("Invalid GitHub repository name.")
+    return f"{GITHUB_REPO_API_BASE}/{normalized_owner}/{normalized_repo}/readme"
+
+
 def parse_github_repo(repo: dict[str, Any]) -> dict[str, Any]:
     """Normalize one GitHub public repository API object."""
 
@@ -72,6 +87,19 @@ def parse_github_repositories(repos: list[dict[str, Any]]) -> list[dict[str, Any
     """Normalize a list of GitHub public repository API objects."""
 
     return [parse_github_repo(repo) for repo in repos]
+
+
+def normalize_github_repo_name(repo: str) -> str:
+    """Trim common GitHub repository input noise."""
+
+    return str(repo or "").strip().strip("/")
+
+
+def is_valid_github_repo_name(repo: str) -> bool:
+    """Return True if the value looks like a valid public GitHub repository name."""
+
+    value = normalize_github_repo_name(repo)
+    return bool(value and _REPO_NAME_PATTERN.match(value) and ".." not in value)
 
 
 def convert_github_repos_to_projects(repos: list[dict[str, Any]]) -> list[dict[str, Any]]:
@@ -165,6 +193,79 @@ def fetch_public_github_repositories(
     return repos[:limit]
 
 
+def fetch_public_repository_readme(
+    owner: str,
+    repo: str,
+    *,
+    max_chars: int = 12000,
+    http_get: Callable[..., Any] | None = None,
+) -> dict[str, Any]:
+    """Fetch README text for a public GitHub repository.
+
+    This uses the official public GitHub REST API only. It does not clone the
+    repository, inspect source code, use OAuth, or access private repositories.
+    """
+
+    normalized_owner = normalize_github_username(owner)
+    normalized_repo = normalize_github_repo_name(repo)
+    url = build_github_readme_api_url(normalized_owner, normalized_repo)
+    getter = http_get or requests.get
+
+    try:
+        response = getter(
+            url,
+            headers={
+                "Accept": "application/vnd.github+json",
+                "User-Agent": "DevPath-Agent-Capstone",
+            },
+            timeout=10,
+        )
+    except Exception as exc:
+        raise RuntimeError(f"Could not fetch README for {normalized_owner}/{normalized_repo}: {exc}") from exc
+
+    status_code = int(getattr(response, "status_code", 0) or 0)
+    if status_code == 404:
+        raise RuntimeError(f"README for '{normalized_owner}/{normalized_repo}' was not found.")
+    if status_code == 403:
+        raise RuntimeError("GitHub README request was rate limited or forbidden. Try again later.")
+    if status_code >= 400:
+        raise RuntimeError(f"GitHub README request failed with status {status_code}.")
+
+    try:
+        payload = response.json()
+    except Exception as exc:
+        raise RuntimeError("GitHub README response was not valid JSON.") from exc
+
+    if not isinstance(payload, dict):
+        raise RuntimeError("GitHub README response did not contain an object.")
+
+    encoded_content = str(payload.get("content") or "")
+    encoding = str(payload.get("encoding") or "").lower()
+    if encoding != "base64" or not encoded_content:
+        raise RuntimeError("GitHub README response did not contain base64 content.")
+
+    try:
+        readme_text = base64.b64decode(encoded_content, validate=False).decode("utf-8", errors="replace")
+    except Exception as exc:
+        raise RuntimeError("GitHub README content could not be decoded.") from exc
+
+    limit = max(1, int(max_chars))
+    truncated = len(readme_text) > limit
+    if truncated:
+        readme_text = readme_text[:limit]
+
+    return {
+        "owner": normalized_owner,
+        "repo": normalized_repo,
+        "name": payload.get("name") or "README",
+        "html_url": payload.get("html_url") or "",
+        "download_url": payload.get("download_url") or "",
+        "content": readme_text,
+        "truncated": truncated,
+        "source": "GitHub public repository README",
+    }
+
+
 class GitHubService:
     """Small service wrapper for public GitHub repository metadata."""
 
@@ -172,6 +273,11 @@ class GitHubService:
         """Fetch public repositories for a username."""
 
         return fetch_public_github_repositories(username, max_repos=max_repos)
+
+    def fetch_repository_readme(self, owner: str, repo: str, max_chars: int = 12000) -> dict[str, Any]:
+        """Fetch README text for a public repository."""
+
+        return fetch_public_repository_readme(owner, repo, max_chars=max_chars)
 
 
 def _clean_list(values: Any) -> list[str]:

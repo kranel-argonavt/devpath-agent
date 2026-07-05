@@ -28,15 +28,19 @@
 - Step 7B - GitHub repo evidence mapping
 - Step 7C - Full ADK agent workflow orchestration
 - Step 7D - Streamlit full agent mode + trace
+- Step 8A - Final capstone demo polish
+- Step 8B - Technical capstone gap fixes: privacy detection, planned MCP file/GitHub tools, public README helper, and updated tests
+- Step 8C - Agent Runtime Upgrade: Gemini/ADK tool-calling workflow with MCP-first route, visible trace, and safe fallback
 
 ## Current
 
-- Step 7D - Streamlit full agent mode + trace
+- Step 8D - Kaggle writeup, video, public repo polish, and clean setup verification
 
 ## Next
 
-- Step 8A - Final capstone demo polish
-- Step 8B - Kaggle writeup and video script
+- Record YouTube demo under 5 minutes
+- Publish or verify public GitHub repository
+- Submit Kaggle Writeup with cover image and project link
 
 ## Guiding Principle
 

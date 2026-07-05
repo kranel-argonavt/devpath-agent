@@ -14,18 +14,62 @@ SKILL_ALIASES = {
     "SQL": ["sql", "sqlite", "ms sql", "mysql", "postgresql"],
     "Git": ["git", "github"],
     "REST API": ["rest api", "restful", "api integration", "web api"],
+    "React": ["react", "react.js", "reactjs"],
+    "JavaScript": ["javascript", "js", "ecmascript"],
+    "TypeScript": ["typescript", "ts"],
+    "HTML": ["html", "html5"],
+    "CSS": ["css", "css3"],
+    "Responsive Design": ["responsive design", "responsive layout", "mobile-friendly", "mobile friendly"],
+    "Tailwind CSS": ["tailwind", "tailwind css"],
+    "Figma": ["figma"],
+    "Next.js": ["next.js", "nextjs", "next js"],
+    "Accessibility": ["accessibility", "a11y"],
+    "UX/UI": ["ux", "ui", "ux/ui", "ui/ux", "user experience", "user interface"],
+    "Python": ["python"],
+    "FastAPI": ["fastapi", "fast api"],
+    "Django": ["django"],
     "English": ["english", "b1", "b2"],
     "Entity Framework": ["entity framework", "ef core"],
     "WPF": ["wpf"],
     "Unity": ["unity"],
     "Docker": ["docker"],
     "Azure": ["azure"],
-    "Unit Testing": ["unit testing", "pytest", "xunit", "nunit", "tests"],
+    "Unit Testing": ["unit testing", "pytest", "xunit", "nunit", "jest", "react testing library", "tests"],
     "Cloud": ["cloud"],
 }
 
-REQUIRED_SKILLS = ["C#", ".NET", "ASP.NET Core", "SQL", "Git", "REST API", "English"]
-NICE_TO_HAVE_SKILLS = ["Docker", "Azure", "Unit Testing", "Entity Framework", "Cloud"]
+REQUIRED_SKILLS = [
+    "C#",
+    ".NET",
+    "ASP.NET Core",
+    "Python",
+    "FastAPI",
+    "Django",
+    "React",
+    "JavaScript",
+    "TypeScript",
+    "HTML",
+    "CSS",
+    "SQL",
+    "Git",
+    "REST API",
+    "English",
+]
+NICE_TO_HAVE_SKILLS = [
+    "Docker",
+    "Azure",
+    "Unit Testing",
+    "Entity Framework",
+    "Cloud",
+    "FastAPI",
+    "Django",
+    "Next.js",
+    "Figma",
+    "Responsive Design",
+    "Tailwind CSS",
+    "Accessibility",
+    "UX/UI",
+]
 
 CATEGORY_WEIGHTS = {
     "required_technical_skills": 35,
@@ -42,10 +86,24 @@ GAP_RECOMMENDATIONS = {
     "SQL": "Practice relational queries and document database work in a portfolio project.",
     "Git": "Show a public repository with clear commits, branches, and README documentation.",
     "English": "Prepare concise English project explanations and interview answers.",
-    "Docker": "Containerize a small .NET app and document the Docker workflow.",
+    "Docker": "Containerize a small portfolio app and document the Docker workflow.",
     "Azure": "Deploy or describe a small cloud-hosted .NET demo when ready.",
-    "Unit Testing": "Add xUnit or NUnit tests to a project and mention what they verify.",
+    "Unit Testing": "Add unit tests to a relevant project and document what they verify.",
     "Entity Framework": "Use EF Core in a small CRUD project and document the data model.",
+    "Python": "Add a Python backend or automation project with clear README evidence.",
+    "FastAPI": "Build a small FastAPI REST endpoint and document requests, responses, and validation.",
+    "Django": "Create or document a small Django project if the target role expects Django.",
+    "React": "Polish a React project with clear component, state, and API integration notes.",
+    "JavaScript": "Document JavaScript logic and browser-side behavior in a frontend project.",
+    "TypeScript": "Add or document TypeScript types, interfaces, and component props in a portfolio project.",
+    "HTML": "Show semantic HTML structure and accessibility basics in a frontend project.",
+    "CSS": "Document responsive CSS layout decisions and styling architecture.",
+    "Next.js": "Create or document a small Next.js page or route if the target role expects it.",
+    "Figma": "Add a short note showing how Figma or design planning influenced the UI.",
+    "Responsive Design": "Document mobile and desktop layout behavior with screenshots or README notes.",
+    "Tailwind CSS": "Show Tailwind utility patterns and responsive classes in a frontend project.",
+    "Accessibility": "Add accessibility improvements such as labels, contrast checks, and keyboard navigation notes.",
+    "UX/UI": "Explain UI decisions, user flows, and tradeoffs in the project README.",
     ".NET": "Create a focused .NET project that shows framework fundamentals.",
     "C#": "Strengthen C# examples with clean classes, collections, and error handling.",
 }
@@ -150,7 +208,7 @@ def calculate_mock_match_score(
         "required_technical_skills": _weighted_score(
             len(full_required_matches), len(required_skills), CATEGORY_WEIGHTS["required_technical_skills"]
         ),
-        "portfolio_evidence": _portfolio_score(required_skills, project_evidence),
+        "portfolio_evidence": _portfolio_score(required_skills, project_evidence, job_requirements),
         "nice_to_have_skills": _weighted_score(
             len(nice_matches), len(nice_skills), CATEGORY_WEIGHTS["nice_to_have_skills"]
         ),
@@ -225,10 +283,10 @@ def _looks_like_responsibility(line: str) -> bool:
 
 def _detect_seniority(job_text: str) -> str:
     normalized = normalize_text(job_text)
-    if "intern" in normalized:
-        return "Intern"
     if "junior" in normalized:
         return "Junior"
+    if re.search(r"(?<![a-z0-9])(?:intern|internship)(?![a-z0-9])", normalized):
+        return "Intern"
     if "senior" in normalized:
         return "Senior"
     if "mid" in normalized:
@@ -269,11 +327,16 @@ def _weighted_score(matches: int, total: int, weight: int) -> int:
     return round((matches / total) * weight)
 
 
-def _portfolio_score(required_skills: list[str], project_evidence: dict[str, list[str]]) -> int:
-    if not required_skills or not project_evidence:
+def _portfolio_score(
+    required_skills: list[str],
+    project_evidence: dict[str, list[str]],
+    job_requirements: dict[str, Any],
+) -> int:
+    portfolio_required_skills = _portfolio_required_skills(required_skills, job_requirements)
+    if not portfolio_required_skills or not project_evidence:
         return 0
-    project_matches = [skill for skill in required_skills if skill in project_evidence]
-    return _weighted_score(len(project_matches), len(required_skills), CATEGORY_WEIGHTS["portfolio_evidence"])
+    project_matches = [skill for skill in portfolio_required_skills if skill in project_evidence]
+    return _weighted_score(len(project_matches), len(portfolio_required_skills), CATEGORY_WEIGHTS["portfolio_evidence"])
 
 
 def _experience_score(job_requirements: dict[str, Any], profile: dict[str, Any]) -> int:
@@ -375,7 +438,8 @@ def _build_category_details(
     job_requirements: dict[str, Any],
     profile: dict[str, Any],
 ) -> dict[str, dict[str, Any]]:
-    project_required_matches = [skill for skill in required_skills if skill in project_evidence]
+    portfolio_required_skills = _portfolio_required_skills(required_skills, job_requirements)
+    project_required_matches = [skill for skill in portfolio_required_skills if skill in project_evidence]
     return {
         "required_technical_skills": {
             "earned": category_scores["required_technical_skills"],
@@ -385,7 +449,10 @@ def _build_category_details(
         "portfolio_evidence": {
             "earned": category_scores["portfolio_evidence"],
             "max": CATEGORY_WEIGHTS["portfolio_evidence"],
-            "reason": _match_reason(project_required_matches, [skill for skill in required_skills if skill not in project_evidence], "portfolio skill"),
+            "reason": _portfolio_reason(
+                project_required_matches,
+                [skill for skill in portfolio_required_skills if skill not in project_evidence],
+            ),
         },
         "nice_to_have_skills": {
             "earned": category_scores["nice_to_have_skills"],
@@ -414,3 +481,17 @@ def _match_reason(matches: list[str], missing: list[str], label: str) -> str:
     matched_text = ", ".join(matches) if matches else "none"
     missing_text = ", ".join(missing) if missing else "none"
     return f"Matched {label}s: {matched_text}. Missing or weak {label}s: {missing_text}."
+
+
+def _portfolio_required_skills(required_skills: list[str], job_requirements: dict[str, Any]) -> list[str]:
+    detected_languages = set(job_requirements.get("detected_languages", []))
+    return [skill for skill in required_skills if skill not in detected_languages]
+
+
+def _portfolio_reason(matches: list[str], missing: list[str]) -> str:
+    matched_text = ", ".join(matches) if matches else "none"
+    missing_text = ", ".join(missing) if missing else "none"
+    return (
+        f"Matched portfolio evidence: {matched_text}. "
+        f"Required skills without project evidence: {missing_text}."
+    )

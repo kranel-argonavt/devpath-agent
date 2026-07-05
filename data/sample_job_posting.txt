@@ -1,26 +1,29 @@
-Junior .NET Developer
-Location: Berlin, Germany / Remote within the EU
-Employment Type: Full-time
+Junior Frontend Developer (React)
 
-We are looking for a Junior .NET Developer to join our product engineering team and help build internal and customer-facing web services. You will work with experienced developers to implement new backend features, improve existing services, and support API integrations.
+We are looking for a Junior Frontend Developer to join our product team and help build responsive web interfaces for a SaaS dashboard.
 
 Responsibilities:
-- Develop and maintain applications using C# and .NET
-- Build backend endpoints with ASP.NET Core
-- Work with SQL databases to read and update application data
-- Collaborate on REST API design and implementation
-- Use Git in a team-based development workflow
-- Participate in code reviews, bug fixing, and technical discussions
+- Build reusable UI components with React and TypeScript.
+- Implement responsive layouts using HTML, CSS, and modern styling practices.
+- Connect frontend screens to REST APIs.
+- Work with Git in a collaborative development workflow.
+- Fix UI bugs and improve accessibility.
+- Communicate progress clearly in English.
 
-Requirements:
-- Good foundation in C# and .NET
-- Basic experience with ASP.NET Core
-- Understanding of SQL and relational databases
-- Familiarity with Git version control
-- Understanding of REST API concepts
-- Ability to communicate in English
+Required skills:
+- React
+- JavaScript or TypeScript
+- HTML and CSS
+- Git
+- REST API basics
+- English communication
 
 Nice to have:
-- Personal or academic backend projects
-- Interest in clean code and software architecture
-- Motivation to learn in a collaborative environment
+- Next.js
+- Unit testing with Jest or React Testing Library
+- Basic UX/UI design understanding
+- Figma
+- Docker basics
+
+This is a junior role. We value portfolio projects, readable code, clear README documentation, and willingness to learn.
+Remote within Europe is possible.

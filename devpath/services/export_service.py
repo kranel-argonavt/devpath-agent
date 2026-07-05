@@ -41,6 +41,8 @@ def _report_to_markdown(report: dict[str, Any]) -> str:
         "",
         *_render_agent_workflow_trace(report),
         "",
+        *_render_tool_call_trace(report.get("tool_call_trace", [])),
+        "",
         "## 1. Job Analysis",
         *_render_job_analysis(report.get("job_analysis", {})),
         "",
@@ -54,6 +56,8 @@ def _report_to_markdown(report: dict[str, Any]) -> str:
         ),
         "",
         "## 4. Prioritized Skill Gaps",
+        *_render_llm_gap_narrative(skill_gaps.get("llm_gap_narrative", {})),
+        "",
         *_render_prioritized_gaps(
             skill_gaps.get("prioritized_gaps") or profile_match.get("prioritized_gaps", []),
             skill_gaps.get("missing_skills") or profile_match.get("missing_skills", []),
@@ -138,6 +142,31 @@ def _render_agent_workflow_trace(report: dict[str, Any]) -> list[str]:
             f"- LLM score modification: {_enabled_disabled(agent_workflow.get('llm_score_modification', False))}",
         ]
     )
+    return lines
+
+
+def _render_tool_call_trace(tool_call_trace: list[dict[str, Any]]) -> list[str]:
+    if not tool_call_trace:
+        return []
+
+    lines = ["## AI Tool-Calling Trace"]
+    for index, step in enumerate(tool_call_trace, start=1):
+        lines.extend(
+            [
+                f"- Step {index}: {step.get('tool_name', 'tool')}",
+                f"  - Agent: {step.get('agent_name', 'agent')}",
+                f"  - Backend used: {step.get('backend_used', 'Unknown')}",
+                f"  - Status: {step.get('status', 'completed')}",
+                f"  - Input summary: {step.get('input_summary', 'No input summary available.')}",
+                f"  - Output summary: {step.get('output_summary', 'No output summary available.')}",
+                f"  - Fallback used: {_yes_no(step.get('fallback_used'))}",
+            ]
+        )
+        warnings = step.get("warnings", [])
+        if warnings:
+            lines.append(f"  - Warnings: {'; '.join(str(warning) for warning in warnings)}")
+        else:
+            lines.append("  - Warnings: None")
     return lines
 
 
@@ -329,7 +358,9 @@ def _render_github_evidence(github_evidence: list[dict[str, Any]]) -> list[str]:
 
 
 def _render_preparation_plan(preparation_plan: dict[str, Any]) -> list[str]:
-    return [
+    lines = [
+        *_render_llm_action_plan(preparation_plan.get("llm_enhanced_plan", {})),
+        "",
         "### 7-Day Plan",
         *_render_bullets(preparation_plan.get("7_day_plan", []), "No 7-day plan available."),
         "",
@@ -342,20 +373,26 @@ def _render_preparation_plan(preparation_plan: dict[str, Any]) -> list[str]:
         "### Gap Recommendations",
         *_render_bullets(preparation_plan.get("gap_recommendations", []), "No gap recommendations available."),
     ]
+    return _strip_trailing_blank(lines)
 
 
 def _render_application_drafts(application_drafts: dict[str, Any]) -> list[str]:
-    return [
+    lines = [
+        *_render_llm_application_drafts(application_drafts.get("llm_enhanced_drafts", {})),
+        "",
         "### Cover Letter Draft",
         str(application_drafts.get("cover_letter_draft", "No cover letter draft available.")),
         "",
         "### Recruiter Message Draft",
         str(application_drafts.get("recruiter_message_draft", "No recruiter message draft available.")),
     ]
+    return _strip_trailing_blank(lines)
 
 
 def _render_interview_prep(interview_prep: dict[str, Any]) -> list[str]:
     lines = [
+        *_render_llm_interview_prep(interview_prep.get("llm_enhanced_prep", {})),
+        "",
         "### Interview Questions",
         *_render_numbered(interview_prep.get("questions", []), "No interview questions available."),
         "",
@@ -366,7 +403,101 @@ def _render_interview_prep(interview_prep: dict[str, Any]) -> list[str]:
     prioritized_gaps = interview_prep.get("prioritized_gaps", [])
     if prioritized_gaps:
         lines.extend(["", "### Gap-Focused Practice", *_render_prioritized_gaps(prioritized_gaps, [])])
-    return lines
+    return _strip_trailing_blank(lines)
+
+
+def _render_llm_gap_narrative(gap_narrative: dict[str, Any]) -> list[str]:
+    if not gap_narrative:
+        return []
+    lines = ["### Gemini-Enhanced Gap Narrative"]
+    if gap_narrative.get("summary"):
+        lines.extend(["", str(gap_narrative["summary"])])
+    for item in gap_narrative.get("gap_explanations", []):
+        lines.extend(
+            [
+                "",
+                f"**{item.get('skill', 'Gap')}**",
+                "",
+                str(item.get("explanation", "")),
+                "",
+                f"Next step: {item.get('next_step', '')}",
+            ]
+        )
+    return _strip_trailing_blank(lines)
+
+
+def _render_llm_action_plan(action_plan: dict[str, Any]) -> list[str]:
+    if not action_plan:
+        return []
+    lines = ["### Gemini-Enhanced Action Plan"]
+    if action_plan.get("summary"):
+        lines.extend(["", str(action_plan["summary"])])
+    lines.extend(
+        [
+            "",
+            "#### Enhanced 7-Day Plan",
+            *_render_bullets(action_plan.get("7_day_plan", []), "No enhanced 7-day plan available."),
+            "",
+            "#### Enhanced 14-Day Plan",
+            *_render_bullets(action_plan.get("14_day_plan", []), "No enhanced 14-day plan available."),
+            "",
+            "#### Enhanced 30-Day Roadmap",
+            *_render_bullets(action_plan.get("30_day_roadmap", []), "No enhanced 30-day roadmap available."),
+        ]
+    )
+    if action_plan.get("portfolio_tasks"):
+        lines.extend(["", "#### Portfolio Tasks", *_render_bullets(action_plan.get("portfolio_tasks", []), "")])
+    if action_plan.get("study_tasks"):
+        lines.extend(["", "#### Focused Study Tasks", *_render_bullets(action_plan.get("study_tasks", []), "")])
+    if action_plan.get("interview_drills"):
+        lines.extend(["", "#### Interview Drills", *_render_bullets(action_plan.get("interview_drills", []), "")])
+    if action_plan.get("done_criteria"):
+        lines.extend(["", "#### Done Criteria", *_render_bullets(action_plan.get("done_criteria", []), "")])
+    return _strip_trailing_blank(lines)
+
+
+def _render_llm_application_drafts(application: dict[str, Any]) -> list[str]:
+    if not application:
+        return []
+    lines = ["### Gemini-Enhanced Application Drafts"]
+    if application.get("cover_letter_draft"):
+        lines.extend(["", "#### Enhanced Cover Letter", str(application["cover_letter_draft"])])
+    if application.get("recruiter_message_draft"):
+        lines.extend(["", "#### Enhanced Recruiter Message", str(application["recruiter_message_draft"])])
+    if application.get("cv_bullets"):
+        lines.extend(["", "#### Suggested CV Bullets", *_render_bullets(application.get("cv_bullets", []), "")])
+    if application.get("project_positioning"):
+        lines.extend(["", "#### Project Positioning", *_render_bullets(application.get("project_positioning", []), "")])
+    if application.get("what_to_emphasize"):
+        lines.extend(["", "#### What To Emphasize", *_render_bullets(application.get("what_to_emphasize", []), "")])
+    if application.get("what_to_avoid"):
+        lines.extend(["", "#### What To Avoid", *_render_bullets(application.get("what_to_avoid", []), "")])
+    if application.get("application_checklist"):
+        lines.extend(["", "#### Application Checklist", *_render_bullets(application.get("application_checklist", []), "")])
+    return _strip_trailing_blank(lines)
+
+
+def _render_llm_interview_prep(interview: dict[str, Any]) -> list[str]:
+    if not interview:
+        return []
+    lines = ["### Gemini-Enhanced Interview Prep"]
+    if interview.get("focus_summary"):
+        lines.extend(["", str(interview["focus_summary"])])
+    if interview.get("questions"):
+        lines.extend(["", "#### Enhanced Questions", *_render_numbered(interview.get("questions", []), "")])
+    if interview.get("technical_questions"):
+        lines.extend(["", "#### Technical Questions With Answer Focus", *_render_question_guides(interview.get("technical_questions", []))])
+    if interview.get("behavioral_questions"):
+        lines.extend(["", "#### Behavioral Questions With Story Focus", *_render_question_guides(interview.get("behavioral_questions", []))])
+    if interview.get("project_story_prompts"):
+        lines.extend(["", "#### Project Story Prompts", *_render_bullets(interview.get("project_story_prompts", []), "")])
+    if interview.get("weak_area_drills"):
+        lines.extend(["", "#### Weak-Area Drills", *_render_bullets(interview.get("weak_area_drills", []), "")])
+    if interview.get("answer_guidance"):
+        lines.extend(["", "#### Answer Guidance", *_render_bullets(interview.get("answer_guidance", []), "")])
+    if interview.get("practice_focus"):
+        lines.extend(["", "#### Enhanced Practice Focus", *_render_bullets(interview.get("practice_focus", []), "")])
+    return _strip_trailing_blank(lines)
 
 
 def _render_bullets(items: list[Any], empty_message: str) -> list[str]:
@@ -379,6 +510,20 @@ def _render_numbered(items: list[Any], empty_message: str) -> list[str]:
     if not items:
         return [f"1. {empty_message}"]
     return [f"{index}. {item}" for index, item in enumerate(items, start=1)]
+
+
+def _render_question_guides(items: list[Any]) -> list[str]:
+    lines: list[str] = []
+    for index, item in enumerate(items, start=1):
+        if isinstance(item, dict):
+            question = item.get("question", "Interview question")
+            answer_focus = item.get("answer_focus", "")
+            lines.append(f"{index}. **{question}**")
+            if answer_focus:
+                lines.append(f"   - Answer focus: {answer_focus}")
+        else:
+            lines.append(f"{index}. {item}")
+    return lines
 
 
 def _project_only_evidence(evidence_by_skill: dict[str, list[str]]) -> dict[str, list[str]]:
