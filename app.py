@@ -988,18 +988,6 @@ def render_profile_match_tab(profile_match: dict[str, Any], skill_gaps: dict[str
             st.metric(name.replace("_", " ").title(), f"{value}")
     render_category_details(profile_match.get("category_details", {}), category_scores)
 
-    match_col, partial_col, gap_col = st.columns(3)
-    with match_col:
-        st.markdown("### Strong Matches")
-        render_bullets(profile_match.get("strong_matches", []), "No strong matches detected yet.")
-    with partial_col:
-        st.markdown("### Partial Matches")
-        render_bullets(profile_match.get("partial_matches", []), "No partial matches detected yet.")
-    with gap_col:
-        st.markdown("### Missing Skills")
-        missing_skills = skill_gaps.get("missing_skills") or profile_match.get("missing_skills", [])
-        render_bullets(missing_skills, "No major required skill gaps detected.")
-
     st.markdown("### Evidence by Skill")
     render_evidence_by_skill(profile_match.get("evidence_by_skill", {}))
 
