@@ -6,6 +6,8 @@ Built for Kaggle's **AI Agents: Intensive Vibe Coding Capstone Project with Goog
 
 Public repository: https://github.com/kranel-argonavt/devpath-agent
 
+Demo video: https://youtu.be/kvx_5-GBpkg
+
 ## Problem
 
 Junior developers often struggle to translate broad job postings into a concrete preparation plan. Requirements are mixed with nice-to-have skills, seniority signals, language expectations, and vague responsibilities. Candidate evidence is also scattered across profile notes, CV text, and portfolio projects.

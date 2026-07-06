@@ -8,14 +8,14 @@ DevPath Agent acts as a personal career copilot for junior developers. It helps 
 
 ## Required Submission Assets
 
-- [ ] Kaggle writeup
+- [x] Kaggle writeup draft
 - [ ] Media Gallery cover image
-- [ ] Architecture diagram image or Mermaid diagram
-- [ ] App screenshots
-- [ ] YouTube video under 5 minutes
-- [ ] Public project link or public GitHub repository
-- [ ] Setup instructions
-- [ ] Clear demo path that works without API keys
+- [x] Architecture diagram image or Mermaid diagram
+- [x] App screenshots
+- [x] YouTube video under 5 minutes
+- [x] Public project link or public GitHub repository
+- [x] Setup instructions
+- [x] Clear demo path that works without API keys
 
 ## Course Concepts Demonstrated
 
@@ -26,36 +26,44 @@ DevPath Agent acts as a personal career copilot for junior developers. It helps 
 - [x] Deployability / reproducible setup
 - [x] Optional Gemini-assisted narrative insights
 
+## Manual Kaggle Actions
+
+- [ ] Create or update Kaggle Writeup from `docs/kaggle_writeup.md`.
+- [ ] Attach Media Gallery cover image.
+- [ ] Attach YouTube demo video.
+- [ ] Add public project link: `https://github.com/kranel-argonavt/devpath-agent`.
+- [ ] Select `Concierge Agents` track.
+- [ ] Submit the Writeup before the deadline.
 
 ## Evaluation Alignment
 
 ### Pitch
 
-- [ ] Problem statement: junior developers struggle to understand job fit and prepare efficiently.
-- [ ] Solution value: deterministic match score, evidence, gaps, plan, drafts, interview prep.
-- [ ] Why agents: staged career workflow with specialized responsibilities.
-- [ ] Demo clarity: one-click sample scenario and offline default path.
-- [ ] Visual evidence: screenshots or diagram show UI, runtime trace, and architecture.
+- [x] Problem statement: junior developers struggle to understand job fit and prepare efficiently.
+- [x] Solution value: deterministic match score, evidence, gaps, plan, drafts, interview prep.
+- [x] Why agents: staged career workflow with specialized responsibilities.
+- [x] Demo clarity: one-click sample scenario and offline default path.
+- [x] Visual evidence: screenshots or diagram show UI, runtime trace, and architecture.
 
 ### Implementation
 
-- [ ] Streamlit app starts locally.
-- [ ] Gemini/ADK tool-calling agent mode is visible.
-- [ ] `Runtime details for judges` shows the locked MCP-first tool route in capstone mode.
-- [ ] Agent Workflow Trace is visible.
-- [ ] AI Tool-Calling Trace is visible.
-- [ ] Workflow Runtime metadata is visible.
-- [ ] Gemini-enhanced Action Plan, Application, and Interview sections are visible when API key is configured.
-- [ ] Markdown export works.
-- [ ] Tests pass.
-- [ ] Smoke scripts pass or have clear optional-network notes.
+- [x] Streamlit app starts locally.
+- [x] Gemini/ADK tool-calling agent mode is visible.
+- [x] `Runtime details for judges` shows the locked MCP-first tool route in capstone mode.
+- [x] Agent Workflow Trace is visible.
+- [x] AI Tool-Calling Trace is visible.
+- [x] Workflow Runtime metadata is visible.
+- [x] Gemini-enhanced Action Plan, Application, and Interview sections are visible when API key is configured.
+- [x] Markdown export works.
+- [x] Tests pass.
+- [x] Smoke scripts pass or have clear optional-network notes.
 
 ### Documentation
 
-- [ ] README explains setup and capstone fit.
-- [ ] Architecture docs explain ADK-style workflow and MCP layers.
-- [ ] Security docs explain secrets, privacy masking, and test boundaries.
-- [ ] Demo script and checklist are up to date.
+- [x] README explains setup and capstone fit.
+- [x] Architecture docs explain ADK-style workflow and MCP layers.
+- [x] Security docs explain secrets, privacy masking, and test boundaries.
+- [x] Demo script and checklist are up to date.
 
 ## Recommended Screenshots
 
@@ -79,8 +87,8 @@ Optional architecture asset:
 
 ### Security
 
-- [ ] `.env` is not committed.
-- [ ] No API keys are shown in screenshots or video.
-- [ ] Exported reports are ignored by Git.
-- [ ] GitHub import uses public metadata only.
-- [ ] Automated tests do not call external APIs.
+- [x] `.env` is not committed.
+- [x] No API keys are shown in screenshots or video.
+- [x] Exported reports are ignored by Git.
+- [x] GitHub import uses public metadata only.
+- [x] Automated tests do not call external APIs.

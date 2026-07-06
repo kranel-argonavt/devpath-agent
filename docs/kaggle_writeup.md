@@ -13,7 +13,7 @@ DevPath Agent fits the Concierge Agents track because it is a personal assistant
 ## Project Links
 
 - Public project link: https://github.com/kranel-argonavt/devpath-agent
-- Demo video: TODO: add YouTube URL
+- Demo video: https://youtu.be/kvx_5-GBpkg
 - Architecture diagram: `assets/architecture/devpath-agent-architecture.png`
 
 ## Problem
