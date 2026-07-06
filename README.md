@@ -242,7 +242,7 @@ Optional GitHub path: switch Portfolio to `GitHub public repositories`, enter a 
 Open your terminal (Command Prompt or Git Bash) and run the following commands to clone the project and navigate into its folder:
 ```bash
 # Clone the repository
-git clone https://github.com/kranel-argonavt/VocabTrainer.git
+git clone https://github.com/kranel-argonavt/devpath-agent.git
 
 # Move into the project directory
 cd devpath-agent
@@ -306,6 +306,19 @@ Run the app:
 
 ```powershell
 streamlit run app.py
+```
+
+Run with Docker:
+
+```powershell
+docker build -t devpath-agent .
+docker run --rm -p 8501:8501 devpath-agent
+```
+
+Optional Gemini configuration can be passed at runtime:
+
+```powershell
+docker run --rm -p 8501:8501 --env-file .env devpath-agent
 ```
 
 Run local smoke tests:

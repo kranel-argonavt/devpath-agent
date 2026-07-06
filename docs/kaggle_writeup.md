@@ -14,7 +14,7 @@ DevPath Agent fits the Concierge Agents track because it is a personal assistant
 
 - Public project link: https://github.com/kranel-argonavt/devpath-agent
 - Demo video: https://youtu.be/kvx_5-GBpkg
-- Architecture diagram: `assets/architecture/devpath-agent-architecture.png`
+- Architecture diagram: https://github.com/kranel-argonavt/devpath-agent/blob/main/assets/architecture/devpath-agent-architecture.png
 
 ## Problem
 
@@ -78,6 +78,36 @@ High-level flow:
 
 The important boundary is that Gemini may explain, but it cannot change the numeric score or canonical evidence fields.
 
+Compact architecture summary:
+
+```text
+Streamlit UI
+  -> Gemini/ADK tool-calling workflow
+  -> Agent stages:
+       privacy_guard
+       job_analyzer
+       portfolio_evidence
+       profile_matcher
+       gap_planner
+       application_writer
+       interview_coach
+  -> MCP-first tool route:
+       MCP runtime
+       -> local MCP-style registry fallback
+       -> direct deterministic services fallback
+  -> Deterministic source of truth:
+       score
+       evidence
+       gaps
+  -> Optional Gemini:
+       structured extraction
+       narrative enhancements
+  -> Runtime tab:
+       Agent Workflow Trace
+       AI Tool-Calling Trace
+       Workflow Runtime
+```
+
 ## Course Concepts Demonstrated
 
 This submission demonstrates more than the minimum three required course concepts. The strongest evidence is in the public codebase and the Runtime tab of the demo UI.
@@ -133,26 +163,60 @@ This is especially important for a Concierge Agents submission because the user 
 
 ### 4. Deployability And Reproducible Setup
 
-The project includes:
+The project is designed to be reproducible from the public GitHub repository, not only demonstrated in a local development environment. A judge can clone the repository, create an isolated Python environment, install dependencies, and run the Streamlit app locally:
+
+```powershell
+git clone https://github.com/kranel-argonavt/devpath-agent.git
+cd devpath-agent
+python -m venv .venv
+Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass
+.\.venv\Scripts\Activate.ps1
+python -m pip install --upgrade pip
+pip install -r requirements.txt
+streamlit run app.py
+```
+
+The app opens locally at `http://localhost:8501`. The core demo path works without a Gemini API key, so judges can load the sample scenario and generate the deterministic career report immediately. If a local Gemini key is available, it can be added through `.env` using `GOOGLE_API_KEY`; Gemini then enriches narrative sections while deterministic scoring remains the source of truth.
+
+The repository includes:
 
 - `requirements.txt`,
 - `.env.example`,
 - `Dockerfile`,
+- `.dockerignore`,
 - Streamlit run instructions,
+- Docker build/run commands,
 - local smoke-test scripts,
 - pytest coverage for deterministic logic, tools, workflow, MCP, export, privacy, and GitHub parsing.
 
-The project does not require a live public deployment for judging. If a live demo is not used, the public GitHub repository and setup instructions allow judges to run it locally.
+A live hosted endpoint is not required for this submission; the public repository, setup instructions, Dockerfile, `.dockerignore`, and tests provide the reproducible deployment path. Docker can also be used with:
 
-### 5. AI-Assisted Vibe Coding
+```powershell
+docker build -t devpath-agent .
+docker run --rm -p 8501:8501 devpath-agent
+```
+
+### 5. Antigravity / AI-Assisted Vibe Coding
 
 The project was built through iterative AI-assisted development. The demo video explains how the workflow evolved from a deterministic career report into a traceable agent system with Gemini structured extraction, MCP-first tool routing, safe fallbacks, and clearer judge-facing UI.
+
+### 6. Agent Skills And Local Validation
+
+The repository includes local scripts that make the agent/tool layers easier to validate:
+
+- `scripts/check_adk_agent.py`
+- `scripts/check_mcp_tools.py`
+- `scripts/check_mcp_runtime.py`
+- `scripts/check_adk_mcp_tools.py`
+- `scripts/check_full_agent_workflow.py`
+
+These scripts support the capstone demo story by showing that ADK-style agents, MCP tools, runtime routing, and fallback behavior can be checked independently from the Streamlit UI.
 
 ## Evaluation Rubric Fit
 
 For the pitch category, DevPath Agent focuses on a clear individual user problem: junior developers need practical, evidence-based career guidance before applying to jobs. The value is not only a score, but a complete preparation workflow that helps the user decide what to highlight, what to improve, and how to prepare for interviews.
 
-For the implementation category, the project emphasizes traceable architecture and meaningful tool use. The agent workflow is visible in the UI, MCP-aware tool calls are displayed in the Runtime tab and documentation explains how to run and verify the system locally.
+For the implementation category, the project emphasizes traceable architecture and meaningful tool use. The agent workflow is visible in the UI, MCP-aware tool calls are displayed in the Runtime tab, deterministic behavior is covered by tests, and the documentation explains how to run and verify the system locally.
 
 ## Deterministic Scoring
 
