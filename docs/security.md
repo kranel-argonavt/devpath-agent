@@ -21,7 +21,7 @@ DevPath Agent is designed around cautious handling of candidate data. The curren
 
 ## GitHub Safety
 
-- No GitHub token is required for Step 7A.
+- No GitHub token is required.
 - Only public repository metadata is imported.
 - GitHub evidence mapping uses metadata only: language, topics, description, URL, and public repository signals.
 - Public README text may be fetched only through the explicit GitHub README helper.
