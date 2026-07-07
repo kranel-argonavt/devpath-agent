@@ -90,6 +90,3 @@ DevPath Agent is designed around cautious handling of candidate data. The curren
 - No LinkedIn scraping.
 - No private repository access.
 - No production secret storage.
-- No automatic LLM calls.
-- No deployed ADK runtime dependency.
-- No required MCP runtime transport for successful demo execution.
